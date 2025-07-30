@@ -1,10 +1,10 @@
 const mysql = require('mysql2');
 const util = require('util');
-require('dotenv').config();
+require('dotenv').config(); // Dôležité!
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
-  port: process.env.DB_PORT,    // toto pridaj
+  port: Number(process.env.DB_PORT), // Konverzia na číslo
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
@@ -15,9 +15,9 @@ const pool = mysql.createPool({
 
 pool.getConnection((err, connection) => {
   if (err) {
-    console.error('Chyba pripojenia:', err);
+    console.error('❌ Chyba pripojenia k databáze:', err);
   } else {
-    console.log('Pripojený k databáze');
+    console.log('✅ Pripojený k databáze');
     connection.release();
   }
 });
