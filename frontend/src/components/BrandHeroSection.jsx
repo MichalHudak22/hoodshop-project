@@ -47,12 +47,15 @@ const BrandHeroSection = () => {
          <SwiperSlide key={brand.id}>
   <div
     className="w-full h-full bg-cover bg-center relative flex items-end justify-start xl:items-center xl:pl-12"
-    style={{ backgroundImage: `url(${import.meta.env.VITE_API_BASE_URL}${brand.background_image})` }}
-  >
+ style={{
+  backgroundImage: `url(${new URL(brand.background_image, import.meta.env.VITE_API_BASE_URL)})`
+}}
+
+>
     {/* Logo značky v pravom hornom rohu */}
-    <img
-      src={`${import.meta.env.VITE_API_BASE_URL}${brand.brand_image}`}
-      alt={`${brand.name} logo`}
+   <img
+  src={new URL(brand.brand_image, import.meta.env.VITE_API_BASE_URL).toString()}
+  alt={`${brand.name} logo`}
       className="absolute top-6 right-6 w-24 xl:w-32 h-auto z-20 bg-white p-2 rounded-lg shadow-md"
     />
 
