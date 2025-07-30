@@ -1,3 +1,8 @@
+# Ignoruj node_modules všade
 node_modules/
-/backend/.env
-/frontend/node_modules/
+
+# Ignoruj .env v backende
+backend/.env
+
+# Ignoruj .env vo fronte, ak existuje
+frontend/.env
