@@ -58,10 +58,6 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/order-history', orderHistoryRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server beží na porte ${PORT}`);
-});
-
 
 app.get('/test-db', async (req, res) => {
   try {
