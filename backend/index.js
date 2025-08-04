@@ -4,6 +4,8 @@ require('dotenv').config();
 const path = require('path');
 const fs = require('fs');  // import fs
 
+const pool = require('./database');  // TU naimportuj pool
+
 const userRoutes = require('./routes/userRoutes');     
 const productRoutes = require('./routes/productRoutes');
 const cartRoutes = require('./routes/cartRoutes');
@@ -64,10 +66,14 @@ app.listen(PORT, () => {
 app.get('/test-db', async (req, res) => {
   try {
     const result = await pool.query('SELECT 1 + 1 AS solution');
-    res.json({ dbWorks: true, result });
+    res.json({ dbWorks: true, result: result[0] });
   } catch (error) {
     console.error('❌ DB test error:', error);
     res.status(500).json({ dbWorks: false, error: error.message });
   }
+});
+
+app.listen(PORT, () => {
+  console.log(`Server beží na porte ${PORT}`);
 });
 
