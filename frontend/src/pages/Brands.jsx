@@ -24,15 +24,19 @@ function Brands() {
       {/* Lišta s logami značiek */}
       <div className="bg-white py-2 px-4 shadow-inner">
         <div className="flex flex-wrap justify-center gap-2 sm:gap-4 xl:gap-8">
-          {brands.map((brand) => (
-            <a key={brand.id} href={`/brands/${brand.name.toLowerCase()}`}>
-              <img
-                src={`${import.meta.env.VITE_API_BASE_URL}${brand.brand_image}`}
-                alt={brand.name}
-                className="h-6 sm:h-10 w-[64px] object-contain transition-transform duration-300 hover:scale-110"
-              />
-            </a>
-          ))}
+       {brands.map((brand) => {
+  const imgUrl = `${import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '')}/${brand.brand_image.replace(/^\//, '')}`;
+  console.log('Brand image URL:', imgUrl);
+  return (
+    <a key={brand.id} href={`/brands/${brand.name.toLowerCase()}`}>
+      <img
+        src={imgUrl}
+        alt={brand.name}
+        className="h-6 sm:h-10 w-[64px] object-contain transition-transform duration-300 hover:scale-110"
+      />
+    </a>
+  );
+})}
         </div>
       </div>
 
