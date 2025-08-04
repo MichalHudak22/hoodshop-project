@@ -8,11 +8,15 @@ function Brands() {
   const [brands, setBrands] = useState([]);
 
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_API_BASE_URL}/api/brands`)
-      .then(response => setBrands(response.data))
-      .catch(err => console.error('Error loading brands:', err));
-  }, []);
+  axios
+    .get(`${import.meta.env.VITE_API_BASE_URL}/api/brands`)
+    .then(response => {
+      console.log('API response data:', response.data);
+      setBrands(response.data);
+    })
+    .catch(err => console.error('Error loading brands:', err));
+}, []);
+
 
   return (
     <section className="bg-gray-900">
