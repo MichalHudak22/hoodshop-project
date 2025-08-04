@@ -3,16 +3,16 @@ const util = require('util');
 require('dotenv').config();
 
 const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  port: Number(process.env.DB_PORT),
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  host: process.env.DB_HOST,          // mainline.proxy.rlwy.net
+  port: Number(process.env.DB_PORT),  // 20728
+  user: process.env.DB_USER,          // root
+  password: process.env.DB_PASSWORD,  // heslo
+  database: process.env.DB_NAME,      // railway
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
   ssl: {
-    rejectUnauthorized: false  // ← skúšaj s týmto
+    rejectUnauthorized: false
   }
 });
 
