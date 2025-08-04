@@ -151,7 +151,7 @@ ${brand.background_image || "/img/bg-default.jpg"}`}
         onAddToCart={handleAddToCart}
       />
 
-       {/* ✅ MESSAGE NA STRED OBRAZOVKY */}
+      {/* ✅ MESSAGE NA STRED OBRAZOVKY */}
       {message && (
         <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
           {message}
