@@ -11,8 +11,7 @@ function Home() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    fetch('${import.meta.env.VITE_API_BASE_URL}
-/products/carousel-top')
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/products/carousel-top`)
       .then((res) => res.json())
       .then((data) => setCarouselSlides(data))
       .catch((e) => console.error('Chyba pri načítaní carousel produktov:', e));
@@ -23,8 +22,7 @@ function Home() {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('${import.meta.env.VITE_API_BASE_URL}
-/api/cart', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -93,12 +91,12 @@ function Home() {
           <HomeBrands />
         </div>
 
-         {/* ✅ MESSAGE NA STRED OBRAZOVKY */}
-      {message && (
-        <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
-          {message}
-        </div>
-      )}
+        {/* ✅ MESSAGE NA STRED OBRAZOVKY */}
+        {message && (
+          <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
+            {message}
+          </div>
+        )}
       </div>
     </div>
   );
