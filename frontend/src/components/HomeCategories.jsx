@@ -66,9 +66,9 @@ export default function SportsSection() {
               <ul className="mb-6 space-y-1">
                 {categories.map(({ name: catName, link: catLink }) => (
                   <li key={catName} className="text-lg">
-                    <a href={catLink} className="hover:text-blue-300 transition">
-                      {catName}
-                    </a>
+                    <Link to={link} className="px-6 py-2 bg-blue-700 hover:bg-blue-600 rounded-xl font-semibold transition">
+                      View Equipment
+                    </Link>
                   </li>
                 ))}
               </ul>
