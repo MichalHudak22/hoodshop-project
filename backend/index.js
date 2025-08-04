@@ -59,3 +59,15 @@ app.use('/api/order-history', orderHistoryRoutes);
 app.listen(PORT, () => {
   console.log(`Server beží na porte ${PORT}`);
 });
+
+
+app.get('/test-db', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT 1 + 1 AS solution');
+    res.json({ dbWorks: true, result });
+  } catch (error) {
+    console.error('❌ DB test error:', error);
+    res.status(500).json({ dbWorks: false, error: error.message });
+  }
+});
+
