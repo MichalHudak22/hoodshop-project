@@ -12,7 +12,8 @@ const HockeyHelmets = () => {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    axios.get('http://localhost:3001/products/hockey/helmets')
+    axios.get('${import.meta.env.VITE_API_BASE_URL}
+/products/hockey/helmets')
       .then(response => setHelmets(response.data))
       .catch(error => console.error('Chyba pri načítavaní hokejových prilieb:', error));
   }, []);
@@ -22,7 +23,8 @@ const HockeyHelmets = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('http://localhost:3001/api/cart', {
+      const response = await fetch('${import.meta.env.VITE_API_BASE_URL}
+/api/cart', {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",

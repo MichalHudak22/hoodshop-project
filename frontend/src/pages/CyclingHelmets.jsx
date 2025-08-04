@@ -12,7 +12,8 @@ const CyclingHelmets = () => {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    axios.get('http://localhost:3001/products/cycling/helmets')
+    axios.get('${import.meta.env.VITE_API_BASE_URL}
+/products/cycling/helmets')
       .then(response => {
         setHelmets(response.data);
       })
@@ -26,7 +27,8 @@ const CyclingHelmets = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('http://localhost:3001/api/cart', {
+      const response = await fetch('${import.meta.env.VITE_API_BASE_URL}
+/api/cart', {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",

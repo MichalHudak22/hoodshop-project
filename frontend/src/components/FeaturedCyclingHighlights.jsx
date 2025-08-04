@@ -14,7 +14,8 @@ const FeaturedCyclingHighlights = () => {
 useEffect(() => {
   setErrorMessage(''); // vymažeme chybu pred novým fetchom
 
-  axios.get('http://localhost:3001/products/cycling/bike')
+  axios.get('${import.meta.env.VITE_API_BASE_URL}
+/products/cycling/bike')
     .then(response => {
       const highlighted = response.data.filter(p => p.highlight_title && p.description);
       setFeaturedBikes(highlighted.slice(0, 2));
@@ -23,7 +24,8 @@ useEffect(() => {
       setErrorMessage('Nepodarilo sa načítať cycling bikes.');
     });
 
-  axios.get('http://localhost:3001/products/cycling/clothes')
+  axios.get('${import.meta.env.VITE_API_BASE_URL}
+/products/cycling/clothes')
     .then(response => {
       const highlighted = response.data.filter(p => p.highlight_title && p.description);
       setFeaturedClothes(highlighted.slice(0, 2));
@@ -32,7 +34,8 @@ useEffect(() => {
       setErrorMessage('Nepodarilo sa načítať cycling clothes.');
     });
 
-  axios.get('http://localhost:3001/products/cycling/helmets')
+  axios.get('${import.meta.env.VITE_API_BASE_URL}
+/products/cycling/helmets')
     .then(response => {
       const highlighted = response.data.filter(p => p.highlight_title && p.description);
       setFeaturedHelmets(highlighted.slice(0, 2));
@@ -97,7 +100,8 @@ useEffect(() => {
           </h3>
           <div className="relative h-64 overflow-hidden shadow-lg group">
             <img
-              src={product ? `http://localhost:3001${product.image}` : defaultBg}
+              src={product ? `${import.meta.env.VITE_API_BASE_URL}
+${product.image}` : defaultBg}
               alt={product?.highlight_title || `${name} default`}
               className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-110"
             />

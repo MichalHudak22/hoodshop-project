@@ -12,7 +12,8 @@ const CyclingBike = () => {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    axios.get('http://localhost:3001/products/cycling/bike')
+    axios.get('${import.meta.env.VITE_API_BASE_URL}
+/products/cycling/bike')
       .then(response => {
         setBikes(response.data);
       })
@@ -26,7 +27,8 @@ const CyclingBike = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('http://localhost:3001/api/cart', {
+      const response = await fetch('${import.meta.env.VITE_API_BASE_URL}
+/api/cart', {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",

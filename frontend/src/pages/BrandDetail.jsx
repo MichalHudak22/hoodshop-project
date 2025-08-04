@@ -15,7 +15,8 @@ const BrandDetail = () => {
   useEffect(() => {
     const fetchAllBrands = async () => {
       try {
-        const res = await fetch(`http://localhost:3001/api/brands`);
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}
+/api/brands`);
         const data = await res.json();
         setBrands(data);
       } catch (error) {
@@ -28,11 +29,13 @@ const BrandDetail = () => {
   useEffect(() => {
     const fetchBrand = async () => {
       try {
-        const res = await fetch(`http://localhost:3001/api/brands/${slug}`);
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}
+/api/brands/${slug}`);
         const data = await res.json();
         setBrand(data);
 
-        const productRes = await fetch(`http://localhost:3001/products/brand/${data.name}`);
+        const productRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}
+/products/brand/${data.name}`);
         const productData = await productRes.json();
         setProducts(productData);
       } catch (error) {
@@ -47,7 +50,8 @@ const BrandDetail = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('http://localhost:3001/api/cart', {
+      const response = await fetch('${import.meta.env.VITE_API_BASE_URL}
+/api/cart', {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -88,7 +92,8 @@ const BrandDetail = () => {
       <section
         className="relative py-16 px-6 bg-black overflow-hidden"
         style={{
-          backgroundImage: `url(http://localhost:3001${brand.background_image || "/img/bg-default.jpg"})`,
+          backgroundImage: `url(${import.meta.env.VITE_API_BASE_URL}
+${brand.background_image || "/img/bg-default.jpg"})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
@@ -100,7 +105,8 @@ const BrandDetail = () => {
 
         <div className="relative z-10 max-w-4xl mx-auto text-white text-center mb-16">
           <img
-            src={`http://localhost:3001${brand.brand_image}`}
+            src={`${import.meta.env.VITE_API_BASE_URL}
+${brand.brand_image}`}
             alt={brand.name}
             className="mx-auto h-40 object-contain mb-6 rounded-xl"
           />
@@ -140,7 +146,8 @@ const BrandDetail = () => {
       <ProductSection
         title={`Explore ${brand.name} Products`}
         products={products}
-        backgroundImage={`http://localhost:3001${brand.background_image || "/img/bg-default.jpg"}`}
+        backgroundImage={`${import.meta.env.VITE_API_BASE_URL}
+${brand.background_image || "/img/bg-default.jpg"}`}
 
         onAddToCart={handleAddToCart}
       />

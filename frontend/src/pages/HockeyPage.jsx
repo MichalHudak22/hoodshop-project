@@ -49,7 +49,8 @@ const HockeyPage = () => {
   const sectionKey = 'hockey-home-header';
 
   useEffect(() => {
-    axios.get('http://localhost:3001/products/hockey/carousel')
+    axios.get('${import.meta.env.VITE_API_BASE_URL}
+/products/hockey/carousel')
       .then(response => {
         setCarouselProducts(response.data);
       })
@@ -60,7 +61,8 @@ const HockeyPage = () => {
 
   useEffect(() => {
     // Načítanie textov pre header podľa sectionKey
-    axios.get(`http://localhost:3001/api/config/section/${sectionKey}`)
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}
+/api/config/section/${sectionKey}`)
       .then(response => {
         const data = response.data || {};
         setTitle(data.title || '');
@@ -76,7 +78,8 @@ const HockeyPage = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('http://localhost:3001/api/cart', {
+      const response = await fetch('${import.meta.env.VITE_API_BASE_URL}
+/api/cart', {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",

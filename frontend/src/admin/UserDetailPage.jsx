@@ -15,7 +15,8 @@ function UserDetailPage() {
   // 1) Načítanie cien dopravy z DB
   useEffect(() => {
     axios
-      .get('http://localhost:3001/api/config/shipping-prices')
+      .get('${import.meta.env.VITE_API_BASE_URL}
+/api/config/shipping-prices')
       .then(res => {
         const opts = (res.data || []).map(o => ({
           name: o.name,
@@ -32,7 +33,8 @@ function UserDetailPage() {
       setError('Missing token – you are not logged in');
       return;
     }
-    fetch(`http://localhost:3001/user/admin/user/${id}`, {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}
+/user/admin/user/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => {
@@ -46,7 +48,8 @@ function UserDetailPage() {
   // 3) Načítanie histórie objednávok
   useEffect(() => {
     if (!token) return;
-    fetch(`http://localhost:3001/api/order-history/history/${id}`, {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}
+/api/order-history/history/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => {

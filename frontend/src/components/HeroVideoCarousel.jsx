@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 
 const videoSources = [
-  'http://localhost:3001/video/football.mp4',
-  'http://localhost:3001/video/hockey.mp4',
-  'http://localhost:3001/video/cycling.mp4',
+  '${import.meta.env.VITE_API_BASE_URL}
+/video/football.mp4',
+  '${import.meta.env.VITE_API_BASE_URL}
+/video/hockey.mp4',
+  '${import.meta.env.VITE_API_BASE_URL}
+/video/cycling.mp4',
 ];
 
 export default function HeroVideoCarousel() {

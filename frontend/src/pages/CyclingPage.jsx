@@ -49,13 +49,15 @@ const CyclingPage = () => {
   const sectionKey = 'cycling-home-header';
 
   useEffect(() => {
-    axios.get('http://localhost:3001/products/cycling/carousel')
+    axios.get('${import.meta.env.VITE_API_BASE_URL}
+/products/cycling/carousel')
       .then(response => setCarouselProducts(response.data))
       .catch(error => console.error('Chyba pri načítavaní carousel produktov:', error));
   }, []);
 
   useEffect(() => {
-    axios.get(`http://localhost:3001/api/config/section/${sectionKey}`)
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}
+/api/config/section/${sectionKey}`)
       .then(response => {
         const data = response.data || {};
         setTitle(data.title || '');
@@ -71,7 +73,8 @@ const CyclingPage = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('http://localhost:3001/api/cart', {
+      const response = await fetch('${import.meta.env.VITE_API_BASE_URL}
+/api/cart', {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",

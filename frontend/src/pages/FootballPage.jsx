@@ -15,7 +15,8 @@ const FootballPage = () => {
 
   useEffect(() => {
     // Načítanie carousel produktov
-    axios.get('http://localhost:3001/products/football/carousel')
+    axios.get('${import.meta.env.VITE_API_BASE_URL}
+/products/football/carousel')
       .then(response => {
         setCarouselProducts(response.data);
       })
@@ -24,7 +25,8 @@ const FootballPage = () => {
       });
 
     // Načítanie titulku a paragrafu z backendu
-    axios.get('http://localhost:3001/api/config/section/football-home-header')
+    axios.get('${import.meta.env.VITE_API_BASE_URL}
+/api/config/section/football-home-header')
       .then(response => {
         setTitleFromDB(response.data.title || '');
         setParagraphFromDB(response.data.paragraph || '');
@@ -39,7 +41,8 @@ const FootballPage = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('http://localhost:3001/api/cart', {
+      const response = await fetch('${import.meta.env.VITE_API_BASE_URL}
+/api/cart', {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",

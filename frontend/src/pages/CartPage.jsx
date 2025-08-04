@@ -37,7 +37,8 @@ const CartPage = () => {
         } else {
           headers['x-session-id'] = sessionId;
         }
-        const response = await axios.get('http://localhost:3001/api/cart', { headers });
+        const response = await axios.get('${import.meta.env.VITE_API_BASE_URL}
+/api/cart', { headers });
         setCartItems(response.data);
         calculateTotal(response.data);
         refreshCartCount();
@@ -64,7 +65,8 @@ const CartPage = () => {
       } else {
         headers['x-session-id'] = sessionId;
       }
-      await axios.delete(`http://localhost:3001/api/cart/${itemId}`, { headers });
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}
+/api/cart/${itemId}`, { headers });
       const updated = cartItems.filter(item => item.id !== itemId);
       setCartItems(updated);
       calculateTotal(updated);
@@ -85,7 +87,8 @@ const CartPage = () => {
         headers['x-session-id'] = sessionId;
       }
       await axios.patch(
-        `http://localhost:3001/api/cart/${itemId}`,
+        `${import.meta.env.VITE_API_BASE_URL}
+/api/cart/${itemId}`,
         { quantity: newQuantity },
         { headers }
       );

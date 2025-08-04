@@ -36,7 +36,8 @@ const ProductSection = ({ title, products, backgroundImage, onAddToCart }) => {
                 className="block"
               >
                 <img
-                  src={`http://localhost:3001${product.image}`}
+                  src={`${import.meta.env.VITE_API_BASE_URL}
+${product.image}`}
                   alt={product.name}
                   className="w-full h-64 object-contain p-4 bg-gray-50"
                 />

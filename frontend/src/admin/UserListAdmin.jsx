@@ -16,7 +16,8 @@ export default function UserListWithDelete() {
       setError('Nie ste prihlásený');
       return;
     }
-    fetch('http://localhost:3001/user', {
+    fetch('${import.meta.env.VITE_API_BASE_URL}
+/user', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -50,7 +51,8 @@ export default function UserListWithDelete() {
     }
     setLoading(true);
     setError(null);
-    fetch(`http://localhost:3001/user/admin/user/${selectedUserId}`, {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}
+/user/admin/user/${selectedUserId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -91,7 +93,8 @@ export default function UserListWithDelete() {
     }
     setLoading(true);
     setError(null);
-    fetch(`http://localhost:3001/user/admin/user/${userId}/role`, {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}
+/user/admin/user/${userId}/role`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

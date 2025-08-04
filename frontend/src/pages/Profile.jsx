@@ -29,7 +29,8 @@ function Profile() {
   const handleAccountDeletion = () => {
     const token = localStorage.getItem('token');
 
-    fetch('http://localhost:3001/user/profile', {
+    fetch('${import.meta.env.VITE_API_BASE_URL}
+/user/profile', {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -64,7 +65,8 @@ function Profile() {
     const formData = new FormData();
     formData.append('photo', selectedFile);
 
-    fetch('http://localhost:3001/user/upload/photo', {
+    fetch('${import.meta.env.VITE_API_BASE_URL}
+/user/upload/photo', {
       method: 'POST',
       headers: {
         Authorization: 'Bearer ' + token,
@@ -96,7 +98,8 @@ function Profile() {
   // Default Phodo funkcia pre nastavenie defaultnej fotky pre avatara 
   const setDefaultPhoto = async () => {
     try {
-      const response = await fetch('http://localhost:3001/user/upload/default-photo', {
+      const response = await fetch('${import.meta.env.VITE_API_BASE_URL}
+/user/upload/default-photo', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -129,7 +132,8 @@ function Profile() {
       return;
     }
 
-    fetch('http://localhost:3001/user/profile', {
+    fetch('${import.meta.env.VITE_API_BASE_URL}
+/user/profile', {
       method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -167,7 +171,8 @@ function Profile() {
       return acc;
     }, {});
 
-    fetch('http://localhost:3001/user/profile', {
+    fetch('${import.meta.env.VITE_API_BASE_URL}
+/user/profile', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -254,7 +259,8 @@ function Profile() {
               {/* Miesto na zobrazenie fotky */}
               <div className="w-56 h-56 rounded-full overflow-hidden border-2 border-gray-400">
                 <img
-                  src={user.user_photo ? `http://localhost:3001${user.user_photo}` : "/img/default-avatar.jpg"}
+                  src={user.user_photo ? `${import.meta.env.VITE_API_BASE_URL}
+${user.user_photo}` : "/img/default-avatar.jpg"}
                   alt="Profilová fotka"
                   className="w-full h-full object-cover"
                 />

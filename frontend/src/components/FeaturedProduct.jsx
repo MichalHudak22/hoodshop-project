@@ -27,7 +27,8 @@ const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
           {/* OBÁLENIE obrázku do Link komponentu */}
           <Link to={`/product/${productSlug}`}>
             <img
-              src={`http://localhost:3001${product.image}`}
+              src={`${import.meta.env.VITE_API_BASE_URL}
+${product.image}`}
               alt={product.name}
               className="max-w-sm rounded-lg shadow-xl object-contain hover:brightness-110"
             />

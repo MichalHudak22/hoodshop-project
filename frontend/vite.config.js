@@ -9,8 +9,10 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/products': 'http://localhost:3001',
-      '/api': 'http://localhost:3001',    // <-- pridaj toto
+      '/products': '${import.meta.env.VITE_API_BASE_URL}
+',
+      '/api': '${import.meta.env.VITE_API_BASE_URL}
+',    // <-- pridaj toto
     },
   },
 });

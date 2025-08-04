@@ -17,7 +17,8 @@ function OrderHistory() {
     }
 
     // Načítať údaje o používateľovi
-    fetch('http://localhost:3001/user/profile', {
+    fetch('${import.meta.env.VITE_API_BASE_URL}
+/user/profile', {
       method: 'GET',
       headers: { 'Authorization': `Bearer ${token}` },
     })
@@ -29,7 +30,8 @@ function OrderHistory() {
           setUser(data);
 
           // Načítať objednávky
-        fetch('http://localhost:3001/api/order-history/history', {
+        fetch('${import.meta.env.VITE_API_BASE_URL}
+/api/order-history/history', {
   method: 'GET',
   headers: { 'Authorization': `Bearer ${token}` },
 })

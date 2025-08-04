@@ -14,7 +14,8 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       try {
-        const res = await fetch('http://localhost:3001/user/profile', {
+        const res = await fetch('${import.meta.env.VITE_API_BASE_URL}
+/user/profile', {
           headers: { 'Authorization': 'Bearer ' + storedToken },
         });
         if (!res.ok) throw new Error('Unauthorized');

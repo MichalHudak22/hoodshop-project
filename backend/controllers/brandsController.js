@@ -1,6 +1,7 @@
 const db = require('../database');
 
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3001'; // render url alebo fallback na local
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3001';
+
 
 // Pomocná funkcia na pridanie base URL k obrázkom
 const formatBrandPaths = (brand) => ({

@@ -12,7 +12,8 @@ const FootballBalls = () => {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    axios.get('http://localhost:3001/products/football/ball')
+    axios.get('${import.meta.env.VITE_API_BASE_URL}
+/products/football/ball')
       .then(response => setBalls(response.data))
       .catch(error => console.error('Chyba pri načítavaní football lôpt:', error));
   }, []);
@@ -22,7 +23,8 @@ const FootballBalls = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('http://localhost:3001/api/cart', {
+      const response = await fetch('${import.meta.env.VITE_API_BASE_URL}
+/api/cart', {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -59,7 +61,8 @@ const FootballBalls = () => {
     name: product.name,
     brand: product.brand,
     price: product.price,
-    image: `http://localhost:3001${product.image}`, // absolútna URL
+    image: `${import.meta.env.VITE_API_BASE_URL}
+${product.image}`, // absolútna URL
   }));
 
   const highlightedBalls = balls.filter(ball => ball.highlight_title && ball.description);
