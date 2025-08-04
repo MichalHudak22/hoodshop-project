@@ -1,6 +1,6 @@
 const mysql = require('mysql2');
 const util = require('util');
-require('dotenv').config(); // Dôležité!
+require('dotenv').config();
 
 const pool = mysql.createPool({
   host: process.env.DB_HOST,
@@ -12,7 +12,7 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0,
   ssl: {
-    rejectUnauthorized: true
+    rejectUnauthorized: false  // ← skúšaj s týmto
   }
 });
 
@@ -25,7 +25,6 @@ pool.getConnection((err, connection) => {
   }
 });
 
-// Promisify query
 pool.query = util.promisify(pool.query);
 
 module.exports = pool;
