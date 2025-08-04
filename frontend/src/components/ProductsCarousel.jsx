@@ -47,14 +47,18 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
         }}
         className="w-full h-[420px] relative z-20"
       >
-        {slides.map((slide, index) => {
-          const productSlug = slide.name.toLowerCase().replace(/\s+/g, '-');
-          const isLoading = loadingIds.includes(slide.id);
+      {slides.map((slide, index) => {
+  const productSlug = slide.name.toLowerCase().replace(/\s+/g, '-');
+  const isLoading = loadingIds.includes(slide.id);
 
-          // Priprav správnu URL obrázka
-          const imageUrl = slide.image.startsWith('http')
-            ? slide.image
-            : `${baseURL}${slide.image}`;
+  // ✅ Oprava URL obrázka
+  let imageUrl = slide.image;
+  if (imageUrl.startsWith('https//')) {
+    imageUrl = imageUrl.replace('https//', 'https://');
+  }
+  if (!imageUrl.startsWith('http')) {
+    imageUrl = `${baseURL}${imageUrl}`;
+  }
 
           return (
             <SwiperSlide key={index}>
