@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');  // import fs
 
 const pool = require('./database');  // TU naimportuj pool
+console.log('pool object:', pool);
 
 const userRoutes = require('./routes/userRoutes');     
 const productRoutes = require('./routes/productRoutes');
@@ -61,13 +62,14 @@ app.use('/api/order-history', orderHistoryRoutes);
 
 app.get('/test-db', async (req, res) => {
   try {
-    const result = await pool.query('SELECT 1 + 1 AS solution');
-    res.json({ dbWorks: true, result: result[0] });
+    const [rows] = await pool.query('SELECT 1 + 1 AS solution');
+    res.json({ dbWorks: true, result: rows[0] });
   } catch (error) {
     console.error('❌ DB test error:', error);
     res.status(500).json({ dbWorks: false, error: error.message });
   }
 });
+
 
 app.listen(PORT, () => {
   console.log(`Server beží na porte ${PORT}`);
