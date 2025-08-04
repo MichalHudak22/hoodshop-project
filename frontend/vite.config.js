@@ -6,6 +6,7 @@ export default ({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   return defineConfig({
+    base: './', // 💥 TOTO PRIDAJ – dôležité pre správne načítanie súborov z dist
     plugins: [react()],
     css: {
       postcss: './postcss.config.js',

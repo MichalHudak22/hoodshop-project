@@ -37,6 +37,7 @@ app.use('/user/upload', uploadRoutes);  // => /user/upload/photo
 // Sprístupnenie vsetkych znaciek
 app.use('/api/brands', brandsRoutes);
 
+
 // Debug: vypíšeme absolútnu cestu a súbory vo video priečinku
 const videoPath = path.join(__dirname, 'src/video');
 
@@ -69,6 +70,14 @@ app.get('/test-db', async (req, res) => {
     console.error('❌ DB test error:', error);
     res.status(500).json({ dbWorks: false, error: error.message });
   }
+});
+
+// ====== Serve React Frontend (client/dist) ======
+const clientBuildPath = path.join(__dirname, '..', 'frontend', 'dist');
+app.use(express.static(clientBuildPath));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(clientBuildPath, 'index.html'));
 });
 
 
