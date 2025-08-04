@@ -3,6 +3,7 @@ import { useEffect, useState, useContext } from "react";
 import ProductsCarousel from "../components/ProductsCarousel";
 import ProductSection from "../components/ProductSection"; // Dôležité
 import { CartContext } from "../context/CartContext";
+import { Link } from "react-router-dom";
 
 const BrandDetail = () => {
   const { slug } = useParams();
@@ -137,13 +138,17 @@ const BrandDetail = () => {
         <h1 className="text-4xl font-semibold text-center py-5">Our Brand Collection</h1>
         <div className="flex flex-wrap justify-center gap-2 sm:gap-4 xl:gap-8">
           {brands.map((brand) => (
-            <a key={brand.id} href={`/brands/${brand.name.toLowerCase()}`}>
+            <Link
+              key={brand.id}
+              to={`/brands/${brand.name.toLowerCase()}`}
+            >
               <img
                 src={buildImageUrl(brand.brand_image)}
                 alt={brand.name}
                 className="sm:h-10 w-[94px] lg:h-full object-contain transition-transform duration-300 hover:scale-110"
               />
-            </a>
+            </Link>
+
           ))}
         </div>
       </div>
