@@ -11,12 +11,10 @@ const FootballPage = () => {
   const [paragraphFromDB, setParagraphFromDB] = useState('');
   const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
-  
 
   useEffect(() => {
     // Načítanie carousel produktov
-    axios.get('${import.meta.env.VITE_API_BASE_URL}
-/products/football/carousel')
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/football/carousel`)
       .then(response => {
         setCarouselProducts(response.data);
       })
@@ -25,8 +23,7 @@ const FootballPage = () => {
       });
 
     // Načítanie titulku a paragrafu z backendu
-    axios.get('${import.meta.env.VITE_API_BASE_URL}
-/api/config/section/football-home-header')
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/config/section/football-home-header`)
       .then(response => {
         setTitleFromDB(response.data.title || '');
         setParagraphFromDB(response.data.paragraph || '');
@@ -41,13 +38,12 @@ const FootballPage = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('${import.meta.env.VITE_API_BASE_URL}
-/api/cart', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-          ...(!token && sessionId && { "x-session-id": sessionId }),
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(!token && sessionId ? { "x-session-id": sessionId } : {}),
         },
         body: JSON.stringify({
           productId: jersey.id,
@@ -56,6 +52,7 @@ const FootballPage = () => {
       });
 
       const data = await response.json();
+
       if (response.ok) {
         setMessage("Product added to cart!");
         refreshCartCount();
@@ -63,7 +60,7 @@ const FootballPage = () => {
         // automaticky zmizne po 3 sekundách
         setTimeout(() => setMessage(''), 3000);
       } else {
-        setMessage("Failed to add to cart: " + data.message);
+        setMessage("Failed to add to cart: " + (data.message || 'Unknown error'));
         setTimeout(() => setMessage(''), 3000);
       }
     } catch (error) {

@@ -13,8 +13,7 @@ useEffect(() => {
   setErrorMessage(''); // Vyčistí chybu pred načítaním
 
   // Lopty
-  axios.get('${import.meta.env.VITE_API_BASE_URL}
-/products/football/ball')
+  axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/football/ball`)
     .then(response => {
       const highlightedBalls = response.data.filter(ball => ball.highlight_title && ball.description);
       setFeaturedBalls(highlightedBalls.slice(0, 2));
@@ -24,8 +23,7 @@ useEffect(() => {
     });
 
   // Dresy
-  axios.get('${import.meta.env.VITE_API_BASE_URL}
-/products/football/jersey')
+  axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/football/jersey`)
     .then(response => {
       const highlightedJerseys = response.data.filter(jersey => jersey.highlight_title && jersey.description);
       setFeaturedJerseys(highlightedJerseys.slice(0, 2));
@@ -35,8 +33,7 @@ useEffect(() => {
     });
 
   // Kopačky
-  axios.get('${import.meta.env.VITE_API_BASE_URL}
-/products/football/cleats')
+  axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/football/cleats`)
     .then(response => {
       const highlightedCleats = response.data.filter(cleat => cleat.highlight_title && cleat.description);
       setFeaturedCleats(highlightedCleats.slice(0, 2));

@@ -12,11 +12,8 @@ const HockeyJerseys = () => {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    axios.get('${import.meta.env.VITE_API_BASE_URL}
-/products/hockey/jersey')
-      .then(response => {
-        setJerseys(response.data);
-      })
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/hockey/jersey`)
+      .then(response => setJerseys(response.data))
       .catch(error => {
         console.error('Chyba pri načítavaní hokejových dresov:', error);
       });
@@ -27,8 +24,7 @@ const HockeyJerseys = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('${import.meta.env.VITE_API_BASE_URL}
-/api/cart', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -45,8 +41,6 @@ const HockeyJerseys = () => {
       if (response.ok) {
         setMessage("Product added to cart!");
         refreshCartCount();
-
-        // automaticky zmizne po 3 sekundách
         setTimeout(() => setMessage(''), 3000);
       } else {
         setMessage("Failed to add to cart: " + data.message);

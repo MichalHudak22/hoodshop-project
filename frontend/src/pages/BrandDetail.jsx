@@ -15,8 +15,7 @@ const BrandDetail = () => {
   useEffect(() => {
     const fetchAllBrands = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}
-/api/brands`);
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/brands`);
         const data = await res.json();
         setBrands(data);
       } catch (error) {
@@ -29,15 +28,17 @@ const BrandDetail = () => {
   useEffect(() => {
     const fetchBrand = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}
-/api/brands/${slug}`);
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/brands/${slug}`);
         const data = await res.json();
         setBrand(data);
 
-        const productRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}
-/products/brand/${data.name}`);
-        const productData = await productRes.json();
-        setProducts(productData);
+        if (data && data.name) {
+          const productRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/products/brand/${data.name}`);
+          const productData = await productRes.json();
+          setProducts(productData);
+        } else {
+          setProducts([]);
+        }
       } catch (error) {
         console.error("Chyba pri načítaní:", error);
       }
@@ -45,13 +46,12 @@ const BrandDetail = () => {
     fetchBrand();
   }, [slug]);
 
-  const handleAddToCart = async (jersey) => {
+  const handleAddToCart = async (product) => {
     const sessionId = localStorage.getItem("sessionId");
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('${import.meta.env.VITE_API_BASE_URL}
-/api/cart', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -59,7 +59,7 @@ const BrandDetail = () => {
           ...(!token && sessionId && { "x-session-id": sessionId }),
         },
         body: JSON.stringify({
-          productId: jersey.id,
+          productId: product.id,
           quantity: 1,
         }),
       });
@@ -69,7 +69,6 @@ const BrandDetail = () => {
         setMessage("Product added to cart!");
         refreshCartCount();
 
-        // automaticky zmizne po 3 sekundách
         setTimeout(() => setMessage(''), 3000);
       } else {
         setMessage("Failed to add to cart: " + data.message);

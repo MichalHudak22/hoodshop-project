@@ -11,20 +11,18 @@ const HockeySkates = () => {
   const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    axios.get('${import.meta.env.VITE_API_BASE_URL}
-/products/hockey/skates')
+ useEffect(() => {
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/hockey/skates`)
       .then(response => setSkates(response.data))
       .catch(error => console.error('Chyba pri načítavaní hokejových korčúľ:', error));
   }, []);
 
-  const handleAddToCart = async (jersey) => {
+  const handleAddToCart = async (skate) => {
     const sessionId = localStorage.getItem("sessionId");
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('${import.meta.env.VITE_API_BASE_URL}
-/api/cart', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -32,7 +30,7 @@ const HockeySkates = () => {
           ...(!token && sessionId && { "x-session-id": sessionId }),
         },
         body: JSON.stringify({
-          productId: jersey.id,
+          productId: skate.id,
           quantity: 1,
         }),
       });
@@ -41,8 +39,6 @@ const HockeySkates = () => {
       if (response.ok) {
         setMessage("Product added to cart!");
         refreshCartCount();
-
-        // automaticky zmizne po 3 sekundách
         setTimeout(() => setMessage(''), 3000);
       } else {
         setMessage("Failed to add to cart: " + data.message);

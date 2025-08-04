@@ -24,33 +24,35 @@ const CartPage = () => {
     setSessionId(sId);
   }, []);
 
-  // Fetch košíka pri zmene user/token alebo sessionId
-  useEffect(() => {
-    if (!sessionId) return;
+useEffect(() => {
+  if (!sessionId) return;
 
-    const fetchCart = async () => {
-      setLoading(true);
-      try {
-        const headers = {};
-        if (user && user.token) {
-          headers.Authorization = `Bearer ${user.token}`;
-        } else {
-          headers['x-session-id'] = sessionId;
-        }
-        const response = await axios.get('${import.meta.env.VITE_API_BASE_URL}
-/api/cart', { headers });
-        setCartItems(response.data);
-        calculateTotal(response.data);
-        refreshCartCount();
-      } catch (err) {
-        console.error('Failed to load cart:', err);
-      } finally {
-        setLoading(false);
+  const fetchCart = async () => {
+    setLoading(true);
+    try {
+      const headers = {};
+      if (user && user.token) {
+        headers.Authorization = `Bearer ${user.token}`;
+      } else {
+        headers['x-session-id'] = sessionId;
       }
-    };
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/api/cart`,
+        { headers }
+      );
+      setCartItems(response.data);
+      calculateTotal(response.data);
+      refreshCartCount();
+    } catch (err) {
+      console.error('Failed to load cart:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    fetchCart();
-  }, [user, sessionId, refreshCartCount]);
+  fetchCart();
+}, [user, sessionId, refreshCartCount]);
+
 
   const calculateTotal = (items) => {
     const sum = items.reduce((acc, item) => acc + item.price * item.quantity, 0);

@@ -27,26 +27,26 @@ function Profile() {
   };
 
   const handleAccountDeletion = () => {
-    const token = localStorage.getItem('token');
+  const token = localStorage.getItem('token');
 
-    fetch('${import.meta.env.VITE_API_BASE_URL}
-/user/profile', {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success) {
+        logout();
+        navigate('/login');
+      } else {
+        setError(data.error || 'Nepodarilo sa vymazať účet.');
+      }
     })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          logout();
-          navigate('/login');
-        } else {
-          setError(data.error || 'Nepodarilo sa vymazať účet.');
-        }
-      })
-      .catch(() => setError('Chyba pri komunikácii so serverom.'));
-  };
+    .catch(() => setError('Chyba pri komunikácii so serverom.'));
+};
+
 
 
   // Upload Photo
@@ -65,9 +65,8 @@ function Profile() {
     const formData = new FormData();
     formData.append('photo', selectedFile);
 
-    fetch('${import.meta.env.VITE_API_BASE_URL}
-/user/upload/photo', {
-      method: 'POST',
+  fetch(`${import.meta.env.VITE_API_BASE_URL}/user/upload/photo`, {
+    method: 'POST',
       headers: {
         Authorization: 'Bearer ' + token,
         // Content-Type sa NEPRIDÁVA pri FormData, nechaj to takto
@@ -95,67 +94,67 @@ function Profile() {
   };
 
 
-  // Default Phodo funkcia pre nastavenie defaultnej fotky pre avatara 
-  const setDefaultPhoto = async () => {
-    try {
-      const response = await fetch('${import.meta.env.VITE_API_BASE_URL}
-/user/upload/default-photo', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
+ const setDefaultPhoto = async () => {
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/upload/default-photo`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
 
-      const data = await response.json();
-      if (data.success) {
-        setUser(prev => ({ ...prev, user_photo: data.photo }));
-        setSelectedFile(null);
+    const data = await response.json();
+    if (data.success) {
+      setUser(prev => ({ ...prev, user_photo: data.photo }));
+      setSelectedFile(null);
 
-        // 🧼 Resetuj file input, aby bolo možné znova nahrať rovnaký súbor
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
-      } else {
-        console.error('Chyba pri nastavovaní default fotky:', data.message);
+      // 🧼 Resetuj file input, aby bolo možné znova nahrať rovnaký súbor
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
       }
-    } catch (error) {
-      console.error('Server error:', error);
+    } else {
+      console.error('Chyba pri nastavovaní default fotky:', data.message);
     }
-  };
+  } catch (error) {
+    console.error('Server error:', error);
+  }
+};
 
-  // Formular
-  useEffect(() => {
-    const token = localStorage.getItem('token');
+// ...
 
-    if (!token) {
-      navigate('/login');
-      return;
-    }
+useEffect(() => {
+  const token = localStorage.getItem('token');
 
-    fetch('${import.meta.env.VITE_API_BASE_URL}
-/user/profile', {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${token}` },
+  if (!token) {
+    navigate('/login');
+    return;
+  }
+
+  fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.error) {
+        setError(data.error);
+      } else {
+        setUser(data);
+      }
     })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          setError(data.error);
-        } else {
-          setUser(data);
-        }
-      })
-      .catch(() => setError('Chyba pri načítaní údajov o používateľovi'));
-  }, [navigate]);
+    .catch(() => setError('Chyba pri načítaní údajov o používateľovi'));
+}, [navigate]);
 
-  // Handler pre update stavov políčok
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUser((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+// ...
+
+const handleChange = (e) => {
+  const { name, value } = e.target;
+  setUser((prev) => ({
+    ...prev,
+    [name]: value,
+  }));
+};
+
 
   // Handler pre uloženie zmien
   const handleSave = () => {
@@ -171,9 +170,8 @@ function Profile() {
       return acc;
     }, {});
 
-    fetch('${import.meta.env.VITE_API_BASE_URL}
-/user/profile', {
-      method: 'PUT',
+   fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
+  method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,

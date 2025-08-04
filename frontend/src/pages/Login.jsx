@@ -16,8 +16,7 @@ function Login() {
   const handleSubmit = (e) => {
   e.preventDefault();
 
-  fetch('${import.meta.env.VITE_API_BASE_URL}
-/user/login', {
+  fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password }),
@@ -28,7 +27,6 @@ function Login() {
         setError(data.error);
         setMessage('');
       } else if (data.message === 'Email is not verified. Please verify your account before logging in.') {
-        // Speciálna správa pre neoverený email
         setError('Email is not verified. Please verify your account before logging in.');
         setMessage('');
       } else {
@@ -52,6 +50,7 @@ function Login() {
       setMessage('');
     });
 };
+
 
 
   return (

@@ -8,52 +8,49 @@ function OrderHistory() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
+useEffect(() => {
+  const token = localStorage.getItem('token');
 
-    if (!token) {
-      navigate('/login');
-      return;
-    }
-
-    // Načítať údaje o používateľovi
-    fetch('${import.meta.env.VITE_API_BASE_URL}
-/user/profile', {
-      method: 'GET',
-      headers: { 'Authorization': `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          setError(data.error);
-        } else {
-          setUser(data);
-
-          // Načítať objednávky
-        fetch('${import.meta.env.VITE_API_BASE_URL}
-/api/order-history/history', {
-  method: 'GET',
-  headers: { 'Authorization': `Bearer ${token}` },
-})
-  .then((res) => res.json())
-  .then((ordersData) => {
-    console.log('Orders data from endpoint:', ordersData);  // <-- tu pridaj console.log
-     // Skontroluj, čo obsahuje prvá objednávka
-  if (ordersData.length > 0) {
-    console.log('First order items:', ordersData[0].items);
+  if (!token) {
+    navigate('/login');
+    return;
   }
-    if (ordersData.error) {
-      setError(ordersData.error);
-    } else {
-      setOrders(ordersData);
-    }
-  })
-  .catch(() => setError('Chyba pri načítaní objednávok'));
 
-        }
-      })
-      .catch(() => setError('Chyba pri načítaní údajov o používateľovi'));
-  }, [navigate]);
+  // Načítať údaje o používateľovi
+  fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
+    method: 'GET',
+    headers: { 'Authorization': `Bearer ${token}` },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.error) {
+        setError(data.error);
+      } else {
+        setUser(data);
+
+        // Načítať objednávky
+        fetch(`${import.meta.env.VITE_API_BASE_URL}/api/order-history/history`, {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${token}` },
+        })
+          .then((res) => res.json())
+          .then((ordersData) => {
+            console.log('Orders data from endpoint:', ordersData);
+            if (ordersData.length > 0) {
+              console.log('First order items:', ordersData[0].items);
+            }
+            if (ordersData.error) {
+              setError(ordersData.error);
+            } else {
+              setOrders(ordersData);
+            }
+          })
+          .catch(() => setError('Chyba pri načítaní objednávok'));
+      }
+    })
+    .catch(() => setError('Chyba pri načítaní údajov o používateľovi'));
+}, [navigate]);
+
 
   return (
    <div

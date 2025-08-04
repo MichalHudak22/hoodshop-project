@@ -49,8 +49,7 @@ const HockeyPage = () => {
   const sectionKey = 'hockey-home-header';
 
   useEffect(() => {
-    axios.get('${import.meta.env.VITE_API_BASE_URL}
-/products/hockey/carousel')
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/hockey/carousel`)
       .then(response => {
         setCarouselProducts(response.data);
       })
@@ -61,8 +60,7 @@ const HockeyPage = () => {
 
   useEffect(() => {
     // Načítanie textov pre header podľa sectionKey
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}
-/api/config/section/${sectionKey}`)
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/config/section/${sectionKey}`)
       .then(response => {
         const data = response.data || {};
         setTitle(data.title || '');
@@ -78,13 +76,12 @@ const HockeyPage = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('${import.meta.env.VITE_API_BASE_URL}
-/api/cart', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-          ...(!token && sessionId && { "x-session-id": sessionId }),
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(!token && sessionId ? { "x-session-id": sessionId } : {}),
         },
         body: JSON.stringify({
           productId: jersey.id,
@@ -100,7 +97,7 @@ const HockeyPage = () => {
         // automaticky zmizne po 3 sekundách
         setTimeout(() => setMessage(''), 3000);
       } else {
-        setMessage("Failed to add to cart: " + data.message);
+        setMessage("Failed to add to cart: " + (data.message || 'Unknown error'));
         setTimeout(() => setMessage(''), 3000);
       }
     } catch (error) {

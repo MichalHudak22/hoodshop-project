@@ -12,52 +12,50 @@ const CyclingHelmets = () => {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    axios.get('${import.meta.env.VITE_API_BASE_URL}
-/products/cycling/helmets')
-      .then(response => {
-        setHelmets(response.data);
-      })
-      .catch(error => {
-        console.error('Chyba pri načítavaní prilieb:', error);
-      });
-  }, []);
+  axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/cycling/helmets`)
+    .then(response => {
+      setHelmets(response.data);
+    })
+    .catch(error => {
+      console.error('Chyba pri načítavaní prilieb:', error);
+    });
+}, []);
 
-  const handleAddToCart = async (jersey) => {
-    const sessionId = localStorage.getItem("sessionId");
-    const token = localStorage.getItem("token");
+const handleAddToCart = async (jersey) => {
+  const sessionId = localStorage.getItem("sessionId");
+  const token = localStorage.getItem("token");
 
-    try {
-      const response = await fetch('${import.meta.env.VITE_API_BASE_URL}
-/api/cart', {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-          ...(!token && sessionId && { "x-session-id": sessionId }),
-        },
-        body: JSON.stringify({
-          productId: jersey.id,
-          quantity: 1,
-        }),
-      });
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+        ...(!token && sessionId && { "x-session-id": sessionId }),
+      },
+      body: JSON.stringify({
+        productId: jersey.id,
+        quantity: 1,
+      }),
+    });
 
-      const data = await response.json();
-      if (response.ok) {
-        setMessage("Product added to cart!");
-        refreshCartCount();
+    const data = await response.json();
+    if (response.ok) {
+      setMessage("Product added to cart!");
+      refreshCartCount();
 
-        // automaticky zmizne po 3 sekundách
-        setTimeout(() => setMessage(''), 3000);
-      } else {
-        setMessage("Failed to add to cart: " + data.message);
-        setTimeout(() => setMessage(''), 3000);
-      }
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      setMessage("Error adding to cart");
+      // automaticky zmizne po 3 sekundách
+      setTimeout(() => setMessage(''), 3000);
+    } else {
+      setMessage("Failed to add to cart: " + data.message);
       setTimeout(() => setMessage(''), 3000);
     }
-  };
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+    setMessage("Error adding to cart");
+    setTimeout(() => setMessage(''), 3000);
+  }
+};
 
   const slides = helmets.map(product => ({
     id: product.id,

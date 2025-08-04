@@ -48,23 +48,23 @@ const Registration = () => {
   };
 
 
-    fetch('${import.meta.env.VITE_API_BASE_URL}
-/user', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(submitData),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          alert('Error: ' + data.error);
-        } else if (data.message) {
-          alert(data.message);
-          navigate('/login');
-        }
-      })
-      .catch((error) => console.error('Registration error:', error));
-  };
+   fetch(`${import.meta.env.VITE_API_BASE_URL}/user`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(submitData),
+})
+  .then(res => res.json())
+  .then(data => {
+    if (data.error) {
+      alert('Error: ' + data.error);
+    } else if (data.message) {
+      alert(data.message);
+      navigate('/login');
+    }
+  })
+  .catch(error => console.error('Registration error:', error));
+};
+
 
   return (
     <div
