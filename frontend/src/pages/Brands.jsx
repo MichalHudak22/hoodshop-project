@@ -3,6 +3,7 @@ import axios from 'axios';
 import BrandHeroSection from '../components/BrandHeroSection';
 import bgImage from '../img/bg-brand.jpg';
 import BrandsGrid from '../components/BrandsGrid';  // import nového komponentu
+import { Link } from 'react-router-dom';
 
 function Brands() {
   const [brands, setBrands] = useState([]);
@@ -40,13 +41,13 @@ function Brands() {
             console.log('Brand image URL:', imgUrl);
 
             return (
-              <a key={brand.id} href={`/brands/${brand.name.toLowerCase()}`}>
+              <Link key={brand.id} to={`/brands/${brand.name.toLowerCase()}`}>
                 <img
                   src={imgUrl}
                   alt={brand.name}
                   className="h-6 sm:h-10 w-[64px] object-contain transition-transform duration-300 hover:scale-110"
                 />
-              </a>
+              </Link>
             );
           })}
         </div>

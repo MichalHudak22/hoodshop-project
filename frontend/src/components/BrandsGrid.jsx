@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 function BrandsGrid({ brands, bgImage }) {
   const baseUrl = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
@@ -34,9 +35,9 @@ function BrandsGrid({ brands, bgImage }) {
             console.log('Brand image URL:', fullUrl);
 
             return (
-              <a
+              <Link
                 key={brand.id}
-                href={`/brands/${brand.name.toLowerCase()}`}
+                to={`/brands/${brand.name.toLowerCase()}`}
                 className="group block rounded-xl overflow-hidden shadow-lg"
               >
                 <div
@@ -46,7 +47,7 @@ function BrandsGrid({ brands, bgImage }) {
                 <div className="bg-black min-h-[75px] flex text-white text-center items-center justify-center py-2">
                   <span className="text-md font-semibold">{brand.brand_info}</span>
                 </div>
-              </a>
+              </Link>
             );
           })}
         </div>
