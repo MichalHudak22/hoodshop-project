@@ -13,19 +13,19 @@ function UserDetailPage() {
   const [ordersError, setOrdersError] = useState(null);
 
   // 1) Načítanie cien dopravy z DB
-  useEffect(() => {
-    axios
-      .get('${import.meta.env.VITE_API_BASE_URL}
-/api/config/shipping-prices')
-      .then(res => {
-        const opts = (res.data || []).map(o => ({
-          name: o.name,
-          price: parseFloat(o.price),
-        }));
-        setShippingOptions(opts);
-      })
-      .catch(err => console.error('Chyba pri načítaní cien dopravy:', err));
-  }, []);
+useEffect(() => {
+  axios
+    .get(`${import.meta.env.VITE_API_BASE_URL}/api/config/shipping-prices`)
+    .then(res => {
+      const opts = (res.data || []).map(o => ({
+        name: o.name,
+        price: parseFloat(o.price),
+      }));
+      setShippingOptions(opts);
+    })
+    .catch(err => console.error('Chyba pri načítaní cien dopravy:', err));
+}, []);
+
 
   // 2) Načítanie používateľa
   useEffect(() => {

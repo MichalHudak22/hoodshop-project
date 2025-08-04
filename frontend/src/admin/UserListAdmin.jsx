@@ -16,12 +16,11 @@ export default function UserListWithDelete() {
       setError('Nie ste prihlásený');
       return;
     }
-    fetch('${import.meta.env.VITE_API_BASE_URL}
-/user', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+   fetch(`${import.meta.env.VITE_API_BASE_URL}/user`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+})
       .then((res) => {
         if (!res.ok) throw new Error('Nepodarilo sa načítať používateľov');
         return res.json();

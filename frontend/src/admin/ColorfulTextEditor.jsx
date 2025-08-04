@@ -96,8 +96,7 @@ const saveToBackend = async () => {
   }
 
   try {
-    await axios.post('${import.meta.env.VITE_API_BASE_URL}
-/api/config/section', {
+    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/config/section`, {
       section_key: sectionKey,
       title,
       paragraph,
