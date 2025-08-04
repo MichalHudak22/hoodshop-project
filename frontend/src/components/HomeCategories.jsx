@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const sports = [
   {
@@ -72,12 +73,10 @@ export default function SportsSection() {
                 ))}
               </ul>
 
-              <a
-                href={link}
-                className="px-6 py-2 bg-blue-700 hover:bg-blue-600 rounded-xl font-semibold transition"
-              >
+              <Link to={link} className="px-6 py-2 bg-blue-700 hover:bg-blue-600 rounded-xl font-semibold transition">
                 View Equipment
-              </a>
+              </Link>
+
             </div>
           </div>
         ))}
