@@ -12,6 +12,16 @@ const BrandDetail = () => {
   const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
 
+  // Pomocná funkcia na skladanie full URL k obrázkom
+  function buildImageUrl(path) {
+    if (!path) return null;
+    const baseUrl = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return path;
+    }
+    return `${baseUrl}/${path.replace(/^\//, '')}`;
+  }
+
   useEffect(() => {
     const fetchAllBrands = async () => {
       try {
@@ -91,8 +101,7 @@ const BrandDetail = () => {
       <section
         className="relative py-16 px-6 bg-black overflow-hidden"
         style={{
-          backgroundImage: `url(${import.meta.env.VITE_API_BASE_URL}
-${brand.background_image || "/img/bg-default.jpg"})`,
+          backgroundImage: `url(${buildImageUrl(brand.background_image) || '/img/bg-default.jpg'})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
@@ -104,8 +113,7 @@ ${brand.background_image || "/img/bg-default.jpg"})`,
 
         <div className="relative z-10 max-w-4xl mx-auto text-white text-center mb-16">
           <img
-            src={`${import.meta.env.VITE_API_BASE_URL}
-${brand.brand_image}`}
+            src={buildImageUrl(brand.brand_image)}
             alt={brand.name}
             className="mx-auto h-40 object-contain mb-6 rounded-xl"
           />
@@ -124,7 +132,6 @@ ${brand.brand_image}`}
         </div>
       )}
 
-
       {/* Lišta s logami značiek mimo overlay sekcie */}
       <div className="bg-white py-2 px-4 shadow-inner my-8">
         <h1 className="text-4xl font-semibold text-center py-5">Our Brand Collection</h1>
@@ -132,7 +139,7 @@ ${brand.brand_image}`}
           {brands.map((brand) => (
             <a key={brand.id} href={`/brands/${brand.name.toLowerCase()}`}>
               <img
-                src={`${import.meta.env.VITE_API_BASE_URL}${brand.brand_image}`}
+                src={buildImageUrl(brand.brand_image)}
                 alt={brand.name}
                 className="sm:h-10 w-[94px] lg:h-full object-contain transition-transform duration-300 hover:scale-110"
               />
@@ -145,9 +152,7 @@ ${brand.brand_image}`}
       <ProductSection
         title={`Explore ${brand.name} Products`}
         products={products}
-        backgroundImage={`${import.meta.env.VITE_API_BASE_URL}
-${brand.background_image || "/img/bg-default.jpg"}`}
-
+        backgroundImage={buildImageUrl(brand.background_image) || '/img/bg-default.jpg'}
         onAddToCart={handleAddToCart}
       />
 
