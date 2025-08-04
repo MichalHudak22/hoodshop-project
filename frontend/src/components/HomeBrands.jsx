@@ -3,8 +3,12 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import bgImage from '../img/bg-brand.jpg';
 
-// Pomocná funkcia na správne zloženie URL obrázka
+// Overí, či ide o plnú URL (externý obrázok)
+const isFullUrl = (url) => url.startsWith('http://') || url.startsWith('https://');
+
+// Funkcia na zloženie správnej cesty k obrázku
 const buildImageUrl = (imagePath) => {
+  if (isFullUrl(imagePath)) return imagePath;
   const base = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
   const path = imagePath.replace(/^\//, '');
   return `${base}/${path}`;
@@ -24,7 +28,7 @@ const HomeBrands = () => {
     Nike: 'Inspires athletic performance',
     Adidas: 'Brand for athletes',
     Bauer: 'Hockey dominance',
-    Trek: 'Leaders in cycling'
+    Trek: 'Leaders in cycling',
   };
 
   return (
@@ -44,9 +48,10 @@ const HomeBrands = () => {
         <h2 className="text-4xl font-bold mb-6 text-white text-center">Top Brands</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
-          {brands.map(brand => {
+          {brands.map((brand) => {
             const slug = brand.name.toLowerCase();
             const fullUrl = buildImageUrl(brand.brand_image);
+
             return (
               <Link
                 key={brand.id}
