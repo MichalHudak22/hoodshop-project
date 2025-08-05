@@ -78,8 +78,6 @@ app.get('/test-db', async (req, res) => {
   }
 });
 
-
-
 app.listen(PORT, () => {
   console.log(`Server beží na porte ${PORT}`);
 });
