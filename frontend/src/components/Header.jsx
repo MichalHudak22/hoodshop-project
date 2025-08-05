@@ -73,8 +73,6 @@ const Header = () => {
         </Link>
 
 
-
-
         {/* Mobilné ikony */}
         <div className="flex items-center space-x-4 lg:hidden">
           <Link to="/cart" className="relative hover:text-blue-200">
