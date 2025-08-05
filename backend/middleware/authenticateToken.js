@@ -38,7 +38,8 @@ authenticateToken.optional = (req, res, next) => {
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
       console.log('JWT verify error:', err);
-      return res.status(403).json({ error: 'Neplatný alebo vypršaný token' });
+      // nevracaj chybu, len ignoruj token a pokračuj ďalej ako anonym
+      return next();
     }
 
     console.log('Decoded token:', decoded);
@@ -49,7 +50,7 @@ authenticateToken.optional = (req, res, next) => {
       role: decoded.role,
     };
 
-    req.userId = decoded.userId;  // pridaj toto pre kompatibilitu so starším kódom
+    req.userId = decoded.userId;
 
     next();
   });
