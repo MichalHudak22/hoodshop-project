@@ -78,13 +78,6 @@ app.get('/test-db', async (req, res) => {
   }
 });
 
-// ====== Serve React Frontend (client/dist) ======
-const clientBuildPath = path.join(__dirname, '..', 'frontend', 'dist');
-app.use(express.static(clientBuildPath));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(clientBuildPath, 'index.html'));
-});
 
 
 app.listen(PORT, () => {
