@@ -173,25 +173,25 @@ const getTopProducts = async (req, res) => {
   }
 
   try {
-   const result = await db.query(`
-  SELECT 
-    p.name AS name,
-    SUM(oi.quantity) AS quantity
-  FROM order_items oi
-  JOIN products p ON oi.product_id = p.id
-  GROUP BY oi.product_id
-  ORDER BY quantity DESC
-  LIMIT 10
-`);
+    const [rows] = await db.query(`
+      SELECT 
+        p.name AS name,
+        SUM(oi.quantity) AS quantity
+      FROM order_items oi
+      JOIN products p ON oi.product_id = p.id
+      GROUP BY oi.product_id
+      ORDER BY quantity DESC
+      LIMIT 10
+    `);
 
-const rows = result;
-res.json(Array.isArray(rows) ? rows : [rows]);
+    res.json(rows);
 
   } catch (err) {
     console.error('Chyba pri získavaní top produktov:', err);
     res.status(500).json({ error: 'Chyba databázy pri získavaní najpredávanejších produktov.' });
   }
 };
+
 
 module.exports = { placeOrder, getAllOrders, getOrdersSummary, getTopProducts };
 

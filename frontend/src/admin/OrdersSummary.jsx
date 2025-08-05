@@ -17,19 +17,14 @@ useEffect(() => {
  const fetchSummary = async () => {
   try {
     const [summaryRes, topProductsRes] = await Promise.all([
-      axios.get('/api/orders/summary', {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-      axios.get('/api/orders/top-products', {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
+      axios.get('/api/orders/summary', { headers: { Authorization: `Bearer ${token}` } }),
+      axios.get('/api/orders/top-products', { headers: { Authorization: `Bearer ${token}` } }),
     ]);
 
-    console.log('Top products data from API:', topProductsRes.data);
+    console.log('Summary response:', summaryRes);
+    console.log('Top products response:', topProductsRes);
 
-    // Skontroluj, či to je pole, alebo sa uprav podľa API
     const products = Array.isArray(topProductsRes.data) ? topProductsRes.data : [];
-
     setSummary(summaryRes.data);
     setTopProducts(products);
     setError(null);
@@ -40,6 +35,7 @@ useEffect(() => {
     setLoading(false);
   }
 };
+
 
 
   if (token) {
