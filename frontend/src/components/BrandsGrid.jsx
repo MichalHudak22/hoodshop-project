@@ -38,7 +38,7 @@ function BrandsGrid({ brands, bgImage }) {
               <Link
                 key={brand.id}
                 to={`/brands/${brand.name.toLowerCase()}`}
-                className="group block rounded-xl overflow-hidden shadow-lg border-2 border-gray-400 hover:border-white"
+                className="group block rounded-xl overflow-hidden shadow-lg border-2 border-gray-700 hover:border-white"
               >
                 <div
                   className="h-40 w-full bg-center bg-no-repeat bg-contain bg-white transition duration-300 group-hover:brightness-110"
