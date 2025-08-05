@@ -29,12 +29,15 @@ const AllOrders = () => {
 
   const terms = searchTerm.toLowerCase().split(' ').filter(Boolean);
 
-  const filteredOrders = orders.filter(order =>
-    terms.every(term =>
-      (order.order_number || '').toLowerCase().includes(term) ||
-      (order.user_email || '').toLowerCase().includes(term)
+  const filteredOrders = Array.isArray(orders) 
+  ? orders.filter(order => 
+      terms.every(term =>
+        (order.order_number || '').toLowerCase().includes(term) ||
+        (order.user_email || '').toLowerCase().includes(term)
+      )
     )
-  );
+  : [];
+
 
   return (
     <div className="bg-black bg-opacity-70 md:rounded-xl p-5 border border-gray-700">
