@@ -37,7 +37,6 @@ function Brands() {
               ? brand.brand_image
               : `${import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '')}/${brand.brand_image.replace(/^\//, '')}`;
 
-            console.log('Brand image URL:', imgUrl);
 
             return (
               <Link key={brand.id} to={`/brands/${brand.name.toLowerCase()}`}>

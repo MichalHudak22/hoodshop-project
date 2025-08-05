@@ -74,7 +74,7 @@ const HockeyJerseys = () => {
         <section
           className="relative text-center py-10 px-4 bg-gradient-to-br from-blue-600 via-black to-blue-900 text-white overflow-hidden border-b-4 border-black"
         >
-          <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
+          <div className="absolute inset-0"></div>
           <div className="relative z-10 max-w-4xl mx-auto">
             <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
               Premium <span className="text-blue-200">Hockey Jerseys</span>
