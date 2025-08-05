@@ -20,7 +20,8 @@ export const CartProvider = ({ children }) => {
         headers['x-session-id'] = sessionId;
       }
 
-      const res = await axios.get('/api/cart/count', { headers });
+      const res = await axios.get('/api/${import.meta.env.VITE_API_BASE_URL}
+', { headers });
       setCartCount(res.data.count || 0);
     } catch (err) {
       console.error('Chyba pri načítaní počtu položiek v košíku:', err);
