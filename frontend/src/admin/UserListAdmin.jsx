@@ -16,11 +16,11 @@ export default function UserListWithDelete() {
       setError('Nie ste prihlásený');
       return;
     }
-   fetch(`${import.meta.env.VITE_API_BASE_URL}/user`, {
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
-})
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/user`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => {
         if (!res.ok) throw new Error('Nepodarilo sa načítať používateľov');
         return res.json();
@@ -50,8 +50,7 @@ export default function UserListWithDelete() {
     }
     setLoading(true);
     setError(null);
-    fetch(`${import.meta.env.VITE_API_BASE_URL}
-/user/admin/user/${selectedUserId}`, {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/user/admin/user/${selectedUserId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -92,8 +91,7 @@ export default function UserListWithDelete() {
     }
     setLoading(true);
     setError(null);
-    fetch(`${import.meta.env.VITE_API_BASE_URL}
-/user/admin/user/${userId}/role`, {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/user/admin/user/${userId}/role`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -101,6 +99,7 @@ export default function UserListWithDelete() {
       },
       body: JSON.stringify({ role: newRole }),
     })
+
       .then((res) => {
         if (!res.ok) {
           return res.json().then(data => { throw new Error(data.error || 'Chyba pri zmene roly'); });
