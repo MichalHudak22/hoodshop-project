@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+// ... všetky importy ostávajú rovnaké
 
 export default function UserListWithDelete() {
   const [users, setUsers] = useState([]);
@@ -28,7 +27,6 @@ export default function UserListWithDelete() {
       })
       .then((data) => {
         console.log('Fetched users data:', data);
-        // Kontrola, či je data pole alebo obsahuje pole v nejakom poli (napr. data.users)
         if (Array.isArray(data)) {
           setUsers(data);
           setError(null);
@@ -51,16 +49,13 @@ export default function UserListWithDelete() {
     fetchUsers();
   }, []);
 
-  // Upravený handler na kliknutie Delete - zobrazí modal
-const handleDeleteClick = () => {
-  if (!selectedUserId) return;
-  setShowConfirmModal(true);
-};
-
+  const handleDeleteClick = () => {
+    if (!selectedUserId) return;
+    setShowConfirmModal(true);
+  };
 
   const handleDeleteUser = () => {
-    if (!selectedUserId) return;
-    if (!token) {
+    if (!selectedUserId || !token) {
       setError('Nie ste prihlásený');
       return;
     }
@@ -74,9 +69,7 @@ const handleDeleteClick = () => {
     })
       .then(async (res) => {
         if (!res.ok) {
-          // Pokusí sa načítať chybovú správu z JSON odpovede
           const errorData = await res.json().catch(() => null);
-          // Ak je v odpovedi error, použije ju, inak defaultnú správu
           throw new Error(errorData?.error || 'Error deleting user');
         }
         return res.json();
@@ -115,7 +108,6 @@ const handleDeleteClick = () => {
       },
       body: JSON.stringify({ role: newRole }),
     })
-
       .then((res) => {
         if (!res.ok) {
           return res.json().then(data => { throw new Error(data.error || 'Chyba pri zmene roly'); });
@@ -132,15 +124,24 @@ const handleDeleteClick = () => {
       });
   };
 
-  const filteredUsers = users.filter(user =>
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Bezpečne aplikujeme filter a map len ak users je pole
+  const filteredUsers = Array.isArray(users)
+    ? users.filter(user =>
+        user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
-  const adminCount = users.filter(u => u.role === 'admin').length;
-  const userCount = users.filter(u => u.role === 'user').length;
+  const adminCount = Array.isArray(users)
+    ? users.filter(u => u.role === 'admin').length
+    : 0;
 
-  // Vyhľadáme meno vybraného používateľa na zobrazenie v modale
-  const selectedUser = users.find(u => u.id === selectedUserId);
+  const userCount = Array.isArray(users)
+    ? users.filter(u => u.role === 'user').length
+    : 0;
+
+  const selectedUser = Array.isArray(users)
+    ? users.find(u => u.id === selectedUserId)
+    : null;
 
   return (
     <div className=''>
@@ -182,7 +183,6 @@ const handleDeleteClick = () => {
       </div>
 
       <div className="max-w-3xl min-h-[500px] mx-auto max-h-[500px] overflow-y-scroll scrollbar scrollbar-thumb-gray-500 scrollbar-track-gray-800 rounded-lg">
-
         <ul className="space-y-3 px-3">
           {filteredUsers.length === 0 ? (
             <p className="text-center text-lg text-red-500">No users found.</p>
@@ -207,7 +207,6 @@ const handleDeleteClick = () => {
                   </span>
                 </p>
               </li>
-
             ))
           )}
         </ul>
@@ -249,7 +248,6 @@ const handleDeleteClick = () => {
         </button>
       </div>
 
-      {/* Modal na potvrdenie mazania */}
       {showConfirmModal && selectedUser && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
           <div className="bg-gray-900 p-6 rounded-lg max-w-md w-full text-center">
