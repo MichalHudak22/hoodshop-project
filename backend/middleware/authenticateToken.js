@@ -33,28 +33,23 @@ const authenticateToken = (req, res, next) => {
 // Verzia, ktorá nevyhadzuje chybu, ak token nie je prítomný
 authenticateToken.optional = (req, res, next) => {
   const token = req.headers['authorization']?.split(' ')[1];
-
-  console.log('🛂 [Middleware] optional auth - token:', token);
-
-  if (!token) {
-    console.log('🛂 No token provided – guest user');
-    return next();
-  }
+  if (!token) return next();
 
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
-      console.log('❌ JWT verify error:', err);
+      console.log('JWT verify error:', err);
       return res.status(403).json({ error: 'Neplatný alebo vypršaný token' });
     }
 
-    console.log('✅ Token decoded:', decoded);
+    console.log('Decoded token:', decoded);
 
     req.user = {
       userId: decoded.userId,
       email: decoded.email,
       role: decoded.role,
     };
-    req.userId = decoded.userId;
+
+    req.userId = decoded.userId;  // pridaj toto pre kompatibilitu so starším kódom
 
     next();
   });
