@@ -174,11 +174,7 @@ const updateCartItem = (req, res) => {
 const getCartCount = (req, res) => {
   const userId = req.userId || null;
   const sessionId = req.headers['x-session-id'] || null;
-  
-console.log('📦 [GET /cart/count] Called');
-  console.log('🔐 userId:', userId);
-  console.log('🌀 sessionId:', sessionId);
-  
+
   if (!userId && !sessionId) {
     return res.status(400).json({ error: 'Chýba identifikácia používateľa' });
   }
