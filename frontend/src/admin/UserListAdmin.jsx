@@ -16,6 +16,7 @@ export default function UserListWithDelete() {
       setError('Nie ste prihlásený');
       return;
     }
+    setLoading(true);
     fetch(`${import.meta.env.VITE_API_BASE_URL}/user`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -26,10 +27,24 @@ export default function UserListWithDelete() {
         return res.json();
       })
       .then((data) => {
-        setUsers(data);
-        setError(null);
+        console.log('Fetched users data:', data);
+        // Kontrola, či je data pole alebo obsahuje pole v nejakom poli (napr. data.users)
+        if (Array.isArray(data)) {
+          setUsers(data);
+          setError(null);
+        } else if (data.users && Array.isArray(data.users)) {
+          setUsers(data.users);
+          setError(null);
+        } else {
+          setUsers([]);
+          setError('Neočakávaný formát dát zo servera');
+        }
+        setLoading(false);
       })
-      .catch((e) => setError(e.message));
+      .catch((e) => {
+        setError(e.message);
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
@@ -37,10 +52,11 @@ export default function UserListWithDelete() {
   }, []);
 
   // Upravený handler na kliknutie Delete - zobrazí modal
-  const handleDeleteClick = () => {
-    if (!selectedUserId) return;
-    setShowConfirmModal(true);
-  };
+const handleDeleteClick = () => {
+  if (!selectedUserId) return;
+  setShowConfirmModal(true);
+};
+
 
   const handleDeleteUser = () => {
     if (!selectedUserId) return;
