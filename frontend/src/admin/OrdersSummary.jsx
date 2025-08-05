@@ -13,36 +13,39 @@ function OrdersSummary() {
 
   const token = localStorage.getItem('token');
 
-  useEffect(() => {
-    const fetchSummary = async () => {
-      try {
-        const [summaryRes, topProductsRes] = await Promise.all([
-          axios.get('/api/orders/summary', {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get('/api/orders/top-products', {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
+useEffect(() => {
+  const fetchSummary = async () => {
+    try {
+      const [summaryRes, topProductsRes] = await Promise.all([
+        axios.get('/api/orders/summary', {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        axios.get('/api/orders/top-products', {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+      ]);
 
-        setSummary(summaryRes.data);
-        setTopProducts(topProductsRes.data);
-        setError(null);
-      } catch (err) {
-        setError('Nepodarilo sa načítať sumár objednávok alebo rebríček produktov.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
+      console.log('Top products data from API:', topProductsRes.data); // <-- sem pridaj
 
-    if (token) {
-      fetchSummary();
-    } else {
+      setSummary(summaryRes.data);
+      setTopProducts(topProductsRes.data);
+      setError(null);
+    } catch (err) {
+      setError('Nepodarilo sa načítať sumár objednávok alebo rebríček produktov.');
+      console.error(err);
+    } finally {
       setLoading(false);
-      setError('Nie ste prihlásený.');
     }
-  }, [token]);
+  };
+
+  if (token) {
+    fetchSummary();
+  } else {
+    setLoading(false);
+    setError('Nie ste prihlásený.');
+  }
+}, [token]);
+
 
   if (loading) return <p>Načítavam sumár objednávok...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
