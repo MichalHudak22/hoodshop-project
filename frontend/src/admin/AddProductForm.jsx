@@ -212,10 +212,11 @@ const AddProductForm = () => {
               disabled={!formData.category}
             >
               <option value="">-- Select Type --</option>
-              {formData.category &&
-                typeOptions[formData.category].map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
+             {formData.category && Array.isArray(typeOptions[formData.category]) &&
+  typeOptions[formData.category].map((t) => (
+    <option key={t} value={t}>{t}</option>
+))}
+
             </select>
           </div>
         </div>
