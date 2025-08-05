@@ -8,21 +8,34 @@ const AllOrders = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const res = await axios.get('/api/orders/admin', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        });
-        setOrders(res.data);
-      } catch (err) {
-        console.error('Chyba pri načítaní objednávok:', err);
-        setError('Nepodarilo sa načítať objednávky.');
-      } finally {
-        setLoading(false);
-      }
-    };
+   const fetchOrders = async () => {
+  try {
+    const res = await axios.get('/api/orders/admin', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
+
+    // Skontrolujeme, či res.data je pole
+    if (Array.isArray(res.data)) {
+      setOrders(res.data);
+    } else if (Array.isArray(res.data.orders)) {
+      // Ak vracia objekt s kľúčom orders, nastavíme ho
+      setOrders(res.data.orders);
+    } else {
+      // Inak nastavíme prázdne pole a vypíšeme varovanie
+      console.warn('Neočakávaný formát dát z API:', res.data);
+      setOrders([]);
+    }
+  } catch (err) {
+    console.error('Chyba pri načítaní objednávok:', err);
+    setError('Nepodarilo sa načítať objednávky.');
+    setOrders([]); // pre istotu, aby sa stav nezasekol
+  } finally {
+    setLoading(false);
+  }
+};
+
 
     fetchOrders();
   }, []);
