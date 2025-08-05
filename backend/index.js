@@ -18,6 +18,8 @@ const adminConfigRoutes = require('./routes/adminConfigRoutes');
 
 const app = express();
 
+app.set('trust proxy', 1);  // Toto pridaj hneď po vytvorení Express app
+
 const imgFile = path.join(__dirname, 'src/img/brands/nike.jpg');
 fs.access(imgFile, fs.constants.F_OK, (err) => {
   console.log(err ? 'Súbor neexistuje' : 'Súbor existuje');
