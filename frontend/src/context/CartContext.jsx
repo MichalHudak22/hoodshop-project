@@ -22,7 +22,8 @@ export const CartProvider = ({ children }) => {
 
     console.log('Fetching cart count with headers:', headers);
 
-    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/cart/count`, { headers });
+    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart/count`, { headers });
+
     console.log('Cart count response:', res.data);
 
     setCartCount(res.data.count || 0);
