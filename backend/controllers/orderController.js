@@ -171,7 +171,7 @@ const getOrdersSummary = (req, res) => {
 // --------------------  ----------------
 const getTopProducts = async (req, res) => {
   try {
-    const [rows] = await db.query(`
+    const rows = await db.query(`
       SELECT 
         p.id AS id,
         p.name AS name,
@@ -183,15 +183,25 @@ const getTopProducts = async (req, res) => {
       LIMIT 10
     `);
 
-    console.log('Top products from DB:', rows);  // <--- pridaj tento riadok
+    console.log('Top products from DB:', rows);  // Zistíme, či je to pole alebo objekt
 
-    res.json(rows);
+    // Ak rows nie je pole, zmeň na pole:
+    const topProducts = Array.isArray(rows) ? rows : [rows];
+
+    // Pre istotu quantity z stringu na number:
+    const normalizedProducts = topProducts.map(p => ({
+      ...p,
+      quantity: Number(p.quantity),
+    }));
+
+    res.json(normalizedProducts);
 
   } catch (err) {
     console.error('Chyba pri získavaní top produktov:', err);
     res.status(500).json({ error: 'Chyba databázy pri získavaní najpredávanejších produktov.' });
   }
 };
+
 
 module.exports = { placeOrder, getAllOrders, getOrdersSummary, getTopProducts };
 
