@@ -159,13 +159,15 @@ const getOrdersSummary = (req, res) => {
     }
 
     const summary = results[0];
+
     res.json({
-      totalOrders: summary.totalOrders || 0,
-      totalRevenue: summary.totalRevenue || 0,
-      totalUsedPoints: summary.totalUsedPoints || 0,
+      totalOrders: Number(summary.totalOrders) || 0,
+      totalRevenue: Number(summary.totalRevenue) || 0,
+      totalUsedPoints: Number(summary.totalUsedPoints) || 0,
     });
   });
 };
+
 
 
 // --------------------  ----------------

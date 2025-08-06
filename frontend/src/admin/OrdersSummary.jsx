@@ -15,49 +15,49 @@ function OrdersSummary() {
 
   const API = import.meta.env.VITE_API_BASE_URL;
 
-useEffect(() => {
-  const fetchSummary = async () => {
-    try {
-      const [summaryRes, topProductsRes] = await Promise.all([
-        axios.get(`${API}/api/orders/summary`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        axios.get(`${API}/api/orders/top-products`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-      ]);
+  useEffect(() => {
+    const fetchSummary = async () => {
+      try {
+        const [summaryRes, topProductsRes] = await Promise.all([
+          axios.get(`${API}/api/orders/summary`, {
+            headers: { Authorization: `Bearer ${token}` }
+          }),
+          axios.get(`${API}/api/orders/top-products`, {
+            headers: { Authorization: `Bearer ${token}` }
+          }),
+        ]);
 
-      console.log('Summary response:', summaryRes);
-      console.log('Top products response:', topProductsRes);
+        console.log('Summary response:', summaryRes);
+        console.log('Top products response:', topProductsRes);
 
-      setSummary(summaryRes.data);
+        setSummary(summaryRes.data);
 
-      let products = [];
-      if (Array.isArray(topProductsRes.data)) {
-        products = topProductsRes.data;
-      } else if (Array.isArray(topProductsRes.data.products)) {
-        products = topProductsRes.data.products;
-      } else {
-        console.warn('Neočekávaný formát topProductsRes.data:', topProductsRes.data);
+        let products = [];
+        if (Array.isArray(topProductsRes.data)) {
+          products = topProductsRes.data;
+        } else if (Array.isArray(topProductsRes.data.products)) {
+          products = topProductsRes.data.products;
+        } else {
+          console.warn('Neočekávaný formát topProductsRes.data:', topProductsRes.data);
+        }
+
+        setTopProducts(products);
+        setError(null);
+      } catch (err) {
+        setError('Nepodarilo sa načítať sumár objednávok alebo rebríček produktov.');
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      setTopProducts(products);
-      setError(null);
-    } catch (err) {
-      setError('Nepodarilo sa načítať sumár objednávok alebo rebríček produktov.');
-      console.error(err);
-    } finally {
+    if (token) {
+      fetchSummary();
+    } else {
       setLoading(false);
+      setError('Nie ste prihlásený.');
     }
-  };
-
-  if (token) {
-    fetchSummary();
-  } else {
-    setLoading(false);
-    setError('Nie ste prihlásený.');
-  }
-}, [token]);
+  }, [token]);
 
 
 
@@ -74,7 +74,6 @@ useEffect(() => {
     if (typeof num !== 'number' || isNaN(num)) return '–';
     return num.toLocaleString('sk-SK');
   };
-
   return (
     <div className="p-2 max-w-md mx-auto rounded-lg shadow-lg text-blue-300">
       <h3 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-5 text-center text-blue-200">
