@@ -14,8 +14,7 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       try {
-const res = await fetch(import.meta.env.VITE_API_BASE_URL + '/user/profile', {
-
+        const res = await fetch(import.meta.env.VITE_API_BASE_URL + '/user/profile', {
           headers: { 'Authorization': 'Bearer ' + storedToken },
         });
         if (!res.ok) throw new Error('Unauthorized');
@@ -47,7 +46,7 @@ const res = await fetch(import.meta.env.VITE_API_BASE_URL + '/user/profile', {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, setUser, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );
