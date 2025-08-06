@@ -95,7 +95,7 @@ return (
               </h2>
 
               <div className="flex flex-col items-center md:flex-row justify-around text-md lg:text-lg">
-                <div className="mb-4 text-left w-[235px]">
+                <div className="mb-4 text-left w-[235px] text-blue-200">
                   <p>
                     <strong>Date:</strong>{' '}
                     {order.created_at
@@ -111,10 +111,10 @@ return (
                 </div>
 
                 <div className="mb-4 text-left w-[235px]">
-                  <strong>Items:</strong>
+                  <strong className='text-blue-200'>Items:</strong>
                   <ul className="list-none">
                     {itemsArray.map((item) => (
-                      <li className="text-sm" key={item.id}>
+                      <li className="text-sm text-white" key={item.id}>
                         {item.product_name || 'Unnamed product'} - {item.quantity || 0} pcs - {item.price || 0} €
                       </li>
                     ))}
