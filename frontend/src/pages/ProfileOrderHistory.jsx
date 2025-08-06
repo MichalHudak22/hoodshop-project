@@ -63,24 +63,19 @@ function OrderHistory() {
 }, [navigate]);
 
 return (
-  <div
-    className="relative text-white flex flex-col items-center bg-cover bg-no-repeat bg-center min-h-screen"
-    style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}
-  >
+   <div className="relative w-full min-h-screen bg-cover bg-no-repeat bg-center" style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}>
     {/* Overlay */}
     <div className="absolute inset-0 bg-black opacity-30 z-0" />
 
     {/* Obsah */}
-    <div className="relative z-10 w-full flex flex-col items-start">
-        {/* Správy o stave načítavania/chybách */}
-        {loading && <p className='pt-10 text-green-400'>Načítavam objednávky...</p>}
+    <div className="relative z-10 w-full max-w-[1024px] mx-auto py-10 px-4 flex flex-col">
+      {loading && <p className='text-green-400'>Načítavam objednávky...</p>}
 
-        {!loading && error && <p className="text-red-500">{error}</p>}
+      {!loading && error && <p className="text-red-500">{error}</p>}
 
-        {!loading && !error && orders.length === 0 && <p>Nemáte žiadne objednávky.</p>}
+      {!loading && !error && orders.length === 0 && <p className="text-white">Nemáte žiadne objednávky.</p>}
 
-        {/* Zoznam objednávok */}
-        {!loading && orders.length > 0 && orders.map((order) => {
+      {!loading && orders.length > 0 && orders.map((order) => {
           const itemsArray = Array.isArray(order.items) ? order.items : [];
 
           const totalQuantity = itemsArray.reduce((sum, item) => {
