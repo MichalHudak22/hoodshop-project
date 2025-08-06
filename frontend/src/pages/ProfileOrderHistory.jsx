@@ -97,7 +97,7 @@ return (
               <div className="flex flex-col items-center md:flex-row justify-around text-md lg:text-lg">
                 <div className="mb-4 text-left w-[235px] text-white">
                   <p>
-                    <strong>Date:</strong>{' '}
+                    <strong className='text-blue-100'>Date:</strong>{' '}
                     {order.created_at
                       ? new Date(order.created_at).toLocaleString()
                       : 'unknown'}
