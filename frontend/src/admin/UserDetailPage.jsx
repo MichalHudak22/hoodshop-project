@@ -32,13 +32,11 @@ const fetchUsers = () => {
       return res.json();
     })
     .then((data) => {
-      console.log('Fetched users data:', data);
       setUsers(Array.isArray(data) ? data : []); // ochrana pred neplatným formátom
       setError(null);
       setLoading(false);
     })
     .catch((e) => {
-      console.error('Error loading users:', e);
       setUsers([]); // bezpečné vyprázdnenie v prípade chyby
       setError(e.message);
       setLoading(false);

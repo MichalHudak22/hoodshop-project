@@ -27,9 +27,6 @@ function OrdersSummary() {
           }),
         ]);
 
-        console.log('Summary response:', summaryRes);
-        console.log('Top products response:', topProductsRes);
-
         setSummary(summaryRes.data);
 
         let products = [];
