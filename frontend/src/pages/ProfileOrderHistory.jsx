@@ -68,7 +68,7 @@ return (
     <div className="absolute inset-0 bg-black opacity-30 z-0" />
 
     {/* Obsah */}
-    <div className="relative z-10 w-full max-w-[1024px] mx-auto py-10 px-4 flex flex-col">
+    <div className="relative z-10 w-full max-w-[1024px] mx-auto py-10 px-4 mt-10 flex flex-col">
       {loading && <p className='text-green-400'>Načítavam objednávky...</p>}
 
       {!loading && error && <p className="text-red-500">{error}</p>}
