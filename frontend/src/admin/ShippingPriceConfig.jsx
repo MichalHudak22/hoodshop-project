@@ -11,28 +11,31 @@ export default function ShippingPriceConfig() {
   const [message, setMessage] = useState(null); // hláška pre používateľa
   const [messageType, setMessageType] = useState(''); // success | info | error
 
-  useEffect(() => {
-    async function fetchPrices() {
-      try {
-        const res = await axios.get('/api/config/shipping-prices');
-        if (Array.isArray(res.data)) {
-          const pricesObj = {};
-          res.data.forEach(({ name, price }) => {
-            pricesObj[name] = price != null ? price.toString() : '';
-          });
-          setPrices(pricesObj);
-        } else {
-          setError('Očakával som pole s cenami dopravy');
-        }
-      } catch (e) {
-        setError('Chyba pri načítaní cien dopravy');
-        console.error(e);
-      } finally {
-        setLoading(false);
+const API = import.meta.env.VITE_API_BASE_URL;
+
+useEffect(() => {
+  async function fetchPrices() {
+    try {
+      const res = await axios.get(`${API}/api/config/shipping-prices`);
+      if (Array.isArray(res.data)) {
+        const pricesObj = {};
+        res.data.forEach(({ name, price }) => {
+          pricesObj[name] = price != null ? price.toString() : '';
+        });
+        setPrices(pricesObj);
+      } else {
+        setError('Očakával som pole s cenami dopravy');
       }
+    } catch (e) {
+      setError('Chyba pri načítaní cien dopravy');
+      console.error(e);
+    } finally {
+      setLoading(false);
     }
-    fetchPrices();
-  }, []);
+  }
+  fetchPrices();
+}, []);
+
 
   const handleChange = (method, value) => {
     if (
