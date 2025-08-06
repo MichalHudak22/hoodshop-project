@@ -166,12 +166,14 @@ const getOrdersSummary = (req, res) => {
     });
   });
 };
+
+
 // --------------------  ----------------
 const getTopProducts = async (req, res) => {
-  // Odstráň kontrolu na admina
   try {
     const [rows] = await db.query(`
       SELECT 
+        p.id AS id,
         p.name AS name,
         SUM(oi.quantity) AS quantity
       FROM order_items oi
@@ -181,6 +183,8 @@ const getTopProducts = async (req, res) => {
       LIMIT 10
     `);
 
+    console.log('Top products from DB:', rows);  // <--- pridaj tento riadok
+
     res.json(rows);
 
   } catch (err) {
@@ -188,7 +192,6 @@ const getTopProducts = async (req, res) => {
     res.status(500).json({ error: 'Chyba databázy pri získavaní najpredávanejších produktov.' });
   }
 };
-
 
 module.exports = { placeOrder, getAllOrders, getOrdersSummary, getTopProducts };
 
