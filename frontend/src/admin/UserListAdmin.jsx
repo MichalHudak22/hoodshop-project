@@ -12,7 +12,7 @@ export default function UserListWithDelete() {
   const navigate = useNavigate();
 
   const API = import.meta.env.VITE_API_BASE_URL;
-  
+
 const fetchUsers = async () => {
   if (!token) {
     setError('Nie ste prihlásený');
@@ -44,7 +44,6 @@ const fetchUsers = async () => {
     setLoading(false);
   }
 };
-
 
   useEffect(() => {
     fetchUsers();
