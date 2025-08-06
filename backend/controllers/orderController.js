@@ -168,10 +168,7 @@ const getOrdersSummary = (req, res) => {
 };
 // --------------------  ----------------
 const getTopProducts = async (req, res) => {
-  if (!req.user || req.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Prístup zamietnutý' });
-  }
-
+  // Odstráň kontrolu na admina
   try {
     const [rows] = await db.query(`
       SELECT 

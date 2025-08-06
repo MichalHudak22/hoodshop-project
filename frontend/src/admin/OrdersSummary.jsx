@@ -15,40 +15,50 @@ function OrdersSummary() {
 
   const API = import.meta.env.VITE_API_BASE_URL;
 
-  useEffect(() => {
-    const fetchSummary = async () => {
-      try {
-        const [summaryRes, topProductsRes] = await Promise.all([
-          axios.get(`${API}/api/orders/summary`, {
-            headers: { Authorization: `Bearer ${token}` }
-          }),
-          axios.get(`${API}/api/orders/top-products`, {
-            headers: { Authorization: `Bearer ${token}` }
-          }),
-        ]);
+useEffect(() => {
+  const fetchSummary = async () => {
+    try {
+      const [summaryRes, topProductsRes] = await Promise.all([
+        axios.get(`${API}/api/orders/summary`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get(`${API}/api/orders/top-products`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+      ]);
 
-        console.log('Summary response:', summaryRes);
-        console.log('Top products response:', topProductsRes);
+      console.log('Summary response:', summaryRes);
+      console.log('Top products response:', topProductsRes);
 
-        const products = Array.isArray(topProductsRes.data) ? topProductsRes.data : [];
-        setSummary(summaryRes.data);
-        setTopProducts(products);
-        setError(null);
-      } catch (err) {
-        setError('Nepodarilo sa načítať sumár objednávok alebo rebríček produktov.');
-        console.error(err);
-      } finally {
-        setLoading(false);
+      setSummary(summaryRes.data);
+
+      let products = [];
+      if (Array.isArray(topProductsRes.data)) {
+        products = topProductsRes.data;
+      } else if (Array.isArray(topProductsRes.data.products)) {
+        products = topProductsRes.data.products;
+      } else {
+        console.warn('Neočekávaný formát topProductsRes.data:', topProductsRes.data);
       }
-    };
 
-    if (token) {
-      fetchSummary();
-    } else {
+      setTopProducts(products);
+      setError(null);
+    } catch (err) {
+      setError('Nepodarilo sa načítať sumár objednávok alebo rebríček produktov.');
+      console.error(err);
+    } finally {
       setLoading(false);
-      setError('Nie ste prihlásený.');
     }
-  }, [token]);
+  };
+
+  if (token) {
+    fetchSummary();
+  } else {
+    setLoading(false);
+    setError('Nie ste prihlásený.');
+  }
+}, [token]);
+
 
 
 

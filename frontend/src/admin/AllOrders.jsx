@@ -63,7 +63,7 @@ const AllOrders = () => {
       </div>
 
       <div className="rounded-lg shadow-lg max-h-[650px] xl:max-h-[900px] mb-10 overflow-y-scroll scrollbar scrollbar-thumb-gray-500 scrollbar-track-gray-800 max-w-5xl mx-auto mt-10">
-        {loading && <p className="text-blue-400 text-center">Načítavam objednávky...</p>}
+        {loading && <p className="text-green-400 text-center">Načítavam objednávky...</p>}
         {error && <p className="text-red-400 text-center">{error}</p>}
 
         {filteredOrders.length > 0 ? (
