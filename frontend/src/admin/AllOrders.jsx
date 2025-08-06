@@ -2,43 +2,40 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const AllOrders = () => {
+  const API = import.meta.env.VITE_API_BASE_URL;
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-   const fetchOrders = async () => {
-  try {
-    const res = await axios.get('/api/orders/admin', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    });
+    const fetchOrders = async () => {
+      try {
+        const res = await axios.get(`${API}/api/orders/admin`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
 
-    // Skontrolujeme, či res.data je pole
-    if (Array.isArray(res.data)) {
-      setOrders(res.data);
-    } else if (Array.isArray(res.data.orders)) {
-      // Ak vracia objekt s kľúčom orders, nastavíme ho
-      setOrders(res.data.orders);
-    } else {
-      // Inak nastavíme prázdne pole a vypíšeme varovanie
-      console.warn('Neočakávaný formát dát z API:', res.data);
-      setOrders([]);
-    }
-  } catch (err) {
-    console.error('Chyba pri načítaní objednávok:', err);
-    setError('Nepodarilo sa načítať objednávky.');
-    setOrders([]); // pre istotu, aby sa stav nezasekol
-  } finally {
-    setLoading(false);
-  }
-};
-
+        if (Array.isArray(res.data)) {
+          setOrders(res.data);
+        } else if (Array.isArray(res.data.orders)) {
+          setOrders(res.data.orders);
+        } else {
+          console.warn('Neočakávaný formát dát z API:', res.data);
+          setOrders([]);
+        }
+      } catch (err) {
+        console.error('Chyba pri načítaní objednávok:', err);
+        setError('Nepodarilo sa načítať objednávky.');
+        setOrders([]);
+      } finally {
+        setLoading(false);
+      }
+    };
 
     fetchOrders();
-  }, []);
+  }, [API]);
 
   const terms = searchTerm.toLowerCase().split(' ').filter(Boolean);
 
@@ -50,7 +47,6 @@ const AllOrders = () => {
       )
     )
   : [];
-
 
   return (
     <div className="bg-black bg-opacity-70 md:rounded-xl p-5 border border-gray-700">
