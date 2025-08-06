@@ -80,12 +80,14 @@ const AddProductForm = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post('/products', data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || ''; // alebo priamo hardcoded na produkčnú API URL
+
+const res = await axios.post(`${API_BASE_URL}/products`, data, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'multipart/form-data',
+  },
+});
 
       setMessage(res.data.message);
       setError(null);
