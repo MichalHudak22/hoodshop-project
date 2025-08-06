@@ -73,7 +73,7 @@ function OrderHistory() {
       {/* Obsah */}
       <div className="relative z-10 w-full flex flex-col items-center min-h-screen">
         {/* Správy o stave načítavania/chybách */}
-        {loading && <p>Načítavam objednávky...</p>}
+        {loading && <p className='pt-10'>Načítavam objednávky...</p>}
 
         {!loading && error && <p className="text-red-500">{error}</p>}
 
