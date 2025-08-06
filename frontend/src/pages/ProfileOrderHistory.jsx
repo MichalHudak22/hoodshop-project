@@ -95,7 +95,7 @@ return (
               </h2>
 
               <div className="flex flex-col items-center md:flex-row justify-around text-md lg:text-lg">
-                <div className="mb-4 text-left w-[235px] text-blue-200">
+                <div className="mb-4 text-left w-[235px] text-white">
                   <p>
                     <strong>Date:</strong>{' '}
                     {order.created_at
@@ -103,15 +103,15 @@ return (
                       : 'unknown'}
                   </p>
 
-                  <p><strong>Name:</strong> {order.full_name || 'unknown'}</p>
-                  <p><strong>Email:</strong> {order.profile_email || 'unknown'}</p>
-                  <p><strong>Status:</strong> {order.status || 'not specified'}</p>
-                  <p><strong>Payment:</strong> {order.payment_method || 'not specified'}</p>
-                  <p><strong>Total Items:</strong> {totalQuantity}</p>
+                  <p><strong className='text-blue-100'>Name:</strong> {order.full_name || 'unknown'}</p>
+                  <p><strong className='text-blue-100'>Email:</strong> {order.profile_email || 'unknown'}</p>
+                  <p><strong className='text-blue-100'>Status:</strong> {order.status || 'not specified'}</p>
+                  <p><strong className='text-blue-100'>Payment:</strong> {order.payment_method || 'not specified'}</p>
+                  <p><strong className='text-blue-100'>Total Items:</strong> {totalQuantity}</p>
                 </div>
 
                 <div className="mb-4 text-left w-[235px]">
-                  <strong className='text-blue-200'>Items:</strong>
+                  <strong className='text-blue-100'>Items:</strong>
                   <ul className="list-none">
                     {itemsArray.map((item) => (
                       <li className="text-sm text-white" key={item.id}>
