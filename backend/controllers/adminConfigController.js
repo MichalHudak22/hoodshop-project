@@ -16,29 +16,26 @@ exports.getShippingPrices = async (req, res) => {
 exports.updateShippingPrice = async (req, res) => {
   const { name, price } = req.body;
 
-  console.log('Received request body:', req.body); // debug
+  console.log('Received request body:', req.body);
 
-  // Overenie mena dopravy (case-insensitive)
   const allowedNames = ['DPD', 'GLS', 'Slovak Post'];
   const matchedName = allowedNames.find(n => n.toLowerCase() === name.toLowerCase());
   if (!matchedName) {
     return res.status(400).json({ error: 'Neplatné meno dopravy' });
   }
 
-  // Parsovanie ceny na číslo
   const numericPrice = parseFloat(price);
   if (isNaN(numericPrice)) {
     return res.status(400).json({ error: 'Cena musí byť číslo' });
   }
 
   try {
-    // Update v DB
-    const [result] = await db.query(
+    const result = await db.query(
       'UPDATE admin_config SET price = ? WHERE name = ?',
       [numericPrice, matchedName]
     );
 
-    console.log('Update result:', result); // debug
+    console.log('Update result:', result);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Cenu sa nepodarilo aktualizovať. Skontrolujte meno dopravy.' });
@@ -46,12 +43,10 @@ exports.updateShippingPrice = async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-  console.error('Chyba pri aktualizácii ceny:', err); // full error do konzoly
-  res.status(500).json({ error: err.message });       // pošli presnú správu aj do frontendu
-}
-
+    console.error('Chyba pri aktualizácii ceny:', err);
+    res.status(500).json({ error: err.message });
+  }
 };
-
 
 
     // ------------------ Admin_Change_Title ------------------
