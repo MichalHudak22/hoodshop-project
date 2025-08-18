@@ -46,9 +46,10 @@ exports.updateShippingPrice = async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
-    console.error('Chyba pri aktualizácii ceny:', err);
-    res.status(500).json({ error: 'Server error' });
-  }
+  console.error('Chyba pri aktualizácii ceny:', err); // full error do konzoly
+  res.status(500).json({ error: err.message });       // pošli presnú správu aj do frontendu
+}
+
 };
 
 
