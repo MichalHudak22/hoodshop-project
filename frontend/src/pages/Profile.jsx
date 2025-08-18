@@ -251,12 +251,12 @@ const handleChange = (e) => {
 
               {/* Miesto na zobrazenie fotky */}
               <div className="w-56 h-56 rounded-full overflow-hidden border-2 border-gray-400">
-                <img
-                  src={user.user_photo ? `${import.meta.env.VITE_API_BASE_URL}
-${user.user_photo}` : "/img/default-avatar.jpg"}
-                  alt="Profilová fotka"
-                  className="w-full h-full object-cover"
-                />
+              <img
+  src={user.user_photo ? user.user_photo : "/img/default-avatar.jpg"}
+  alt="Profilová fotka"
+  className="w-full h-full object-cover"
+/>
+
               </div>
 
               {/* Tlačidlo Default Photo */}
