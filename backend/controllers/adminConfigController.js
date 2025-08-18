@@ -12,16 +12,30 @@ exports.getShippingPrices = async (req, res) => {
   }
 };
 
-// ------------------ Upravit ceny DPD GLS a SLovak Post ------------------
+// ------------------ Upravit ceny DPD GLS a Slovak Post ------------------
 exports.updateShippingPrice = async (req, res) => {
   const { name, price } = req.body;
 
-  if (!['DPD', 'GLS', 'Slovak Post'].includes(name)) {
+  // Overenie mena dopravy
+  const allowedNames = ['DPD', 'GLS', 'Slovak Post'];
+  if (!allowedNames.includes(name)) {
     return res.status(400).json({ error: 'Neplatné meno dopravy' });
   }
 
   try {
-    await db.query('UPDATE admin_config SET price = ? WHERE name = ?', [price, name]);
+    // Vykonanie update a získanie výsledku
+    const [result] = await db.query(
+      'UPDATE admin_config SET price = ? WHERE name = ?',
+      [price, name]
+    );
+
+    console.log('Update result:', result); // pre debug: affectedRows, changedRows
+
+    // Ak sa nič nezmenilo (napr. meno neexistuje)
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Cenu sa nepodarilo aktualizovať. Skontrolujte meno dopravy.' });
+    }
+
     res.json({ success: true });
   } catch (err) {
     console.error('Chyba pri aktualizácii ceny:', err);
