@@ -16,22 +16,30 @@ exports.getShippingPrices = async (req, res) => {
 exports.updateShippingPrice = async (req, res) => {
   const { name, price } = req.body;
 
-  // Overenie mena dopravy
+  console.log('Received request body:', req.body); // debug
+
+  // Overenie mena dopravy (case-insensitive)
   const allowedNames = ['DPD', 'GLS', 'Slovak Post'];
-  if (!allowedNames.includes(name)) {
+  const matchedName = allowedNames.find(n => n.toLowerCase() === name.toLowerCase());
+  if (!matchedName) {
     return res.status(400).json({ error: 'Neplatné meno dopravy' });
   }
 
+  // Parsovanie ceny na číslo
+  const numericPrice = parseFloat(price);
+  if (isNaN(numericPrice)) {
+    return res.status(400).json({ error: 'Cena musí byť číslo' });
+  }
+
   try {
-    // Vykonanie update a získanie výsledku
+    // Update v DB
     const [result] = await db.query(
       'UPDATE admin_config SET price = ? WHERE name = ?',
-      [price, name]
+      [numericPrice, matchedName]
     );
 
-    console.log('Update result:', result); // pre debug: affectedRows, changedRows
+    console.log('Update result:', result); // debug
 
-    // Ak sa nič nezmenilo (napr. meno neexistuje)
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Cenu sa nepodarilo aktualizovať. Skontrolujte meno dopravy.' });
     }
@@ -42,6 +50,7 @@ exports.updateShippingPrice = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
 
 
     // ------------------ Admin_Change_Title ------------------
