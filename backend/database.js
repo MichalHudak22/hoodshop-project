@@ -1,5 +1,7 @@
 const mysql = require('mysql2');
 const util = require('util');
+const fs = require('fs');             // <-- pridaj
+const path = require('path');         // <-- pridaj
 require('dotenv').config();
 
 const pool = mysql.createPool({
@@ -12,8 +14,7 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0,
   ssl: {
-    // ak máš CA cert
-    ca: fs.readFileSync('<CA_PATH>')  // nahraď cestou k stiahnutému CA certu
+    ca: fs.readFileSync(path.join(__dirname, 'ssl', 'isrgrootx1.pem'))  // cesta k certu
   }
 });
 
