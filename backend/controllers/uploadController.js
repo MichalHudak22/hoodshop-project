@@ -1,5 +1,5 @@
 const db = require('../database');
-const upload = require('../middleware/upload'); // multer s Cloudinary
+const upload = require('../cloudinaryUpload'); // multer s Cloudinary
 
 // Nahranie profilovej fotky
 exports.uploadProfilePhoto = (req, res) => {
