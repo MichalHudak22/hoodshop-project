@@ -1,33 +1,43 @@
+// controllers/uploadController.js
 const db = require('../database');
-const upload = require('../cloudinaryUpload'); // multer s Cloudinary
-const cloudinary = require('../cloudinary');   // import cloudinary konfigurácie
+const upload = require('../cloudinaryUpload');
+const cloudinary = require('../cloudinary');
 
 // Nahranie profilovej fotky
 exports.uploadProfilePhoto = async (req, res) => {
   const userId = req.userId;
-  if (!userId) return res.status(401).json({ success: false, message: 'Neautorizovaný prístup.' });
+  if (!userId) {
+    return res.status(401).json({ success: false, message: 'Neautorizovaný prístup.' });
+  }
 
   try {
     // 1️⃣ Zisti starý public_id
     const [rows] = await db.query('SELECT user_photo_public_id FROM user WHERE id = ?', [userId]);
     const oldPublicId = rows[0]?.user_photo_public_id;
 
-    // 2️⃣ Vymaž starý obrázok, ak existuje a nie je default
-    if (oldPublicId && !oldPublicId.includes('default-avatar')) {
-      await cloudinary.uploader.destroy(oldPublicId);
-      console.log('Starý obrázok vymazaný z Cloudinary:', oldPublicId);
-    }
-
-    // 3️⃣ Spusti upload cez multer
+    // 2️⃣ Spusti upload cez multer (cloudinary)
     upload.single('photo')(req, res, async function (err) {
-      if (err) return res.status(400).json({ success: false, message: err.message });
-      if (!req.file || !req.file.path) return res.status(400).json({ success: false, message: 'Súbor nebol odoslaný.' });
+      if (err) {
+        return res.status(400).json({ success: false, message: err.message });
+      }
+      if (!req.file || !req.file.path || !req.file.filename) {
+        return res.status(400).json({ success: false, message: 'Súbor nebol odoslaný.' });
+      }
 
-      const cloudinaryUrl = req.file.path;
-      const publicId = req.file.filename || req.file.public_id;
+      const cloudinaryUrl = req.file.path;       // URL uloženého obrázka
+      const publicId = req.file.filename;        // unikátny public_id od Cloudinary
+
+      // 3️⃣ Vymaž starý obrázok (iba ak nie je default a existuje)
+      if (oldPublicId && !oldPublicId.includes('default-avatar')) {
+        await cloudinary.uploader.destroy(oldPublicId);
+        console.log('Starý obrázok vymazaný z Cloudinary:', oldPublicId);
+      }
 
       // 4️⃣ Ulož nový obrázok do DB
-      await db.query('UPDATE user SET user_photo = ?, user_photo_public_id = ? WHERE id = ?', [cloudinaryUrl, publicId, userId]);
+      await db.query(
+        'UPDATE user SET user_photo = ?, user_photo_public_id = ? WHERE id = ?',
+        [cloudinaryUrl, publicId, userId]
+      );
 
       console.log('Nová fotka nahraná na Cloudinary:', cloudinaryUrl);
       return res.json({ success: true, photo: cloudinaryUrl });
@@ -38,6 +48,7 @@ exports.uploadProfilePhoto = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Chyba pri uploadovaní fotky.' });
   }
 };
+
 
 
 // Nastavenie defaultnej profilovej fotky
