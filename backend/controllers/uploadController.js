@@ -3,6 +3,10 @@
 const db = require('../database');
 const upload = require('../cloudinaryUpload');
 const cloudinary = require('../cloudinary');
+const util = require('util');
+
+// Promisify multer
+const uploadAsync = util.promisify(upload.single('photo'));
 
 exports.uploadProfilePhoto = async (req, res) => {
   const userId = req.userId;
@@ -15,54 +19,50 @@ exports.uploadProfilePhoto = async (req, res) => {
     console.log("Starý public_id:", oldPublicId);
 
     // 2️⃣ Použijeme multer upload
-    upload.single('photo')(req, res, async (err) => {
-      if (err) {
-        console.error("Multer chyba:", err);
-        return res.status(400).json({ success: false, message: err.message });
-      }
+    await uploadAsync(req, res);
 
-      if (!req.file) {
-        console.log("Žiadny súbor v req.file");
-        return res.status(400).json({ success: false, message: 'Súbor nebol odoslaný.' });
-      }
+    if (!req.file) {
+      console.log("Žiadny súbor v req.file");
+      return res.status(400).json({ success: false, message: 'Súbor nebol odoslaný.' });
+    }
 
-      const cloudinaryUrl = req.file.path;     // celá URL pre zobrazenie
-      const publicId = req.file.filename;      // správny public_id pre mazanie
+    const cloudinaryUrl = req.file.path;     // celá URL pre zobrazenie
+    const publicId = req.file.filename;      // správny public_id pre mazanie
 
-      console.log("Nový public_id:", publicId);
-      console.log("Cloudinary URL:", cloudinaryUrl);
+    console.log("Nový public_id:", publicId);
+    console.log("Cloudinary URL:", cloudinaryUrl);
 
-      // 3️⃣ Zmaž starý obrázok až PO UPLOADE
-      if (oldPublicId && !oldPublicId.includes('default-avatar')) {
-        try {
-          const destroyResult = await cloudinary.uploader.destroy(oldPublicId);
-          console.log("Starý obrázok zmazaný, výsledok:", destroyResult);
-        } catch (err) {
-          console.error("Chyba pri mazaní starého obrázka:", err.message);
-        }
-      } else {
-        console.log("Starý obrázok neexistuje alebo je default, mazanie preskočené.");
-      }
-
-      // 4️⃣ Ulož nový do DB
+    // 3️⃣ Zmaž starý obrázok až PO UPLOADE
+    if (oldPublicId && !oldPublicId.includes('default-avatar')) {
       try {
-        await db.query(
-          'UPDATE user SET user_photo = ?, user_photo_public_id = ? WHERE id = ?',
-          [cloudinaryUrl, publicId, userId]
-        );
-        console.log("DB aktualizovaná s novým obrázkom");
+        const destroyResult = await cloudinary.uploader.destroy(oldPublicId);
+        console.log("Starý obrázok zmazaný, výsledok:", destroyResult);
       } catch (err) {
-        console.error("Chyba pri ukladaní do DB:", err.message);
-        return res.status(500).json({ success: false, message: 'Chyba pri ukladaní fotky.' });
+        console.error("Chyba pri mazaní starého obrázka:", err.message);
       }
+    } else {
+      console.log("Starý obrázok neexistuje alebo je default, mazanie preskočené.");
+    }
 
-      return res.json({ success: true, photo: cloudinaryUrl });
-    });
+    // 4️⃣ Ulož nový do DB
+    try {
+      await db.query(
+        'UPDATE user SET user_photo = ?, user_photo_public_id = ? WHERE id = ?',
+        [cloudinaryUrl, publicId, userId]
+      );
+      console.log("DB aktualizovaná s novým obrázkom");
+    } catch (err) {
+      console.error("Chyba pri ukladaní do DB:", err.message);
+      return res.status(500).json({ success: false, message: 'Chyba pri ukladaní fotky.' });
+    }
+
+    return res.json({ success: true, photo: cloudinaryUrl });
   } catch (err) {
     console.error("Chyba vo funkcii uploadProfilePhoto:", err.message);
     return res.status(500).json({ success: false, message: 'Neočakovaná chyba.' });
   }
 };
+
 
 
 
