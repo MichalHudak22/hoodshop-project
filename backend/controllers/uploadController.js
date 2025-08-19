@@ -20,8 +20,15 @@ exports.uploadProfilePhoto = async (req, res) => {
     return res.status(400).json({ success: false, message: 'Súbor nebol odoslaný.' });
   }
 
-  const cloudinaryUrl = req.file.path;
-  const publicId = `profile_photos/${req.file.filename}`; // tu je kompletný public_id
+const cloudinaryUrl = req.file.path;
+
+// Získame presný public_id bez duplicity a bez prípony
+const publicId = req.file.path
+  .split('/')
+  .slice(-2)           // vezmeme posledný folder + filename
+  .join('/')
+  .replace(/\.[^/.]+$/, ''); // odstránime príponu
+
 
   // 3️⃣ Zmaž starý obrázok (ak existuje a nie je default)
   if (oldPublicId && !oldPublicId.includes('default-avatar')) {
