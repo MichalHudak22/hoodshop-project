@@ -15,33 +15,32 @@ exports.uploadProfilePhoto = async (req, res) => {
 
     // 2️⃣ Uploadni nový obrázok
     upload.single('photo')(req, res, async function (err) {
-      if (err) return res.status(400).json({ success: false, message: err.message });
-      if (!req.file || !req.file.path || !req.file.filename) {
-        return res.status(400).json({ success: false, message: 'Súbor nebol odoslaný.' });
-      }
+  if (err) return res.status(400).json({ success: false, message: err.message });
+  if (!req.file || !req.file.path || !req.file.filename) {
+    return res.status(400).json({ success: false, message: 'Súbor nebol odoslaný.' });
+  }
 
-      // Správny public_id z multer-storage-cloudinary
-      const cloudinaryUrl = req.file.path;
-      const publicId = req.file.filename; // toto je ten, čo treba uložiť do DB
+  const cloudinaryUrl = req.file.path;
+  const publicId = `profile_photos/${req.file.filename}`; // tu je kompletný public_id
 
-      // 3️⃣ Zmaž starý obrázok (ak existuje a nie je default)
-      if (oldPublicId && !oldPublicId.includes('default-avatar')) {
-        try {
-          await cloudinary.uploader.destroy(oldPublicId);
-          console.log("Starý obrázok zmazaný:", oldPublicId);
-        } catch (err) {
-          console.error("Chyba pri mazaní starého obrázka:", err);
-        }
-      }
+  // 3️⃣ Zmaž starý obrázok (ak existuje a nie je default)
+  if (oldPublicId && !oldPublicId.includes('default-avatar')) {
+    try {
+      await cloudinary.uploader.destroy(oldPublicId);
+      console.log("Starý obrázok zmazaný:", oldPublicId);
+    } catch (err) {
+      console.error("Chyba pri mazaní starého obrázka:", err);
+    }
+  }
 
-      // 4️⃣ Ulož nový do DB
-      await db.query(
-        'UPDATE user SET user_photo = ?, user_photo_public_id = ? WHERE id = ?',
-        [cloudinaryUrl, publicId, userId]
-      );
+  // 4️⃣ Ulož nový do DB
+  await db.query(
+    'UPDATE user SET user_photo = ?, user_photo_public_id = ? WHERE id = ?',
+    [cloudinaryUrl, publicId, userId]
+  );
 
-      return res.json({ success: true, photo: cloudinaryUrl });
-    });
+  return res.json({ success: true, photo: cloudinaryUrl });
+});
 
   } catch (error) {
     console.error('Chyba pri uploadovaní fotky:', error);
