@@ -27,8 +27,8 @@ exports.uploadProfilePhoto = async (req, res) => {
         return res.status(400).json({ success: false, message: 'Súbor nebol odoslaný.' });
       }
 
-      const cloudinaryUrl = req.file.path;
-      const publicId = req.file.filename; // presný public_id
+      const cloudinaryUrl = req.file.path;      // celá URL
+      const publicId = req.file.filename;       // presný public_id pre Cloudinary
 
       console.log("Nový public_id:", publicId);
       console.log("Cloudinary URL:", cloudinaryUrl);
@@ -49,7 +49,7 @@ exports.uploadProfilePhoto = async (req, res) => {
       try {
         await db.query(
           'UPDATE user SET user_photo = ?, user_photo_public_id = ? WHERE id = ?',
-          [cloudinaryUrl, publicId, userId]
+          [cloudinaryUrl, publicId, userId]   // tu ukladáme publicId bez folderu
         );
         console.log("DB aktualizovaná s novým obrázkom");
       } catch (err) {
@@ -64,7 +64,6 @@ exports.uploadProfilePhoto = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Neočakovaná chyba.' });
   }
 };
-
 
 
 
