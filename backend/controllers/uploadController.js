@@ -59,18 +59,15 @@ exports.uploadProfilePhoto = async (req, res) => {
 // Nastavenie defaultnej profilovej fotky
 exports.setDefaultProfilePhoto = async (req, res) => {
   const userId = req.userId;
-  if (!userId) {
-    return res.status(401).json({ success: false, message: 'Neautorizovaný prístup.' });
-  }
+  if (!userId) return res.status(401).json({ success: false, message: 'Neautorizovaný prístup.' });
 
+  // Cloudinary URL default avatar
   const defaultUrl = 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1690000000/profile_photos/default-avatar.jpg';
+  const defaultPublicId = `profile_photos/user_${userId}`; // prepíšeme existujúci public_id
 
   try {
-    // Zistíme starý obrázok a vymažeme ho (ak nebol default)
-    const [rows] = await db.query(
-      'SELECT user_photo_public_id FROM user WHERE id = ?',
-      [userId]
-    );
+    // Zistíme starý obrázok a vymažeme ho (ak nie je default)
+    const [rows] = await db.query('SELECT user_photo_public_id FROM user WHERE id = ?', [userId]);
     const oldPublicId = rows[0]?.user_photo_public_id;
 
     if (oldPublicId && !oldPublicId.includes('default-avatar')) {
@@ -78,16 +75,23 @@ exports.setDefaultProfilePhoto = async (req, res) => {
       console.log('Predchádzajúci obrázok vymazaný z Cloudinary:', oldPublicId);
     }
 
-    // Nastavíme default URL a null public_id
+    // Nahráme default avatar na rovnaký public_id ako má používateľ
+    await cloudinary.uploader.upload(defaultUrl, {
+      public_id: defaultPublicId,
+      overwrite: true,
+      transformation: [{ width: 500, height: 500, crop: 'limit' }],
+    });
+
+    // Uložíme do DB
     await db.query(
-      'UPDATE user SET user_photo = ?, user_photo_public_id = NULL WHERE id = ?',
-      [defaultUrl, userId]
+      'UPDATE user SET user_photo = ?, user_photo_public_id = ? WHERE id = ?',
+      [defaultUrl, defaultPublicId, userId]
     );
 
     return res.json({ success: true, photo: defaultUrl });
-
   } catch (error) {
     console.error('Chyba pri nastavovaní defaultnej fotky:', error);
     return res.status(500).json({ success: false, message: 'Chyba pri nastavovaní defaultnej fotky.' });
   }
 };
+
