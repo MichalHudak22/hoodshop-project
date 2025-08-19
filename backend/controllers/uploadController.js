@@ -4,7 +4,6 @@ const db = require('../database');
 const upload = require('../cloudinaryUpload');
 const cloudinary = require('../cloudinary');
 
-// Middleware pre multer
 exports.uploadProfilePhoto = async (req, res) => {
   const userId = req.userId;
   if (!userId) return res.status(401).json({ success: false, message: 'Neautorizovaný prístup.' });
@@ -27,8 +26,8 @@ exports.uploadProfilePhoto = async (req, res) => {
         return res.status(400).json({ success: false, message: 'Súbor nebol odoslaný.' });
       }
 
-      const cloudinaryUrl = req.file.path;      // celá URL
-      const publicId = req.file.filename;       // presný public_id pre Cloudinary
+      const cloudinaryUrl = req.file.path;     // celá URL pre zobrazenie
+      const publicId = req.file.filename;      // správny public_id pre mazanie
 
       console.log("Nový public_id:", publicId);
       console.log("Cloudinary URL:", cloudinaryUrl);
@@ -49,7 +48,7 @@ exports.uploadProfilePhoto = async (req, res) => {
       try {
         await db.query(
           'UPDATE user SET user_photo = ?, user_photo_public_id = ? WHERE id = ?',
-          [cloudinaryUrl, publicId, userId]   // tu ukladáme publicId bez folderu
+          [cloudinaryUrl, publicId, userId]
         );
         console.log("DB aktualizovaná s novým obrázkom");
       } catch (err) {
@@ -64,6 +63,7 @@ exports.uploadProfilePhoto = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Neočakovaná chyba.' });
   }
 };
+
 
 
 
