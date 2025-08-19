@@ -9,56 +9,60 @@ exports.uploadProfilePhoto = async (req, res) => {
   const userId = req.userId;
   if (!userId) return res.status(401).json({ success: false, message: 'Neautorizovaný prístup.' });
 
-  // 1️⃣ Zisti starý public_id
-  const [rows] = await db.query('SELECT user_photo_public_id FROM user WHERE id = ?', [userId]);
-  const oldPublicId = rows[0]?.user_photo_public_id;
-  console.log("Starý public_id:", oldPublicId);
+  try {
+    // 1️⃣ Zisti starý public_id
+    const [rows] = await db.query('SELECT user_photo_public_id FROM user WHERE id = ?', [userId]);
+    const oldPublicId = rows[0]?.user_photo_public_id;
+    console.log("Starý public_id:", oldPublicId);
 
-  // 2️⃣ Použijeme multer upload
-  upload.single('photo')(req, res, async (err) => {
-    if (err) {
-      console.error("Multer chyba:", err);
-      return res.status(400).json({ success: false, message: err.message });
-    }
-    if (!req.file) {
-      console.error("Žiadny súbor v req.file");
-      return res.status(400).json({ success: false, message: 'Súbor nebol odoslaný.' });
-    }
-
-    console.log("req.file:", req.file);
-
-    const cloudinaryUrl = req.file.path;
-    const publicId = req.file.filename; // presný public_id
-
-    console.log("Nový public_id:", publicId);
-    console.log("Cloudinary URL:", cloudinaryUrl);
-
-    // 3️⃣ Zmaž starý obrázok až PO UPLOADE
-    if (oldPublicId && !oldPublicId.includes('default-avatar')) {
-      try {
-        const destroyResult = await cloudinary.uploader.destroy(oldPublicId);
-        console.log("Destroy result:", destroyResult);
-      } catch (err) {
-        console.error("Chyba pri mazaní starého obrázka:", err);
+    // 2️⃣ Použijeme multer upload
+    upload.single('photo')(req, res, async (err) => {
+      if (err) {
+        console.error("Multer chyba:", err);
+        return res.status(400).json({ success: false, message: err.message });
       }
-    } else {
-      console.log("Starý obrázok neexistuje alebo je default.");
-    }
 
-    // 4️⃣ Ulož nový do DB
-    try {
-      await db.query(
-        'UPDATE user SET user_photo = ?, user_photo_public_id = ? WHERE id = ?',
-        [cloudinaryUrl, publicId, userId]
-      );
-      console.log("DB aktualizovaná");
-    } catch (err) {
-      console.error("Chyba pri ukladaní do DB:", err);
-      return res.status(500).json({ success: false, message: 'Chyba pri ukladaní fotky.' });
-    }
+      if (!req.file) {
+        console.log("Žiadny súbor v req.file");
+        return res.status(400).json({ success: false, message: 'Súbor nebol odoslaný.' });
+      }
 
-    return res.json({ success: true, photo: cloudinaryUrl });
-  });
+      const cloudinaryUrl = req.file.path;
+      const publicId = req.file.filename; // presný public_id
+
+      console.log("Nový public_id:", publicId);
+      console.log("Cloudinary URL:", cloudinaryUrl);
+
+      // 3️⃣ Zmaž starý obrázok až PO UPLOADE
+      if (oldPublicId && !oldPublicId.includes('default-avatar')) {
+        try {
+          const destroyResult = await cloudinary.uploader.destroy(oldPublicId);
+          console.log("Starý obrázok zmazaný, výsledok:", destroyResult);
+        } catch (err) {
+          console.error("Chyba pri mazaní starého obrázka:", err.message);
+        }
+      } else {
+        console.log("Starý obrázok neexistuje alebo je default, mazanie preskočené.");
+      }
+
+      // 4️⃣ Ulož nový do DB
+      try {
+        await db.query(
+          'UPDATE user SET user_photo = ?, user_photo_public_id = ? WHERE id = ?',
+          [cloudinaryUrl, publicId, userId]
+        );
+        console.log("DB aktualizovaná s novým obrázkom");
+      } catch (err) {
+        console.error("Chyba pri ukladaní do DB:", err.message);
+        return res.status(500).json({ success: false, message: 'Chyba pri ukladaní fotky.' });
+      }
+
+      return res.json({ success: true, photo: cloudinaryUrl });
+    });
+  } catch (err) {
+    console.error("Chyba vo funkcii uploadProfilePhoto:", err.message);
+    return res.status(500).json({ success: false, message: 'Neočakovaná chyba.' });
+  }
 };
 
 
