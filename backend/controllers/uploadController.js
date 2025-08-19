@@ -20,8 +20,9 @@ exports.uploadProfilePhoto = async (req, res) => {
         return res.status(400).json({ success: false, message: 'Súbor nebol odoslaný.' });
       }
 
+      // Správny public_id z multer-storage-cloudinary
       const cloudinaryUrl = req.file.path;
-      const publicId = req.file.filename;
+      const publicId = req.file.filename; // toto je ten, čo treba uložiť do DB
 
       // 3️⃣ Zmaž starý obrázok (ak existuje a nie je default)
       if (oldPublicId && !oldPublicId.includes('default-avatar')) {
@@ -47,6 +48,7 @@ exports.uploadProfilePhoto = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Chyba pri uploadovaní fotky.' });
   }
 };
+
 
 
 // Nastavenie defaultnej profilovej fotky
