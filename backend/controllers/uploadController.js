@@ -13,37 +13,28 @@ exports.uploadProfilePhoto = async (req, res) => {
     const [rows] = await db.query('SELECT user_photo_public_id FROM user WHERE id = ?', [userId]);
     const oldPublicId = rows[0]?.user_photo_public_id;
 
-    // 2️⃣ Najprv zmaž starý avatar (ak existuje)
+    // 2️⃣ Zmaž starý avatar (ak existuje a nie je default)
     if (oldPublicId && !oldPublicId.includes('default-avatar')) {
       try {
-        // 🟢 Debug log
-        console.log("Mazem z Cloudinary:", oldPublicId);
-
-        // 🟢 Skús overiť, či existuje
-        try {
-          const info = await cloudinary.api.resource(oldPublicId);
-          console.log("Obrázok existuje:", info.secure_url);
-        } catch (err) {
-          console.error("❌ Obrázok sa nenašiel:", err.message);
+        const resource = await cloudinary.api.resource(oldPublicId).catch(() => null);
+        if (resource) {
+          console.log("Mazem z Cloudinary:", oldPublicId);
+          const result = await cloudinary.uploader.destroy(oldPublicId);
+          console.log("Destroy Cloudinary response:", result);
+        } else {
+          console.log("Starý obrázok neexistuje, nič sa nemaže.");
         }
-
-        // 🟢 Skús vymazať
-        const result = await cloudinary.uploader.destroy(oldPublicId);
-        console.log("Destroy Cloudinary response:", result);
       } catch (err) {
-        console.error("❌ Chyba pri mazaní obrázka:", err);
+        console.error("Chyba pri mazaní starého obrázka:", err);
       }
     }
 
-    // 3️⃣ Potom uploadni nový
+    // 3️⃣ Uploadni nový
     upload.single('photo')(req, res, async function (err) {
       if (err) return res.status(400).json({ success: false, message: err.message });
       if (!req.file || !req.file.path || !req.file.filename) {
         return res.status(400).json({ success: false, message: 'Súbor nebol odoslaný.' });
       }
-
-      // 🟢 Debug log
-      console.log("req.file:", req.file);
 
       const cloudinaryUrl = req.file.path;
       const publicId = req.file.filename;
