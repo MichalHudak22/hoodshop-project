@@ -1,52 +1,61 @@
-import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
-import axios from 'axios';
-import { AuthContext } from './AuthContext';
-
-export const CartContext = createContext();
-
+// CartContext.jsx
 export const CartProvider = ({ children }) => {
+  const [cartItems, setCartItems] = useState([]);
   const { user } = useContext(AuthContext);
-  const [cartCount, setCartCount] = useState(0);
   const [sessionId, setSessionId] = useState(null);
 
-  // Inicializácia sessionId
   useEffect(() => {
-    let sId = localStorage.getItem('sessionId') || localStorage.getItem('session_id');
+    let sId = localStorage.getItem("sessionId");
     if (!sId) {
       sId = crypto.randomUUID();
-      localStorage.setItem('sessionId', sId);
+      localStorage.setItem("sessionId", sId);
     }
     setSessionId(sId);
   }, []);
 
-  const fetchCartCount = useCallback(async () => {
-    if (!sessionId && !user) return;
-
+  const fetchCartFromBackend = async () => {
+    if (!user && !sessionId) return;
     try {
       const headers = {};
-      const token = user?.token || localStorage.getItem('token');
+      if (user?.token) headers.Authorization = `Bearer ${user.token}`;
+      else headers['x-session-id'] = sessionId;
 
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      } else if (sessionId) {
-        headers['x-session-id'] = sessionId;
-      }
-
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart/count`, { headers });
-      setCartCount(res.data?.count || 0);
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { headers });
+      setCartItems(res.data || []);
     } catch (err) {
-      console.error('Chyba pri načítaní počtu položiek v košíku:', err);
-      setCartCount(0);
+      console.error(err);
+      setCartItems([]);
     }
-  }, [sessionId, user]);
+  };
 
   useEffect(() => {
-    fetchCartCount();
-  }, [user, sessionId, fetchCartCount]);
+    fetchCartFromBackend();
+  }, [user, sessionId]);
+
+  const addToCart = async (product) => {
+    // najprv lokálne update
+    setCartItems(prev => {
+      const existing = prev.find(i => i.id === product.id);
+      if (existing) return prev.map(i => i.id === product.id ? {...i, quantity: i.quantity+1} : i);
+      return [...prev, {...product, quantity:1}];
+    });
+
+    // potom call na backend
+    try {
+      const headers = {};
+      if (user?.token) headers.Authorization = `Bearer ${user.token}`;
+      else headers['x-session-id'] = sessionId;
+
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { productId: product.id }, { headers });
+      await fetchCartFromBackend(); // refresh po úspešnom pridaní
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   return (
-    <CartContext.Provider value={{ cartCount, refreshCartCount: fetchCartCount }}>
+    <CartContext.Provider value={{ cartItems, addToCart, fetchCartFromBackend }}>
       {children}
     </CartContext.Provider>
-  );
-};
+  )
+}

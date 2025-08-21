@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 const CartPage = () => {
   const { user } = useContext(AuthContext);
-  const { refreshCartCount } = useContext(CartContext);
+  const { fetchCartFromBackend, cartItems: contextCartItems, refreshCartCount } = useContext(CartContext);
 
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,38 +23,19 @@ const CartPage = () => {
     setSessionId(sId);
   }, []);
 
-  // Funkcia na načítanie košíka
-  const fetchCart = async () => {
-    if (!sessionId && !user) return;
-    setLoading(true);
-    try {
-      const headers = {};
-      if (user?.token) {
-        headers.Authorization = `Bearer ${user.token}`;
-      } else {
-        headers['x-session-id'] = sessionId;
-      }
-
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/api/cart`,
-        { headers }
-      );
-      setCartItems(response.data || []);
-      calculateTotal(response.data || []);
-      refreshCartCount();
-    } catch (err) {
-      console.error('Failed to load cart:', err);
-      setCartItems([]);
-      setTotal(0);
-    } finally {
+  // Synchronizuje košík s CartContext
+  useEffect(() => {
+    if (contextCartItems) {
+      setCartItems(contextCartItems);
+      calculateTotal(contextCartItems);
       setLoading(false);
     }
-  };
+  }, [contextCartItems]);
 
-  // Re-fetch košíka keď sa zmení user alebo sessionId
+  // Fetch pri zmene user alebo sessionId
   useEffect(() => {
     if (!sessionId) return;
-    fetchCart();
+    fetchCartFromBackend();
   }, [user, sessionId]);
 
   const calculateTotal = (items) => {
@@ -65,11 +46,9 @@ const CartPage = () => {
   const handleRemove = async (itemId) => {
     try {
       const headers = {};
-      if (user?.token) {
-        headers.Authorization = `Bearer ${user.token}`;
-      } else {
-        headers['x-session-id'] = sessionId;
-      }
+      if (user?.token) headers.Authorization = `Bearer ${user.token}`;
+      else headers['x-session-id'] = sessionId;
+
       await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`, { headers });
       const updated = cartItems.filter(item => item.id !== itemId);
       setCartItems(updated);
@@ -84,16 +63,15 @@ const CartPage = () => {
     if (newQuantity < 1) return;
     try {
       const headers = {};
-      if (user?.token) {
-        headers.Authorization = `Bearer ${user.token}`;
-      } else {
-        headers['x-session-id'] = sessionId;
-      }
+      if (user?.token) headers.Authorization = `Bearer ${user.token}`;
+      else headers['x-session-id'] = sessionId;
+
       await axios.patch(
         `${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`,
         { quantity: newQuantity },
         { headers }
       );
+
       const updated = cartItems.map(item =>
         item.id === itemId ? { ...item, quantity: newQuantity } : item
       );
@@ -140,7 +118,7 @@ const CartPage = () => {
             Total: <span className="text-green-500 text-2xl font-semibold">${total.toFixed(2)}</span>
           </h2>
           <Link to="/checkout">
-            <button type="button" className="w-full md:w-[50%] lg:w-80 lg:text-xl bg-green-700 hover:bg-green-600 text-white font-semibold py-3 rounded-xl">Proceed to Checkout</button>
+            <button type="button" className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 font-semibold">Proceed to Checkout</button>
           </Link>
         </div>
       </div>
