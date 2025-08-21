@@ -1,4 +1,10 @@
 // CartContext.jsx
+import { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
+import { AuthContext } from './AuthContext';
+
+export const CartContext = createContext(); // <-- toto ti chýba
+
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const { user } = useContext(AuthContext);
@@ -33,21 +39,19 @@ export const CartProvider = ({ children }) => {
   }, [user, sessionId]);
 
   const addToCart = async (product) => {
-    // najprv lokálne update
     setCartItems(prev => {
       const existing = prev.find(i => i.id === product.id);
       if (existing) return prev.map(i => i.id === product.id ? {...i, quantity: i.quantity+1} : i);
       return [...prev, {...product, quantity:1}];
     });
 
-    // potom call na backend
     try {
       const headers = {};
       if (user?.token) headers.Authorization = `Bearer ${user.token}`;
       else headers['x-session-id'] = sessionId;
 
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { productId: product.id }, { headers });
-      await fetchCartFromBackend(); // refresh po úspešnom pridaní
+      await fetchCartFromBackend();
     } catch (err) {
       console.error(err);
     }
@@ -57,5 +61,5 @@ export const CartProvider = ({ children }) => {
     <CartContext.Provider value={{ cartItems, addToCart, fetchCartFromBackend }}>
       {children}
     </CartContext.Provider>
-  )
-}
+  );
+};
