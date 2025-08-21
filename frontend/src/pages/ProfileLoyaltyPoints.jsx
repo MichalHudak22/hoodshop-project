@@ -6,13 +6,13 @@ import { AuthContext } from '../context/AuthContext';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function ProfileLoyaltyPoints() {
-  const { user } = useContext(AuthContext);
-  const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { user } = useContext(AuthContext); // sledujeme aktualny user
+  const [profile, setProfile] = useState(user || null); // nastavime user hned
+  const [loading, setLoading] = useState(!user); // ak user este nie je, loading=true
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!user?.token) return; // počkaj, kým sa načíta token
+    if (!user?.token) return;
 
     const fetchProfile = async () => {
       try {
@@ -30,7 +30,7 @@ function ProfileLoyaltyPoints() {
     };
 
     fetchProfile();
-  }, [user?.token]); // spusti fetch vždy, keď sa token zmení
+  }, [user]); // spusti fetch vzdy ked sa zmeni user
 
   if (!user) {
     return (
@@ -46,7 +46,6 @@ function ProfileLoyaltyPoints() {
       style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}
     >
       <div className="absolute inset-0 bg-black opacity-30 z-0" />
-
       <div className="relative z-10 w-full flex flex-col items-center">
         <div className="py-8 text-center bg-black w-full">
           <h1 className="text-2xl lg:text-4xl font-bold text-white">

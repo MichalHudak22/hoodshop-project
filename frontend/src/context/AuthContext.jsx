@@ -3,23 +3,30 @@ import { createContext, useState, useEffect } from 'react';
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem('user');
+    const storedToken = localStorage.getItem('token');
+    if (storedUser && storedToken) {
+      return { ...JSON.parse(storedUser), token: storedToken };
+    }
+    return null;
+  });
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const verifyToken = async () => {
-      const storedToken = localStorage.getItem('token');
-      if (!storedToken) {
+      if (!user) {
         setLoading(false);
         return;
       }
       try {
         const res = await fetch(import.meta.env.VITE_API_BASE_URL + '/user/profile', {
-          headers: { 'Authorization': 'Bearer ' + storedToken },
+          headers: { 'Authorization': 'Bearer ' + user.token },
         });
         if (!res.ok) throw new Error('Unauthorized');
         const userData = await res.json();
-        setUser({ ...userData, token: storedToken });
+        setUser({ ...userData, token: user.token }); // user teraz obsahuje aj loyalty_points
         localStorage.setItem('user', JSON.stringify(userData));
       } catch {
         setUser(null);
