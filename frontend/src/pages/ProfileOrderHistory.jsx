@@ -11,66 +11,66 @@ function OrderHistory() {
   const navigate = useNavigate();
 
   useEffect(() => {
-  const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token');
 
-  if (!token) {
-    navigate('/login');
-    return;
-  }
+    if (!token) {
+      navigate('/login');
+      return;
+    }
 
-  setLoading(true);
+    setLoading(true);
 
-  // Načítať údaje o používateľovi
-  fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
-    method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.error) {
-        setError(data.error);
-        setLoading(false);
-      } else {
-        setUser(data);
-
-        // Načítať objednávky
-        fetch(`${import.meta.env.VITE_API_BASE_URL}/api/order-history/history`, {
-          method: 'GET',
-          headers: { Authorization: `Bearer ${token}` },
-        })
-          .then((res) => res.json())
-          .then((ordersData) => {
-            if (ordersData.error) {
-              setError(ordersData.error);
-              setOrders([]);
-            } else if (Array.isArray(ordersData)) {
-              setOrders(ordersData);
-            } else {
-              setOrders([]);
-            }
-            setLoading(false);
-          })
-          .catch(() => {
-            setError('Chyba pri načítaní objednávok');
-            setLoading(false);
-          });
-      }
+    // Načítať údaje o používateľovi
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${token}` },
     })
-    .catch(() => {
-      setError('Chyba pri načítaní údajov o používateľovi');
-      setLoading(false);
-    });
-}, [navigate]);
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          setError(data.error);
+          setLoading(false);
+        } else {
+          setUser(data);
 
-return (
-   <div className="relative w-full min-h-screen bg-cover bg-no-repeat bg-center" style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}>
-    {/* Overlay */}
-    <div className="absolute inset-0 bg-black opacity-30 z-0" />
+          // Načítať objednávky
+          fetch(`${import.meta.env.VITE_API_BASE_URL}/api/order-history/history`, {
+            method: 'GET',
+            headers: { Authorization: `Bearer ${token}` },
+          })
+            .then((res) => res.json())
+            .then((ordersData) => {
+              if (ordersData.error) {
+                setError(ordersData.error);
+                setOrders([]);
+              } else if (Array.isArray(ordersData)) {
+                setOrders(ordersData);
+              } else {
+                setOrders([]);
+              }
+              setLoading(false);
+            })
+            .catch(() => {
+              setError('Chyba pri načítaní objednávok');
+              setLoading(false);
+            });
+        }
+      })
+      .catch(() => {
+        setError('Chyba pri načítaní údajov o používateľovi');
+        setLoading(false);
+      });
+  }, [navigate]);
 
-    {/* Obsah */}
-    <div className="relative z-10 w-full max-w-[1024px] mx-auto py-10 px-4 mt-10 flex flex-col">
+  return (
+    <div className="relative w-full min-h-screen bg-cover bg-no-repeat bg-center" style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}>
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black opacity-30 z-0" />
 
-             {/* Nadpis */}
+      {/* Obsah */}
+      <div className="relative z-10 w-full max-w-[1024px] mx-auto py-10 px-4 mt-10 flex flex-col">
+
+        {/* Nadpis */}
         <div className="py-8 text-center bg-black w-full">
           <h1 className="text-2xl lg:text-4xl font-bold text-white">
             Your<span className="text-blue-200">Orders</span>
@@ -83,8 +83,8 @@ return (
         </div>
 
         {/* Admin Panel - zobrazí sa len adminovi */}
-        {user.role === 'admin' && (
-          <div className=" pb-5 w-[220px] md:m-auto">
+        {user && user.role === 'admin' && (
+          <div className="pb-5 w-[220px] md:m-auto">
             <button
               onClick={() => navigate('/admin')}
               className="w-full px-3 py-3 bg-black text-white hover:text-blue-200 text-[12px] sm:text-[16px] lg:text-[20px] font-bold transition-all duration-300 border-2 border-gray-500 hover:border-blue-200"
@@ -93,13 +93,14 @@ return (
             </button>
           </div>
         )}
-      {loading && <p className='text-green-400'>Načítavam objednávky...</p>}
 
-      {!loading && error && <p className="text-red-500">{error}</p>}
+        {loading && <p className='text-green-400'>Načítavam objednávky...</p>}
 
-      {!loading && !error && orders.length === 0 && <p className="text-white">Nemáte žiadne objednávky.</p>}
+        {!loading && error && <p className="text-red-500">{error}</p>}
 
-      {!loading && orders.length > 0 && orders.map((order) => {
+        {!loading && !error && orders.length === 0 && <p className="text-white">Nemáte žiadne objednávky.</p>}
+
+        {!loading && orders.length > 0 && orders.map((order) => {
           const itemsArray = Array.isArray(order.items) ? order.items : [];
 
           const totalQuantity = itemsArray.reduce((sum, item) => {
