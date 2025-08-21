@@ -54,8 +54,6 @@ exports.uploadProfilePhoto = async (req, res) => {
 
 
 
-
-
 // Nastavenie defaultnej profilovej fotky
 exports.setDefaultProfilePhoto = async (req, res) => {
   const userId = req.userId;
