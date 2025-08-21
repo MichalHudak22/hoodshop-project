@@ -63,24 +63,35 @@ function OrderHistory() {
   }, [navigate]);
 
   return (
-    <div className="relative w-full min-h-screen bg-cover bg-no-repeat bg-center" style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}>
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black opacity-30 z-0" />
+<div
+  className="relative text-white flex flex-col items-center bg-fixed bg-cover bg-no-repeat bg-center min-h-screen"
+  style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}
+>
+  {/* Overlay */}
+  <div className="absolute inset-0 bg-black opacity-30 z-0" />
 
-      {/* Obsah */}
-      <div className="relative z-10 w-full max-w-[1024px] mx-auto pb-10 px-4 mt-10 flex flex-col">
+  {/* Obsah */}
+  <div className="relative z-10 w-full flex flex-col items-center">
+    
+    {/* Nadpis */}
+    <div className="py-8 text-center bg-black w-full">
+      <h1 className="text-2xl lg:text-4xl font-bold text-white">
+        Your <span className="text-blue-200">Orders</span>
+      </h1>
+    </div>
 
-        {/* Nadpis */}
-        <div className="py-8 text-center bg-black w-full">
-          <h1 className="text-2xl lg:text-4xl font-bold text-white">
-            Your<span className="text-blue-200">Orders</span>
-          </h1>
-        </div>
+    {/* Profile Navigation */}
+    <div className="w-full lg:max-w-2xl">
+      <ProfileNavigation />
+    </div>
 
-        {/* Profile Navigation */}
-        <div className="w-full lg:max-w-2xl mx-auto">
-          <ProfileNavigation />
-        </div>
+    {/* Tu môžeš potom vložiť zoznam objednávok */}
+    <div className="w-full lg:max-w-2xl mt-6">
+      {/* napr. <OrderList /> alebo map cez orders */}
+    </div>
+
+
+
 
         {loading && <p className='text-green-400'>Načítavam objednávky...</p>}
 
