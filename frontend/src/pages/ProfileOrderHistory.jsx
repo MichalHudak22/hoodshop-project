@@ -69,6 +69,30 @@ return (
 
     {/* Obsah */}
     <div className="relative z-10 w-full max-w-[1024px] mx-auto py-10 px-4 mt-10 flex flex-col">
+
+             {/* Nadpis */}
+        <div className="py-8 text-center bg-black w-full">
+          <h1 className="text-2xl lg:text-4xl font-bold text-white">
+            Your Orders<span className="text-blue-200">{user.name}</span>
+          </h1>
+        </div>
+
+        {/* Profile Navigation */}
+        <div className="w-full lg:max-w-2xl">
+          <ProfileNavigation />
+        </div>
+
+        {/* Admin Panel - zobrazí sa len adminovi */}
+        {user.role === 'admin' && (
+          <div className=" pb-5 w-[220px] md:m-auto">
+            <button
+              onClick={() => navigate('/admin')}
+              className="w-full px-3 py-3 bg-black text-white hover:text-blue-200 text-[12px] sm:text-[16px] lg:text-[20px] font-bold transition-all duration-300 border-2 border-gray-500 hover:border-blue-200"
+            >
+              Go to Admin Panel
+            </button>
+          </div>
+        )}
       {loading && <p className='text-green-400'>Načítavam objednávky...</p>}
 
       {!loading && error && <p className="text-red-500">{error}</p>}
