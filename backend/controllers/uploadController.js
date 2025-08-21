@@ -61,16 +61,16 @@ exports.setDefaultProfilePhoto = async (req, res) => {
     return res.status(401).json({ success: false, message: 'Neautorizovaný prístup.' });
   }
 
-  // Sem vlož pevný public_id a URL svojho default avataru z Cloudinary
+  // ⚡️ Skutočné údaje z Cloudinary (pozri detail obrázka v Cloudinary)
   const defaultPublicId = 'profile_photos/default-avatar_z3c30l'; 
-  const defaultUrl = 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1234567890/profile_photos/default-avatar_z3c30l.jpg';
+  const defaultUrl = 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1724234234/profile_photos/default-avatar_z3c30l.jpg';
 
   try {
-    // Najprv zistíme starý obrázok
+    // Zistíme, či má user uloženú fotku
     const [rows] = await db.query('SELECT user_photo_public_id FROM user WHERE id = ?', [userId]);
     const oldPublicId = rows[0]?.user_photo_public_id;
 
-    // Ak mal predtým iný obrázok ako default, zmaž ho
+    // Ak mal vlastnú fotku (nie default), zmaž ju
     if (oldPublicId && oldPublicId !== defaultPublicId) {
       try {
         await cloudinary.uploader.destroy(oldPublicId);
@@ -80,7 +80,7 @@ exports.setDefaultProfilePhoto = async (req, res) => {
       }
     }
 
-    // Ulož default do DB
+    // Nastavíme default avatar
     await db.query(
       'UPDATE user SET user_photo = ?, user_photo_public_id = ? WHERE id = ?',
       [defaultUrl, defaultPublicId, userId]
@@ -92,5 +92,6 @@ exports.setDefaultProfilePhoto = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Chyba pri nastavovaní defaultnej fotky.' });
   }
 };
+
 
 
