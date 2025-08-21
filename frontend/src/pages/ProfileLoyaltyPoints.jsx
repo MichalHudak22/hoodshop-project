@@ -53,7 +53,7 @@ function ProfileLoyaltyPoints() {
           </h1>
         </div>
 
-        <div className="w-full lg:max-w-2xl px-4">
+        <div className="w-full lg:max-w-2xl">
           <ProfileNavigation />
 
           {loading && (
