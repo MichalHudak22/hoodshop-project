@@ -78,7 +78,7 @@ function OrderHistory() {
         </div>
 
         {/* Profile Navigation */}
-        <div className="w-full lg:max-w-2xl">
+        <div className="w-full lg:max-w-2xl mx-auto">
           <ProfileNavigation />
         </div>
 
