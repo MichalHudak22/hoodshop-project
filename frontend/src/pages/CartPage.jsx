@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
 import { CartContext } from '../context/CartContext';
 import { AuthContext } from '../context/AuthContext';
 import { Link } from "react-router-dom";
@@ -14,33 +13,34 @@ const CartPage = () => {
   const [total, setTotal] = useState(0);
   const [sessionId, setSessionId] = useState(null);
 
-  // Pri mountnutí vygeneruj alebo načítaj sessionId
+  // Načíta alebo vygeneruje sessionId
   useEffect(() => {
-    let sId = localStorage.getItem('sessionId') || localStorage.getItem('session_id');
+    let sId = localStorage.getItem('sessionId');
     if (!sId) {
-      sId = uuidv4();
+      sId = crypto.randomUUID();
       localStorage.setItem('sessionId', sId);
     }
     setSessionId(sId);
   }, []);
 
   // Funkcia na načítanie košíka
-  const fetchCart = async (currentUser, currentSessionId) => {
-    if (!currentUser && !currentSessionId) return;
+  const fetchCart = async () => {
+    if (!sessionId && !user) return;
     setLoading(true);
     try {
       const headers = {};
-      if (currentUser?.token) {
-        headers.Authorization = `Bearer ${currentUser.token}`;
+      if (user?.token) {
+        headers.Authorization = `Bearer ${user.token}`;
       } else {
-        headers['x-session-id'] = currentSessionId;
+        headers['x-session-id'] = sessionId;
       }
+
       const response = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/api/cart`,
         { headers }
       );
-      setCartItems(response.data);
-      calculateTotal(response.data);
+      setCartItems(response.data || []);
+      calculateTotal(response.data || []);
       refreshCartCount();
     } catch (err) {
       console.error('Failed to load cart:', err);
@@ -51,10 +51,10 @@ const CartPage = () => {
     }
   };
 
-  // Re-fetch košíka pri zmene user alebo sessionId
+  // Re-fetch košíka keď sa zmení user alebo sessionId
   useEffect(() => {
     if (!sessionId) return;
-    fetchCart(user, sessionId);
+    fetchCart();
   }, [user, sessionId]);
 
   const calculateTotal = (items) => {
