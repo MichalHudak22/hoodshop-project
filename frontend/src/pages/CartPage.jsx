@@ -1,107 +1,42 @@
-import React, { useEffect, useState, useContext } from 'react';
-import axios from 'axios';
-import { CartContext } from '../context/CartContext';
-import { AuthContext } from '../context/AuthContext';
+import React, { useEffect, useContext, useState } from "react";
+import { CartContext } from "../context/CartContext";
+import { AuthContext } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 
 const CartPage = () => {
   const { user } = useContext(AuthContext);
-  const { refreshCartCount } = useContext(CartContext);
+  const { cartItems, fetchCartFromBackend } = useContext(CartContext);
 
-  const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
-  const [sessionId, setSessionId] = useState(null);
 
-  // Načíta alebo vygeneruje sessionId
+  // Calculate total whenever cartItems change
   useEffect(() => {
-    let sId = localStorage.getItem('sessionId');
-    if (!sId) {
-      sId = crypto.randomUUID();
-      localStorage.setItem('sessionId', sId);
-    }
-    setSessionId(sId);
-  }, []);
-
-  // Funkcia na načítanie košíka
-  const fetchCart = async () => {
-    if (!sessionId && !user) return;
-    setLoading(true);
-    try {
-      const headers = {};
-      if (user?.token) {
-        headers.Authorization = `Bearer ${user.token}`;
-      } else {
-        headers['x-session-id'] = sessionId;
-      }
-
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/api/cart`,
-        { headers }
-      );
-      setCartItems(response.data || []);
-      calculateTotal(response.data || []);
-      refreshCartCount();
-    } catch (err) {
-      console.error('Failed to load cart:', err);
-      setCartItems([]);
-      setTotal(0);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Re-fetch košíka keď sa zmení user alebo sessionId
-  useEffect(() => {
-    if (!sessionId) return;
-    fetchCart();
-  }, [user, sessionId]);
-
-  const calculateTotal = (items) => {
-    const sum = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const sum = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
     setTotal(sum);
-  };
+    setLoading(false);
+  }, [cartItems]);
+
+  // Fetch cart on first render or when user changes (login/logout)
+  useEffect(() => {
+    setLoading(true);
+    fetchCartFromBackend().finally(() => setLoading(false));
+  }, [user]); // len user, sessionId je už v kontekte
 
   const handleRemove = async (itemId) => {
     try {
-      const headers = {};
-      if (user?.token) {
-        headers.Authorization = `Bearer ${user.token}`;
-      } else {
-        headers['x-session-id'] = sessionId;
-      }
-      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`, { headers });
-      const updated = cartItems.filter(item => item.id !== itemId);
-      setCartItems(updated);
-      calculateTotal(updated);
-      refreshCartCount();
+      await fetchCartFromBackend({ removeId: itemId });
     } catch (err) {
-      console.error('Remove failed:', err);
+      console.error(err);
     }
   };
 
   const handleQuantityChange = async (itemId, newQuantity) => {
     if (newQuantity < 1) return;
     try {
-      const headers = {};
-      if (user?.token) {
-        headers.Authorization = `Bearer ${user.token}`;
-      } else {
-        headers['x-session-id'] = sessionId;
-      }
-      await axios.patch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`,
-        { quantity: newQuantity },
-        { headers }
-      );
-      const updated = cartItems.map(item =>
-        item.id === itemId ? { ...item, quantity: newQuantity } : item
-      );
-      setCartItems(updated);
-      calculateTotal(updated);
-      refreshCartCount();
+      await fetchCartFromBackend({ updateId: itemId, quantity: newQuantity });
     } catch (err) {
-      console.error('Update failed:', err);
+      console.error(err);
     }
   };
 
@@ -140,7 +75,9 @@ const CartPage = () => {
             Total: <span className="text-green-500 text-2xl font-semibold">${total.toFixed(2)}</span>
           </h2>
           <Link to="/checkout">
-            <button type="button" className="w-full md:w-[50%] lg:w-80 lg:text-xl bg-green-700 hover:bg-green-600 text-white font-semibold py-3 rounded-xl">Proceed to Checkout</button>
+            <button type="button" className="w-full md:w-[50%] lg:w-[40%] bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg transition-all">
+              Proceed to Checkout
+            </button>
           </Link>
         </div>
       </div>
