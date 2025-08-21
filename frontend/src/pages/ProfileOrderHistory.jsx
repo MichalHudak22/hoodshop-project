@@ -68,7 +68,7 @@ function OrderHistory() {
       <div className="absolute inset-0 bg-black opacity-30 z-0" />
 
       {/* Obsah */}
-      <div className="relative z-10 w-full max-w-[1024px] mx-auto py-10 px-4 mt-10 flex flex-col">
+      <div className="relative z-10 w-full max-w-[1024px] mx-auto pb-10 px-4 mt-10 flex flex-col">
 
         {/* Nadpis */}
         <div className="py-8 text-center bg-black w-full">
