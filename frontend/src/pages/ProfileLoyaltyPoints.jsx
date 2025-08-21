@@ -12,8 +12,7 @@ function ProfileLoyaltyPoints() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // počkaj, kým sa user načíta
-    if (!user) return;
+    if (!user?.token) return; // počkaj, kým sa načíta token
 
     const fetchProfile = async () => {
       try {
@@ -31,9 +30,8 @@ function ProfileLoyaltyPoints() {
     };
 
     fetchProfile();
-  }, [user]);
+  }, [user?.token]); // spusti fetch vždy, keď sa token zmení
 
-  // Ak sa user ešte nenačítal
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center text-white bg-black">
@@ -50,7 +48,6 @@ function ProfileLoyaltyPoints() {
       <div className="absolute inset-0 bg-black opacity-30 z-0" />
 
       <div className="relative z-10 w-full flex flex-col items-center">
-        {/* Nadpis */}
         <div className="py-8 text-center bg-black w-full">
           <h1 className="text-2xl lg:text-4xl font-bold text-white">
             Points & <span className="text-blue-200">Rewards</span>
