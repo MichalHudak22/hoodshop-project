@@ -6,9 +6,9 @@ import { AuthContext } from '../context/AuthContext';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function ProfileLoyaltyPoints() {
-  const { user } = useContext(AuthContext); // sledujeme aktualny user
-  const [profile, setProfile] = useState(user || null); // nastavime user hned
-  const [loading, setLoading] = useState(!user); // ak user este nie je, loading=true
+  const { user } = useContext(AuthContext);
+  const [profile, setProfile] = useState(user || null);
+  const [loading, setLoading] = useState(!user);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ function ProfileLoyaltyPoints() {
     };
 
     fetchProfile();
-  }, [user]); // spusti fetch vzdy ked sa zmeni user
+  }, [user]);
 
   if (!user) {
     return (
@@ -84,6 +84,19 @@ function ProfileLoyaltyPoints() {
                 </span>{' '}
                 in discounts!
               </p>
+            </div>
+          )}
+
+          {/* Admin panel */}
+          {profile?.isAdmin && (
+            <div className="mt-10 bg-red-900 bg-opacity-80 p-6 rounded-xl shadow-lg border-2 border-red-600">
+              <h2 className="text-2xl font-bold text-yellow-400 mb-4 text-center">Admin Panel</h2>
+              <ul className="text-white space-y-2 text-center">
+                <li>🛠 Manage Users</li>
+                <li>📦 Manage Products</li>
+                <li>📈 View Orders</li>
+                <li>⚙️ Site Settings</li>
+              </ul>
             </div>
           )}
 
