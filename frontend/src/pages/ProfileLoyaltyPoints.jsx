@@ -12,7 +12,8 @@ function ProfileLoyaltyPoints() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!user?.token) return;
+    // počkaj, kým sa user načíta
+    if (!user) return;
 
     const fetchProfile = async () => {
       try {
@@ -31,6 +32,15 @@ function ProfileLoyaltyPoints() {
 
     fetchProfile();
   }, [user]);
+
+  // Ak sa user ešte nenačítal
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white bg-black">
+        Loading user info...
+      </div>
+    );
+  }
 
   return (
     <div
