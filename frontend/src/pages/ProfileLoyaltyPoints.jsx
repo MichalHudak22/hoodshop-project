@@ -87,19 +87,6 @@ function ProfileLoyaltyPoints() {
             </div>
           )}
 
-          {/* Admin panel */}
-          {profile?.isAdmin && (
-            <div className="mt-10 bg-red-900 bg-opacity-80 p-6 rounded-xl shadow-lg border-2 border-red-600">
-              <h2 className="text-2xl font-bold text-yellow-400 mb-4 text-center">Admin Panel</h2>
-              <ul className="text-white space-y-2 text-center">
-                <li>🛠 Manage Users</li>
-                <li>📦 Manage Products</li>
-                <li>📈 View Orders</li>
-                <li>⚙️ Site Settings</li>
-              </ul>
-            </div>
-          )}
-
           {/* Info o vernostnych bodoch */}
           <div className="max-w-5xl mx-auto bg-black bg-opacity-70 shadow-md rounded-2xl p-6 mt-10 text-gray-800 border-2 border-gray-600">
             <h2 className="text-2xl text-blue-100 font-bold mb-4 text-center">
