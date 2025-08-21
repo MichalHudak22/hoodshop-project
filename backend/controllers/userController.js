@@ -39,6 +39,9 @@ const transporter = nodemailer.createTransport({
 const createUser = (req, res) => {
   const { name, email, password } = req.body;
 
+  const defaultUrl = 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1755594977/default-avatar_z3c30l.jpg';
+  const defaultPublicId = 'default-avatar_z3c30l';
+
   const checkEmailQuery = 'SELECT * FROM user WHERE email = ?';
   db.query(checkEmailQuery, [email], (err, results) => {
     if (err) return res.status(500).json({ error: 'Chyba pri overovaní emailu.' });
@@ -47,8 +50,12 @@ const createUser = (req, res) => {
     bcrypt.hash(password, 10, (err, hashedPassword) => {
       if (err) return res.status(500).json({ error: 'Chyba pri hashovaní hesla.' });
 
-      const insertUserQuery = 'INSERT INTO user (name, email, password, is_verified) VALUES (?, ?, ?, false)';
-      db.query(insertUserQuery, [name, email, hashedPassword], (err, result) => {
+      const insertUserQuery = `
+        INSERT INTO user (name, email, password, is_verified, user_photo, user_photo_public_id)
+        VALUES (?, ?, ?, false, ?, ?)
+      `;
+
+      db.query(insertUserQuery, [name, email, hashedPassword, defaultUrl, defaultPublicId], (err, result) => {
         if (err) return res.status(500).json({ error: 'Chyba pri ukladaní používateľa.' });
 
         const userId = result.insertId;
@@ -56,19 +63,16 @@ const createUser = (req, res) => {
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
         const expiresAtFormatted = expiresAt.toISOString().slice(0, 19).replace('T', ' ');
 
-        // VLOŽENIE IBA RAZ
         db.query(
           'INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
           [userId, token, expiresAtFormatted],
           (err) => {
-           if (err) {
-  console.error('Chyba pri ukladaní tokenu:', err);
-  return res.status(500).json({ error: 'Chyba pri ukladaní tokenu.' });
-}
+            if (err) {
+              console.error('Chyba pri ukladaní tokenu:', err);
+              return res.status(500).json({ error: 'Chyba pri ukladaní tokenu.' });
+            }
 
-
-          const verificationLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${token}`;
-
+            const verificationLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${token}`;
 
             transporter.sendMail({
               to: email,
