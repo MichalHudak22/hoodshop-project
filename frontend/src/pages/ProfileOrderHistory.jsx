@@ -73,7 +73,7 @@ return (
              {/* Nadpis */}
         <div className="py-8 text-center bg-black w-full">
           <h1 className="text-2xl lg:text-4xl font-bold text-white">
-            Your Orders<span className="text-blue-200">{user.name}</span>
+            Your<span className="text-blue-200">Orders</span>
           </h1>
         </div>
 
