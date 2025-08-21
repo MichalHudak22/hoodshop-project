@@ -62,8 +62,8 @@ exports.setDefaultProfilePhoto = async (req, res) => {
   }
 
   // Cloudinary údaje pre default avatar
-  const defaultPublicId = 'profile_photos/default-avatar_z3c30l';
-  const defaultUrl = 'https://res.cloudinary.com/dd8gjvv80/image/upload/profile_photos/default-avatar_z3c30l.jpg';
+  const defaultPublicId = 'default-avatar_z3c30l';
+  const defaultUrl = 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1755594977/default-avatar_z3c30l.jpg';
 
   try {
     // Najprv zistíme starý obrázok
