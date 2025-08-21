@@ -13,14 +13,14 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
     let sId = localStorage.getItem('sessionId') || localStorage.getItem('session_id');
     if (!sId) {
-      sId = crypto.randomUUID(); // alternatívne v Node môžeš použiť uuidv4()
+      sId = crypto.randomUUID();
       localStorage.setItem('sessionId', sId);
     }
     setSessionId(sId);
   }, []);
 
   const fetchCartCount = useCallback(async () => {
-    if (!sessionId && !user) return; // čakáme, kým máme sessionId alebo user
+    if (!sessionId && !user) return;
 
     try {
       const headers = {};
@@ -33,23 +33,19 @@ export const CartProvider = ({ children }) => {
       }
 
       const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart/count`, { headers });
-      setCartCount(res.data.count || 0);
+      setCartCount(res.data?.count || 0);
     } catch (err) {
       console.error('Chyba pri načítaní počtu položiek v košíku:', err);
       setCartCount(0);
     }
   }, [sessionId, user]);
 
-  const refreshCartCount = useCallback(() => {
-    fetchCartCount();
-  }, [fetchCartCount]);
-
   useEffect(() => {
     fetchCartCount();
   }, [user, sessionId, fetchCartCount]);
 
   return (
-    <CartContext.Provider value={{ cartCount, refreshCartCount }}>
+    <CartContext.Provider value={{ cartCount, refreshCartCount: fetchCartCount }}>
       {children}
     </CartContext.Provider>
   );
