@@ -57,30 +57,30 @@ exports.uploadProfilePhoto = async (req, res) => {
 // Nastavenie defaultnej profilovej fotky
 exports.setDefaultProfilePhoto = async (req, res) => {
   const userId = req.userId;
-  if (!userId) return res.status(401).json({ success: false, message: 'Neautorizovaný prístup.' });
+  if (!userId) {
+    return res.status(401).json({ success: false, message: 'Neautorizovaný prístup.' });
+  }
 
-  // Cloudinary URL default avatar
-  const defaultUrl = 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1690000000/profile_photos/default-avatar.jpg';
-  const defaultPublicId = `profile_photos/user_${userId}`; // prepíšeme existujúci public_id
+  // Sem vlož pevný public_id a URL svojho default avataru z Cloudinary
+  const defaultPublicId = 'profile_photos/default-avatar_z3c30l'; 
+  const defaultUrl = 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1234567890/profile_photos/default-avatar_z3c30l.jpg';
 
   try {
-    // Zistíme starý obrázok a vymažeme ho (ak nie je default)
+    // Najprv zistíme starý obrázok
     const [rows] = await db.query('SELECT user_photo_public_id FROM user WHERE id = ?', [userId]);
     const oldPublicId = rows[0]?.user_photo_public_id;
 
-    if (oldPublicId && !oldPublicId.includes('default-avatar')) {
-      await cloudinary.uploader.destroy(oldPublicId);
-      console.log('Predchádzajúci obrázok vymazaný z Cloudinary:', oldPublicId);
+    // Ak mal predtým iný obrázok ako default, zmaž ho
+    if (oldPublicId && oldPublicId !== defaultPublicId) {
+      try {
+        await cloudinary.uploader.destroy(oldPublicId);
+        console.log('Vymazaný starý obrázok:', oldPublicId);
+      } catch (err) {
+        console.error('Chyba pri mazaní starého obrázka:', err.message);
+      }
     }
 
-    // Nahráme default avatar na rovnaký public_id ako má používateľ
-    await cloudinary.uploader.upload(defaultUrl, {
-      public_id: defaultPublicId,
-      overwrite: true,
-      transformation: [{ width: 500, height: 500, crop: 'limit' }],
-    });
-
-    // Uložíme do DB
+    // Ulož default do DB
     await db.query(
       'UPDATE user SET user_photo = ?, user_photo_public_id = ? WHERE id = ?',
       [defaultUrl, defaultPublicId, userId]
@@ -92,4 +92,5 @@ exports.setDefaultProfilePhoto = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Chyba pri nastavovaní defaultnej fotky.' });
   }
 };
+
 
