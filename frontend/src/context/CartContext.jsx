@@ -7,28 +7,38 @@ export const CartContext = createContext();
 export const CartProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
   const [cartCount, setCartCount] = useState(0);
+  const [sessionId, setSessionId] = useState(null);
+
+  // Inicializácia sessionId
+  useEffect(() => {
+    let sId = localStorage.getItem('sessionId') || localStorage.getItem('session_id');
+    if (!sId) {
+      sId = crypto.randomUUID(); // alternatívne v Node môžeš použiť uuidv4()
+      localStorage.setItem('sessionId', sId);
+    }
+    setSessionId(sId);
+  }, []);
 
   const fetchCartCount = useCallback(async () => {
-  try {
-    const headers = {};
-    const token = localStorage.getItem('token');
-    const sessionId = localStorage.getItem('session_id') || localStorage.getItem('sessionId');
+    if (!sessionId && !user) return; // čakáme, kým máme sessionId alebo user
 
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    } else if (sessionId) {
-      headers['x-session-id'] = sessionId;
+    try {
+      const headers = {};
+      const token = user?.token || localStorage.getItem('token');
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      } else if (sessionId) {
+        headers['x-session-id'] = sessionId;
+      }
+
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart/count`, { headers });
+      setCartCount(res.data.count || 0);
+    } catch (err) {
+      console.error('Chyba pri načítaní počtu položiek v košíku:', err);
+      setCartCount(0);
     }
-
-    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart/count`, { headers });
-
-    setCartCount(res.data.count || 0);
-  } catch (err) {
-    console.error('Chyba pri načítaní počtu položiek v košíku:', err);
-    setCartCount(0);
-  }
-}, []);
-
+  }, [sessionId, user]);
 
   const refreshCartCount = useCallback(() => {
     fetchCartCount();
@@ -36,7 +46,7 @@ export const CartProvider = ({ children }) => {
 
   useEffect(() => {
     fetchCartCount();
-  }, [user, fetchCartCount]);
+  }, [user, sessionId, fetchCartCount]);
 
   return (
     <CartContext.Provider value={{ cartCount, refreshCartCount }}>
