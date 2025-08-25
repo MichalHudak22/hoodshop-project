@@ -6,10 +6,9 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
-    if (storedUser && storedToken) {
-      return { ...JSON.parse(storedUser), token: storedToken };
-    }
-    return null;
+    return storedUser && storedToken
+      ? { ...JSON.parse(storedUser), token: storedToken }
+      : null;
   });
 
   const [loading, setLoading] = useState(true);
@@ -21,12 +20,12 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       try {
-        const res = await fetch(import.meta.env.VITE_API_BASE_URL + '/user/profile', {
-          headers: { 'Authorization': 'Bearer ' + user.token },
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
+          headers: { Authorization: `Bearer ${user.token}` },
         });
         if (!res.ok) throw new Error('Unauthorized');
         const userData = await res.json();
-        setUser({ ...userData, token: user.token }); // user teraz obsahuje aj loyalty_points
+        setUser({ ...userData, token: user.token });
         localStorage.setItem('user', JSON.stringify(userData));
       } catch {
         setUser(null);
@@ -36,20 +35,21 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
       }
     };
-
     verifyToken();
   }, []);
 
-  const login = (userData) => {
+  const login = (userData, callback) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', userData.token);
+    if (callback) callback(); // napr. refresh košíka
   };
 
-  const logout = () => {
+  const logout = (callback) => {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    if (callback) callback(); // napr. refresh košíka
   };
 
   return (

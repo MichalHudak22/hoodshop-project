@@ -1,45 +1,45 @@
 import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
+import { v4 as uuidv4 } from 'uuid';
 
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
+  const [cartItems, setCartItems] = useState([]);
   const [cartCount, setCartCount] = useState(0);
-
-  const fetchCartCount = useCallback(async () => {
-  try {
-    const headers = {};
-    const token = localStorage.getItem('token');
-    const sessionId = localStorage.getItem('session_id') || localStorage.getItem('sessionId');
-
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    } else if (sessionId) {
-      headers['x-session-id'] = sessionId;
+  const [sessionId, setSessionId] = useState(() => {
+    let sId = localStorage.getItem('sessionId') || localStorage.getItem('session_id');
+    if (!sId) {
+      sId = uuidv4();
+      localStorage.setItem('sessionId', sId);
     }
+    return sId;
+  });
 
-    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart/count`, { headers });
+  const fetchCart = useCallback(async () => {
+    try {
+      const headers = {};
+      if (user && user.token) headers.Authorization = `Bearer ${user.token}`;
+      else if (sessionId) headers['x-session-id'] = sessionId;
 
-    setCartCount(res.data.count || 0);
-  } catch (err) {
-    console.error('Chyba pri načítaní počtu položiek v košíku:', err);
-    setCartCount(0);
-  }
-}, []);
-
-
-  const refreshCartCount = useCallback(() => {
-    fetchCartCount();
-  }, [fetchCartCount]);
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { headers });
+      setCartItems(res.data);
+      setCartCount(res.data.length);
+    } catch (err) {
+      console.error('Chyba pri načítaní košíka:', err);
+      setCartItems([]);
+      setCartCount(0);
+    }
+  }, [user, sessionId]);
 
   useEffect(() => {
-    fetchCartCount();
-  }, [user, fetchCartCount]);
+    fetchCart();
+  }, [fetchCart]);
 
   return (
-    <CartContext.Provider value={{ cartCount, refreshCartCount }}>
+    <CartContext.Provider value={{ cartItems, cartCount, refreshCart: fetchCart }}>
       {children}
     </CartContext.Provider>
   );

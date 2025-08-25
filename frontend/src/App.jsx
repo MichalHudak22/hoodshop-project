@@ -3,6 +3,7 @@ import { Suspense, lazy, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid'; 
 import Header from './components/Header';
 import Footer from './components/Footer';
+import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext'; // <- pridaj import
 
 // Lazy load stránok
@@ -60,6 +61,7 @@ function App() {
 
   return (
     <Router>
+       <AuthProvider>
       <CartProvider> {/* OBALÍME TÝMTO VŠETKO, ČO POTREBUJE PRÍSTUP KU KART CONTEXT */}
         <Header />
         <div className="pt-[89px]">
@@ -103,6 +105,7 @@ function App() {
         </div>
         <Footer />
       </CartProvider>
+      </AuthProvider>
     </Router>
   );
 }
