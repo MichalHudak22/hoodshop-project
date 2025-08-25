@@ -11,7 +11,8 @@ function Login() {
   const navigate = useNavigate();
 
   const { login } = useContext(AuthContext);
-  const { refreshCartCount } = useContext(CartContext);
+  const { refreshCart } = useContext(CartContext);
+
 
 const handleSubmit = async (e) => {
   e.preventDefault();
@@ -45,7 +46,7 @@ const handleSubmit = async (e) => {
         token: data.token,
       },
       () => {
-        refreshCartCount(); // refresh košíka
+        refreshCart(); // refresh košíka
         navigate('/profile'); // presmerovanie na profil
       }
     );
