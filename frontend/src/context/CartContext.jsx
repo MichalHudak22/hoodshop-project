@@ -1,70 +1,49 @@
-import { createContext, useState, useEffect, useContext } from 'react';
-import { CartContext } from './CartContext';
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import axios from 'axios';
+import { AuthContext } from './AuthContext';
+import { v4 as uuidv4 } from 'uuid';
 
-export const AuthContext = createContext();
+export const CartContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem('user');
-    const storedToken = localStorage.getItem('token');
-    if (storedUser && storedToken) {
-      return { ...JSON.parse(storedUser), token: storedToken };
+export const CartProvider = ({ children }) => {
+  const { user, loading } = useContext(AuthContext);
+  const [cartItems, setCartItems] = useState([]);
+  const [cartCount, setCartCount] = useState(0);
+
+  const fetchCart = async () => {
+    try {
+      const headers = {};
+      const token = user?.token || localStorage.getItem('token');
+      const sessionId = localStorage.getItem('sessionId') || localStorage.getItem('session_id');
+
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      else if (sessionId) headers['x-session-id'] = sessionId;
+
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { headers });
+      setCartItems(res.data);
+      setCartCount(res.data.length);
+    } catch (err) {
+      console.error('Chyba pri načítaní košíka:', err);
+      setCartItems([]);
+      setCartCount(0);
     }
-    return null;
-  });
-
-  const [loading, setLoading] = useState(true);
-
-  // Natiahneme refreshCart z CartContext
-  const { refreshCart } = useContext(CartContext) || {};
+  };
 
   useEffect(() => {
-    const verifyToken = async () => {
-      if (!user) {
-        setLoading(false);
-        return;
+    if (!loading) {
+      // ak sa user zmenil (login/logout), fetchni košík
+      let sId = localStorage.getItem('sessionId') || localStorage.getItem('session_id');
+      if (!sId) {
+        sId = uuidv4();
+        localStorage.setItem('sessionId', sId);
       }
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
-        if (!res.ok) throw new Error('Unauthorized');
-        const userData = await res.json();
-        setUser({ ...userData, token: user.token });
-        localStorage.setItem('user', JSON.stringify(userData));
-      } catch {
-        setUser(null);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    verifyToken();
-  }, []);
-
-  const login = (userData) => {
-    setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
-    localStorage.setItem('token', userData.token);
-
-    // ihneď refresh košíka po login
-    refreshCart?.();
-  };
-
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-
-    // ihneď refresh košíka na sessionId
-    refreshCart?.();
-  };
+      fetchCart();
+    }
+  }, [user, loading]);
 
   return (
-    <AuthContext.Provider value={{ user, setUser, login, logout, loading }}>
+    <CartContext.Provider value={{ cartItems, cartCount, refreshCart: fetchCart }}>
       {children}
-    </AuthContext.Provider>
+    </CartContext.Provider>
   );
 };
