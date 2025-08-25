@@ -13,30 +13,36 @@ export const AuthProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const verifyToken = async () => {
-      if (!user) {
-        setLoading(false);
-        return;
+useEffect(() => {
+  const verifyToken = async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+
+      if (!res.ok) {
+        throw new Error('Unauthorized');
       }
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
-          headers: { Authorization: `Bearer ${user.token}` },
-        });
-        if (!res.ok) throw new Error('Unauthorized');
-        const userData = await res.json();
-        setUser({ ...userData, token: user.token });
-        localStorage.setItem('user', JSON.stringify(userData));
-      } catch {
-        setUser(null);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-      } finally {
-        setLoading(false);
-      }
-    };
-    verifyToken();
-  }, []);
+
+      const userData = await res.json();
+      setUser({ ...userData, token: user.token });
+      localStorage.setItem('user', JSON.stringify({ ...userData, token: user.token }));
+    } catch (err) {
+      console.warn('Token verification failed:', err);
+      setUser(null);
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    } finally {
+      setLoading(false);
+    }
+  };
+  verifyToken();
+}, []);
+
 
   const login = (userData, callback) => {
     setUser(userData); // toto spustí re-render vo všetkých kontextoch

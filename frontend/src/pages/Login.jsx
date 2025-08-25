@@ -13,58 +13,49 @@ function Login() {
   const { login } = useContext(AuthContext);
   const { refreshCartCount } = useContext(CartContext);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
+  setMessage('');
 
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        // kontrola chýb zo servera
-        if (data.error) {
-          setError(data.error);
-          setMessage('');
-          return;
-        }
+    });
 
-        if (
-          data.message ===
-          'Email is not verified. Please verify your account before logging in.'
-        ) {
-          setError(
-            'Email is not verified. Please verify your account before logging in.'
-          );
-          setMessage('');
-          return;
-        }
+    const data = await res.json();
 
-        // úspešné prihlásenie
-        setMessage(data.message);
-        setError('');
+    if (data.error) {
+      setError(data.error);
+      return;
+    }
 
-        login(
-          {
-            email: data.email,
-            name: data.name,
-            role: data.role,
-            token: data.token,
-          },
-          () => {
-            // callback sa spustí až po nastavení usera
-            refreshCartCount(); // refresh košíka
-            navigate('/profile'); // presmerovanie na profil
-          }
-        );
-      })
-      .catch((err) => {
-        console.error('Error during login:', err);
-        setError('An error occurred while logging in.');
-        setMessage('');
-      });
-  };
+    if (data.message === 'Email is not verified. Please verify your account before logging in.') {
+      setError(data.message);
+      return;
+    }
+
+    login(
+      {
+        email: data.email,
+        name: data.name,
+        role: data.role,
+        token: data.token,
+      },
+      () => {
+        refreshCartCount(); // refresh košíka
+        navigate('/profile'); // presmerovanie na profil
+      }
+    );
+
+  } catch (err) {
+    console.error('Login error:', err);
+    setError('An error occurred while logging in.');
+  }
+};
+
 
   return (
     <div
