@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', userData.token);
 
-    // ihneď refreshneme košík po login
+    // ihneď refresh košíka po login
     refreshCartCount?.();
   };
 
@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
 
-    // refresh košíka na sessionId košík
+    // ihneď refresh košíka po logout
     refreshCartCount?.();
   };
 
