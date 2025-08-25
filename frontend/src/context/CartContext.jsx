@@ -10,11 +10,20 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [cartCount, setCartCount] = useState(0);
 
+  // inicializácia sessionId pred fetchom
+  const sessionId = (() => {
+    let sId = localStorage.getItem('sessionId') || localStorage.getItem('session_id');
+    if (!sId) {
+      sId = uuidv4();
+      localStorage.setItem('sessionId', sId);
+    }
+    return sId;
+  })();
+
   const fetchCart = async () => {
     try {
       const headers = {};
       const token = user?.token || localStorage.getItem('token');
-      const sessionId = localStorage.getItem('sessionId') || localStorage.getItem('session_id');
 
       if (token) headers['Authorization'] = `Bearer ${token}`;
       else if (sessionId) headers['x-session-id'] = sessionId;
@@ -30,15 +39,7 @@ export const CartProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (!loading) {
-      // ak sa user zmenil (login/logout), fetchni košík
-      let sId = localStorage.getItem('sessionId') || localStorage.getItem('session_id');
-      if (!sId) {
-        sId = uuidv4();
-        localStorage.setItem('sessionId', sId);
-      }
-      fetchCart();
-    }
+    if (!loading) fetchCart();
   }, [user, loading]);
 
   return (
