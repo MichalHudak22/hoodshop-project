@@ -45,9 +45,6 @@ login(
     navigate('/profile'); // a naviguje na profil
   }
 );
-
-        refreshCartCount();
-        navigate('/profile');
       }
     })
     .catch((err) => {
