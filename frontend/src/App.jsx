@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Suspense, lazy, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid'; 
+import { v4 as uuidv4 } from 'uuid';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { CartProvider } from './context/CartContext';
@@ -39,7 +39,7 @@ const Login = lazy(() => import('./pages/Login'));
 
 const Profile = lazy(() => import('./pages/Profile'));
 const ProfileOrderHistory = lazy(() => import('./pages/ProfileOrderHistory'));
-const ProfileLoyaltyPoints= lazy(() => import('./pages/ProfileLoyaltyPoints'));
+const ProfileLoyaltyPoints = lazy(() => import('./pages/ProfileLoyaltyPoints'));
 
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 const BrandDetail = lazy(() => import('./pages/BrandDetail'));
@@ -59,8 +59,8 @@ function App() {
 
   return (
     <Router>
-      <CartProvider> {/* musí byť nad AuthProvider */}
-        <AuthProvider>
+      <AuthProvider>
+        <CartProvider> {/* musí byť nad AuthProvider */}
           <Header />
           <div className="pt-[89px]">
             <Suspense fallback={<div>Loading...</div>}>
@@ -102,8 +102,8 @@ function App() {
             </Suspense>
           </div>
           <Footer />
-        </AuthProvider>
-      </CartProvider>
+        </CartProvider>
+      </AuthProvider>
     </Router>
   );
 }
