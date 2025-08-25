@@ -15,8 +15,8 @@ export const AuthProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(true);
 
-  // Natiahneme refreshCartCount z CartContext
-  const { refreshCartCount } = useContext(CartContext) || {};
+  // Natiahneme refreshCart z CartContext
+  const { refreshCart } = useContext(CartContext) || {};
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('token', userData.token);
 
     // ihneď refresh košíka po login
-    refreshCartCount?.();
+    refreshCart?.();
   };
 
   const logout = () => {
@@ -58,8 +58,8 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
 
-    // ihneď refresh košíka po logout
-    refreshCartCount?.();
+    // ihneď refresh košíka na sessionId
+    refreshCart?.();
   };
 
   return (
