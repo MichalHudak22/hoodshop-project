@@ -1,4 +1,6 @@
-import { createContext, useState, useEffect } from 'react';
+// AuthContext.jsx
+import { createContext, useState, useEffect, useContext } from 'react';
+import { CartContext } from './CartContext';
 
 export const AuthContext = createContext();
 
@@ -14,6 +16,9 @@ export const AuthProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(true);
 
+  // 👉 sem natiahneme CartContext
+  const { refreshCartCount } = useContext(CartContext) || {};
+
   useEffect(() => {
     const verifyToken = async () => {
       if (!user) {
@@ -26,7 +31,7 @@ export const AuthProvider = ({ children }) => {
         });
         if (!res.ok) throw new Error('Unauthorized');
         const userData = await res.json();
-        setUser({ ...userData, token: user.token }); // user teraz obsahuje aj loyalty_points
+        setUser({ ...userData, token: user.token });
         localStorage.setItem('user', JSON.stringify(userData));
       } catch {
         setUser(null);
@@ -44,12 +49,14 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', userData.token);
+    refreshCartCount?.(); // 👈 po login hneď načítaj košík
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    refreshCartCount?.(); // 👈 po logout hneď načítaj košík
   };
 
   return (
