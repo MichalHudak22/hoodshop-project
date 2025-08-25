@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useCallback, useContext } from 'react';
+import { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
 import { v4 as uuidv4 } from 'uuid';
@@ -11,7 +11,7 @@ export const CartProvider = ({ children }) => {
   const [cartCount, setCartCount] = useState(0);
 
   const [sessionId] = useState(() => {
-    let sId = localStorage.getItem('sessionId') || localStorage.getItem('session_id');
+    let sId = localStorage.getItem('sessionId');
     if (!sId) {
       sId = uuidv4();
       localStorage.setItem('sessionId', sId);
@@ -35,6 +35,7 @@ export const CartProvider = ({ children }) => {
     }
   }, [user, sessionId]);
 
+  // ✅ fetchCart vždy pri mountnutí a pri zmene user
   useEffect(() => {
     fetchCart();
   }, [fetchCart]);
