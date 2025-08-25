@@ -12,7 +12,7 @@ export const CartProvider = ({ children }) => {
   const [cartCount, setCartCount] = useState(0);
   const [sessionId, setSessionId] = useState(null);
 
-  // Inicializácia sessionId pri mountnutí
+  // inicializácia sessionId
   useEffect(() => {
     let sId = localStorage.getItem('sessionId') || localStorage.getItem('session_id');
     if (!sId) {
@@ -40,12 +40,27 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  // pridanie položky do košíka
+  const addToCart = async (productId, quantity = 1) => {
+    try {
+      const headers = {};
+      const token = user?.token || localStorage.getItem('token');
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      else if (sessionId) headers['x-session-id'] = sessionId;
+
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { productId, quantity }, { headers });
+      fetchCart(); // refresh po pridaní
+    } catch (err) {
+      console.error('Add to cart failed:', err);
+    }
+  };
+
   useEffect(() => {
     if (!loading && sessionId) fetchCart();
   }, [user, loading, sessionId]);
 
   return (
-    <CartContext.Provider value={{ cartItems, cartCount, refreshCart: fetchCart }}>
+    <CartContext.Provider value={{ cartItems, cartCount, fetchCart, addToCart }}>
       {children}
     </CartContext.Provider>
   );

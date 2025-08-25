@@ -1,18 +1,17 @@
 // AuthContext.jsx
 import { createContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const navigate = useNavigate();
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
-    if (storedUser && storedToken) {
-      return { ...JSON.parse(storedUser), token: storedToken };
-    }
+    if (storedUser && storedToken) return { ...JSON.parse(storedUser), token: storedToken };
     return null;
   });
-
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,6 +43,7 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', userData.token);
+    navigate("/profile"); // presmerovanie po login
   };
 
   const logout = () => {
