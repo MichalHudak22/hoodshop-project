@@ -49,14 +49,12 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', userData.token);
-    refreshCartCount?.(); // 👈 po login hneď načítaj košík
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    refreshCartCount?.(); // 👈 po logout hneď načítaj košík
   };
 
   return (
