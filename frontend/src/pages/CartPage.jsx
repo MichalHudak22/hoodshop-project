@@ -31,18 +31,12 @@ useEffect(() => {
     setLoading(true);
     try {
       const headers = {};
-      if (user && user.token) {
-        headers.Authorization = `Bearer ${user.token}`;
-      } else {
-        headers['x-session-id'] = sessionId;
-      }
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/api/cart`,
-        { headers }
-      );
+      if (user?.token) headers.Authorization = `Bearer ${user.token}`;
+      else headers['x-session-id'] = sessionId;
+
+      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { headers });
       setCartItems(response.data);
       calculateTotal(response.data);
-      refreshCartCount();
     } catch (err) {
       console.error('Failed to load cart:', err);
     } finally {
@@ -51,7 +45,7 @@ useEffect(() => {
   };
 
   fetchCart();
-}, [user, sessionId, refreshCartCount]);
+}, [user, sessionId]); // 🔹 odchytáva login/logout zmeny
 
 
   const calculateTotal = (items) => {
