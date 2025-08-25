@@ -39,10 +39,10 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (userData, callback) => {
-    setUser(userData);
+    setUser(userData); // toto spustí re-render vo všetkých kontextoch
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', userData.token);
-    if (callback) callback(); // napr. refresh košíka
+    if (callback) callback(); // napr. refresh košíka + navigácia
   };
 
   const logout = (callback) => {

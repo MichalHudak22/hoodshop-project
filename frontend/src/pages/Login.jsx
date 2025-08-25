@@ -33,12 +33,18 @@ function Login() {
         setMessage(data.message);
         setError('');
 
-        login({
-          email: data.email,
-          name: data.name,
-          role: data.role,
-          token: data.token,
-        });
+login(
+  {
+    email: data.email,
+    name: data.name,
+    role: data.role,
+    token: data.token,
+  },
+  () => {                // callback sa spustí až po nastavení user
+    refreshCartCount();   // hneď refreshne košík
+    navigate('/profile'); // a naviguje na profil
+  }
+);
 
         refreshCartCount();
         navigate('/profile');
