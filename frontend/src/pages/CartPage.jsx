@@ -37,6 +37,7 @@ useEffect(() => {
       const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { headers });
       setCartItems(response.data);
       calculateTotal(response.data);
+      refreshCartCount(); // 🟢 ihneď po fetch
     } catch (err) {
       console.error('Failed to load cart:', err);
     } finally {
@@ -45,7 +46,8 @@ useEffect(() => {
   };
 
   fetchCart();
-}, [user, sessionId]); // 🔹 odchytáva login/logout zmeny
+}, [user, sessionId, refreshCartCount]);
+
 
 
   const calculateTotal = (items) => {

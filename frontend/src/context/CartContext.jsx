@@ -6,26 +6,19 @@ import { AuthContext } from './AuthContext';
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
   const [cartCount, setCartCount] = useState(0);
 
   const fetchCartCount = async () => {
     try {
       const headers = {};
-      const token = localStorage.getItem('token');
+      const token = user?.token || localStorage.getItem('token');
       const sessionId = localStorage.getItem('session_id') || localStorage.getItem('sessionId');
 
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      } else if (sessionId) {
-        headers['x-session-id'] = sessionId;
-      }
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      else if (sessionId) headers['x-session-id'] = sessionId;
 
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/api/cart/count`,
-        { headers }
-      );
-
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart/count`, { headers });
       setCartCount(res.data.count || 0);
     } catch (err) {
       console.error('Chyba pri načítaní počtu položiek v košíku:', err);
@@ -33,10 +26,10 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // 🟢 refresh pri zmene user (login/logout)
+  // Refresh pri zmene user alebo po load auth
   useEffect(() => {
-    fetchCartCount();
-  }, [user]);
+    if (!loading) fetchCartCount();
+  }, [user, loading]);
 
   return (
     <CartContext.Provider value={{ cartCount, refreshCartCount: fetchCartCount }}>
@@ -44,3 +37,4 @@ export const CartProvider = ({ children }) => {
     </CartContext.Provider>
   );
 };
+
