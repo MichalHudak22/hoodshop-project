@@ -38,24 +38,28 @@ const handleSubmit = async (e) => {
       return;
     }
 
-    login(
-      {
-        email: data.email,
-        name: data.name,
-        role: data.role,
-        token: data.token,
-      },
-      () => {
-        refreshCart(); // refresh košíka
-        navigate('/profile'); // presmerovanie na profil
-      }
-    );
+    // 1️⃣ login do AuthContext
+    login({
+      email: data.email,
+      name: data.name,
+      role: data.role,
+      token: data.token,
+    });
+
+    // 2️⃣ refresh košíka (CartContext musí byť dostupný!)
+    if (refreshCart) {
+      await refreshCart();
+    }
+
+    // 3️⃣ presmerovanie
+    navigate('/profile');
 
   } catch (err) {
     console.error('Login error:', err);
     setError('An error occurred while logging in.');
   }
 };
+
 
 
   return (

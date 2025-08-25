@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
+import { createContext, useState, useEffect, useCallback, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
 import { v4 as uuidv4 } from 'uuid';
@@ -9,7 +9,8 @@ export const CartProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
   const [cartItems, setCartItems] = useState([]);
   const [cartCount, setCartCount] = useState(0);
-  const [sessionId, setSessionId] = useState(() => {
+
+  const [sessionId] = useState(() => {
     let sId = localStorage.getItem('sessionId') || localStorage.getItem('session_id');
     if (!sId) {
       sId = uuidv4();
@@ -22,7 +23,7 @@ export const CartProvider = ({ children }) => {
     try {
       const headers = {};
       if (user && user.token) headers.Authorization = `Bearer ${user.token}`;
-      else if (sessionId) headers['x-session-id'] = sessionId;
+      else headers['x-session-id'] = sessionId;
 
       const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { headers });
       setCartItems(res.data);

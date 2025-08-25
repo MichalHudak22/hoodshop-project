@@ -1,10 +1,8 @@
-import { createContext, useState, useEffect, useContext } from 'react';
-import { CartContext } from './CartContext';
+import { createContext, useState, useEffect } from 'react';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const { refreshCart } = useContext(CartContext); // pridáme refreshCart
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
@@ -26,9 +24,7 @@ export const AuthProvider = ({ children }) => {
           headers: { Authorization: `Bearer ${user.token}` },
         });
 
-        if (!res.ok) {
-          throw new Error('Unauthorized');
-        }
+        if (!res.ok) throw new Error('Unauthorized');
 
         const userData = await res.json();
         setUser({ ...userData, token: user.token });
@@ -46,25 +42,17 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (userData, callback) => {
-    setUser(userData); // toto spustí re-render vo všetkých kontextoch
+    setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', userData.token);
-
-    // okamžite refresh košíka po login
-    if (refreshCart) refreshCart();
-
-    if (callback) callback(); // napr. navigácia
+    if (callback) callback(); // navigácia, refresh košíka sa rieši inde
   };
 
   const logout = (callback) => {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-
-    // refresh košíka po logout, aby sa vrátil session košík
-    if (refreshCart) refreshCart();
-
-    if (callback) callback(); // napr. navigácia
+    if (callback) callback();
   };
 
   return (
