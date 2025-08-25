@@ -1,3 +1,4 @@
+// CartContext.jsx
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
@@ -9,22 +10,23 @@ export const CartProvider = ({ children }) => {
   const { user, loading } = useContext(AuthContext);
   const [cartItems, setCartItems] = useState([]);
   const [cartCount, setCartCount] = useState(0);
+  const [sessionId, setSessionId] = useState(null);
 
-  // inicializácia sessionId pred fetchom
-  const sessionId = (() => {
+  // Inicializácia sessionId pri mountnutí
+  useEffect(() => {
     let sId = localStorage.getItem('sessionId') || localStorage.getItem('session_id');
     if (!sId) {
       sId = uuidv4();
       localStorage.setItem('sessionId', sId);
     }
-    return sId;
-  })();
+    setSessionId(sId);
+  }, []);
 
   const fetchCart = async () => {
+    if (!sessionId && !loading) return;
     try {
       const headers = {};
       const token = user?.token || localStorage.getItem('token');
-
       if (token) headers['Authorization'] = `Bearer ${token}`;
       else if (sessionId) headers['x-session-id'] = sessionId;
 
@@ -39,8 +41,8 @@ export const CartProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (!loading) fetchCart();
-  }, [user, loading]);
+    if (!loading && sessionId) fetchCart();
+  }, [user, loading, sessionId]);
 
   return (
     <CartContext.Provider value={{ cartItems, cartCount, refreshCart: fetchCart }}>
