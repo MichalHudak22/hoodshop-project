@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 
 const CartPage = () => {
   const { user } = useContext(AuthContext);
-  const { refreshCartCount } = useContext(CartContext);
+  const { refreshCart } = useContext(CartContext);
 
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -42,7 +42,7 @@ useEffect(() => {
       );
       setCartItems(response.data);
       calculateTotal(response.data);
-      refreshCartCount();
+      refreshCart();
     } catch (err) {
       console.error('Failed to load cart:', err);
     } finally {
@@ -51,7 +51,7 @@ useEffect(() => {
   };
 
   fetchCart();
-}, [user, sessionId, refreshCartCount]);
+}, [user, sessionId, refreshCart]);
 
 
   const calculateTotal = (items) => {
@@ -72,7 +72,7 @@ useEffect(() => {
       const updated = cartItems.filter(item => item.id !== itemId);
       setCartItems(updated);
       calculateTotal(updated);
-      refreshCartCount();
+      refreshCart();
     } catch (err) {
       console.error('Remove failed:', err);
     }
@@ -99,7 +99,7 @@ useEffect(() => {
       );
       setCartItems(updated);
       calculateTotal(updated);
-      refreshCartCount();
+      refreshCart();
     } catch (err) {
       console.error('Update failed:', err);
     }
