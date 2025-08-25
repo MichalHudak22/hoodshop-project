@@ -1,4 +1,3 @@
-// CartContext.jsx
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
@@ -26,7 +25,7 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // Refresh pri zmene user alebo po load auth
+  // Refresh pri zmene user alebo po načítaní AuthContext
   useEffect(() => {
     if (!loading) fetchCartCount();
   }, [user, loading]);
@@ -37,4 +36,3 @@ export const CartProvider = ({ children }) => {
     </CartContext.Provider>
   );
 };
-

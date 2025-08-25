@@ -59,9 +59,9 @@ function App() {
 
   return (
     <Router>
+      <AuthProvider>
+        <CartProvider> {/* musí byť nad AuthProvider */}
 
-      <CartProvider> {/* musí byť nad AuthProvider */}
-        <AuthProvider>
           <Header />
           <div className="pt-[89px]">
             <Suspense fallback={<div>Loading...</div>}>
@@ -103,8 +103,9 @@ function App() {
             </Suspense>
           </div>
           <Footer />
-        </AuthProvider>
-      </CartProvider>
+
+        </CartProvider>
+      </AuthProvider>
 
     </Router>
   );

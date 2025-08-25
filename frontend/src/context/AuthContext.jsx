@@ -1,4 +1,3 @@
-// AuthContext.jsx
 import { createContext, useState, useEffect, useContext } from 'react';
 import { CartContext } from './CartContext';
 
@@ -16,7 +15,7 @@ export const AuthProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(true);
 
-  // 👉 sem natiahneme CartContext
+  // Natiahneme refreshCartCount z CartContext
   const { refreshCartCount } = useContext(CartContext) || {};
 
   useEffect(() => {
@@ -26,8 +25,8 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       try {
-        const res = await fetch(import.meta.env.VITE_API_BASE_URL + '/user/profile', {
-          headers: { 'Authorization': 'Bearer ' + user.token },
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
+          headers: { Authorization: `Bearer ${user.token}` },
         });
         if (!res.ok) throw new Error('Unauthorized');
         const userData = await res.json();
@@ -49,12 +48,18 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', userData.token);
+
+    // ihneď refreshneme košík po login
+    refreshCartCount?.();
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+
+    // refresh košíka na sessionId košík
+    refreshCartCount?.();
   };
 
   return (
