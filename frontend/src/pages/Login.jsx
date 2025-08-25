@@ -14,47 +14,57 @@ function Login() {
   const { refreshCartCount } = useContext(CartContext);
 
   const handleSubmit = (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.error) {
-        setError(data.error);
-        setMessage('');
-      } else if (data.message === 'Email is not verified. Please verify your account before logging in.') {
-        setError('Email is not verified. Please verify your account before logging in.');
-        setMessage('');
-      } else {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        // kontrola chýb zo servera
+        if (data.error) {
+          setError(data.error);
+          setMessage('');
+          return;
+        }
+
+        if (
+          data.message ===
+          'Email is not verified. Please verify your account before logging in.'
+        ) {
+          setError(
+            'Email is not verified. Please verify your account before logging in.'
+          );
+          setMessage('');
+          return;
+        }
+
+        // úspešné prihlásenie
         setMessage(data.message);
         setError('');
 
-login(
-  {
-    email: data.email,
-    name: data.name,
-    role: data.role,
-    token: data.token,
-  },
-  () => {                // callback sa spustí až po nastavení user
-    refreshCartCount();   // hneď refreshne košík
-    navigate('/profile'); // a naviguje na profil
-  }
-);
-      }
-    })
-    .catch((err) => {
-      console.error('Error during login:', err);
-      setError('An error occurred while logging in.');
-      setMessage('');
-    });
-};
-
-
+        login(
+          {
+            email: data.email,
+            name: data.name,
+            role: data.role,
+            token: data.token,
+          },
+          () => {
+            // callback sa spustí až po nastavení usera
+            refreshCartCount(); // refresh košíka
+            navigate('/profile'); // presmerovanie na profil
+          }
+        );
+      })
+      .catch((err) => {
+        console.error('Error during login:', err);
+        setError('An error occurred while logging in.');
+        setMessage('');
+      });
+  };
 
   return (
     <div
@@ -113,7 +123,7 @@ login(
           </div>
         </form>
 
-          <div className="mt-4 text-center h-8">
+        <div className="mt-4 text-center h-8">
           {error ? (
             <p className="text-red-400">{error}</p>
           ) : message ? (
@@ -134,8 +144,6 @@ login(
             Create Account
           </Link>
         </div>
-
-      
       </div>
     </div>
   );
