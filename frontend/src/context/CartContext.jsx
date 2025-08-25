@@ -22,8 +22,11 @@ export const CartProvider = ({ children }) => {
   const fetchCart = useCallback(async () => {
     try {
       const headers = {};
-      if (user && user.token) headers.Authorization = `Bearer ${user.token}`;
-      else headers['x-session-id'] = sessionId;
+      if (user?.token) {
+        headers.Authorization = `Bearer ${user.token}`;
+      } else {
+        headers['x-session-id'] = sessionId;
+      }
 
       const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { headers });
       setCartItems(res.data);
@@ -35,7 +38,7 @@ export const CartProvider = ({ children }) => {
     }
   }, [user, sessionId]);
 
-  // ✅ fetchCart vždy pri mountnutí a pri zmene user
+  // ✅ fetchCart sa zavolá vždy keď sa zmení user alebo session
   useEffect(() => {
     fetchCart();
   }, [fetchCart]);

@@ -1,7 +1,6 @@
 import { useState, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { CartContext } from '../context/CartContext';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -11,56 +10,49 @@ function Login() {
   const navigate = useNavigate();
 
   const { login } = useContext(AuthContext);
-  const { refreshCart } = useContext(CartContext);
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setMessage('');
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError('');
-  setMessage('');
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+      const data = await res.json();
 
-    const data = await res.json();
+      if (data.error) {
+        setError(data.error);
+        return;
+      }
 
-    if (data.error) {
-      setError(data.error);
-      return;
+      if (data.message === 'Email is not verified. Please verify your account before logging in.') {
+        setError(data.message);
+        return;
+      }
+
+      // 1️⃣ login do AuthContext
+      login({
+        email: data.email,
+        name: data.name,
+        role: data.role,
+        token: data.token,
+      });
+
+      // 2️⃣ CartContext sa automaticky refreshne keď sa zmení user → nemusíš volať refreshCart tu
+
+      // 3️⃣ presmerovanie
+      navigate('/profile');
+
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('An error occurred while logging in.');
     }
-
-    if (data.message === 'Email is not verified. Please verify your account before logging in.') {
-      setError(data.message);
-      return;
-    }
-
-    // 1️⃣ login do AuthContext
-    login({
-      email: data.email,
-      name: data.name,
-      role: data.role,
-      token: data.token,
-    });
-
-    // 2️⃣ refresh košíka (CartContext musí byť dostupný!)
-    if (refreshCart) {
-      await refreshCart();
-    }
-
-    // 3️⃣ presmerovanie
-    navigate('/profile');
-
-  } catch (err) {
-    console.error('Login error:', err);
-    setError('An error occurred while logging in.');
-  }
-};
-
-
+  };
 
   return (
     <div
