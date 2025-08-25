@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 
 const CartPage = () => {
   const { user } = useContext(AuthContext);
-  const { refreshCart } = useContext(CartContext);
+  const { cartItems: contextCartItems, refreshCart } = useContext(CartContext);
 
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,35 +24,41 @@ const CartPage = () => {
     setSessionId(sId);
   }, []);
 
-useEffect(() => {
-  if (!sessionId) return;
+  // Ak sa zmení user alebo sessionId, načítaj košík
+  useEffect(() => {
+    if (!sessionId) return;
 
-  const fetchCart = async () => {
-    setLoading(true);
-    try {
-      const headers = {};
-      if (user && user.token) {
-        headers.Authorization = `Bearer ${user.token}`;
-      } else {
-        headers['x-session-id'] = sessionId;
+    const fetchCart = async () => {
+      setLoading(true);
+      try {
+        const headers = {};
+        if (user && user.token) {
+          headers.Authorization = `Bearer ${user.token}`;
+        } else {
+          headers['x-session-id'] = sessionId;
+        }
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/api/cart`,
+          { headers }
+        );
+        setCartItems(response.data);
+        calculateTotal(response.data);
+        refreshCart(); // aktualizuje aj CartContext
+      } catch (err) {
+        console.error('Failed to load cart:', err);
+      } finally {
+        setLoading(false);
       }
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/api/cart`,
-        { headers }
-      );
-      setCartItems(response.data);
-      calculateTotal(response.data);
-      refreshCart();
-    } catch (err) {
-      console.error('Failed to load cart:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  fetchCart();
-}, [user, sessionId, refreshCart]);
+    fetchCart();
+  }, [user, sessionId, refreshCart]);
 
+  // Pri zmene položiek v kontexte okamžite aktualizujeme lokálny stav
+  useEffect(() => {
+    setCartItems(contextCartItems);
+    calculateTotal(contextCartItems);
+  }, [contextCartItems]);
 
   const calculateTotal = (items) => {
     const sum = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
@@ -67,8 +73,7 @@ useEffect(() => {
       } else {
         headers['x-session-id'] = sessionId;
       }
-      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}
-/api/cart/${itemId}`, { headers });
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`, { headers });
       const updated = cartItems.filter(item => item.id !== itemId);
       setCartItems(updated);
       calculateTotal(updated);
@@ -89,8 +94,7 @@ useEffect(() => {
         headers['x-session-id'] = sessionId;
       }
       await axios.patch(
-        `${import.meta.env.VITE_API_BASE_URL}
-/api/cart/${itemId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`,
         { quantity: newQuantity },
         { headers }
       );
