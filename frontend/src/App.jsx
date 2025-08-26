@@ -61,9 +61,9 @@ function App() {
 
   return (
     <Router>
-      <AuthProvider>
-        <CartProvider> {/* OBALÍME TÝMTO VŠETKO, ČO POTREBUJE PRÍSTUP KU KART CONTEXT */}
 
+      <CartProvider> {/* OBALÍME TÝMTO VŠETKO, ČO POTREBUJE PRÍSTUP KU KART CONTEXT */}
+        <AuthProvider>
           <Header />
           <div className="pt-[89px]">
             <Suspense fallback={<div>Loading...</div>}>
@@ -105,9 +105,8 @@ function App() {
             </Suspense>
           </div>
           <Footer />
-
-        </CartProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </CartProvider>
     </Router>
   );
 }
