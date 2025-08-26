@@ -16,7 +16,7 @@ const CartPage = () => {
 
   // Pri mountnutí vygeneruj alebo načítaj sessionId
   useEffect(() => {
-    let sId = localStorage.getItem('sessionId') || localStorage.getItem('session_id');
+    let sId = localStorage.getItem('sessionId');
     if (!sId) {
       sId = uuidv4();
       localStorage.setItem('sessionId', sId);
@@ -24,41 +24,45 @@ const CartPage = () => {
     setSessionId(sId);
   }, []);
 
-useEffect(() => {
-  if (!sessionId) return;
+  // Načítanie košíka
+  useEffect(() => {
+    if (!sessionId) return;
 
-  const fetchCart = async () => {
-    setLoading(true);
-    try {
-      const headers = {};
-      if (user && user.token) {
-        headers.Authorization = `Bearer ${user.token}`;
-      } else {
-        headers['x-session-id'] = sessionId;
+    const fetchCart = async () => {
+      setLoading(true);
+      try {
+        const headers = {};
+        if (user && user.token) {
+          headers.Authorization = `Bearer ${user.token}`;
+        } else {
+          headers['x-session-id'] = sessionId;
+        }
+
+        const response = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/api/cart`,
+          { headers }
+        );
+
+        setCartItems(response.data);
+        calculateTotal(response.data);
+        refreshCartCount();
+      } catch (err) {
+        console.error('Failed to load cart:', err);
+      } finally {
+        setLoading(false);
       }
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/api/cart`,
-        { headers }
-      );
-      setCartItems(response.data);
-      calculateTotal(response.data);
-      refreshCartCount();
-    } catch (err) {
-      console.error('Failed to load cart:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  fetchCart();
-}, [user, sessionId, refreshCartCount]);
+    fetchCart();
+  }, [user, sessionId, refreshCartCount]);
 
-
+  // Výpočet ceny
   const calculateTotal = (items) => {
     const sum = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
     setTotal(sum);
   };
 
+  // Odstránenie položky
   const handleRemove = async (itemId) => {
     try {
       const headers = {};
@@ -67,8 +71,12 @@ useEffect(() => {
       } else {
         headers['x-session-id'] = sessionId;
       }
-      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}
-/api/cart/${itemId}`, { headers });
+
+      await axios.delete(
+        `${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`,
+        { headers }
+      );
+
       const updated = cartItems.filter(item => item.id !== itemId);
       setCartItems(updated);
       calculateTotal(updated);
@@ -78,6 +86,7 @@ useEffect(() => {
     }
   };
 
+  // Zmena množstva
   const handleQuantityChange = async (itemId, newQuantity) => {
     if (newQuantity < 1) return;
 
@@ -88,12 +97,13 @@ useEffect(() => {
       } else {
         headers['x-session-id'] = sessionId;
       }
+
       await axios.patch(
-        `${import.meta.env.VITE_API_BASE_URL}
-/api/cart/${itemId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`,
         { quantity: newQuantity },
         { headers }
       );
+
       const updated = cartItems.map(item =>
         item.id === itemId ? { ...item, quantity: newQuantity } : item
       );
@@ -170,7 +180,6 @@ useEffect(() => {
                 </button>
               </div>
             </li>
-
           ))}
         </ul>
 
@@ -184,7 +193,6 @@ useEffect(() => {
               Proceed to Checkout
             </button>
           </Link>
-
         </div>
       </div>
     </div>

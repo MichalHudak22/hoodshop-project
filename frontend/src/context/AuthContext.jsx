@@ -1,4 +1,5 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useContext } from 'react';
+import { CartContext } from './CartContext';
 
 export const AuthContext = createContext();
 
@@ -13,6 +14,7 @@ export const AuthProvider = ({ children }) => {
   });
 
   const [loading, setLoading] = useState(true);
+  const { refreshCartCount, clearCartCount } = useContext(CartContext);
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -26,7 +28,7 @@ export const AuthProvider = ({ children }) => {
         });
         if (!res.ok) throw new Error('Unauthorized');
         const userData = await res.json();
-        setUser({ ...userData, token: user.token }); // user teraz obsahuje aj loyalty_points
+        setUser({ ...userData, token: user.token }); 
         localStorage.setItem('user', JSON.stringify(userData));
       } catch {
         setUser(null);
@@ -44,12 +46,14 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', userData.token);
+    refreshCartCount(); // 🔥 hneď natiahne správny cart
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    clearCartCount(); // 🔥 resetne cart
   };
 
   return (
