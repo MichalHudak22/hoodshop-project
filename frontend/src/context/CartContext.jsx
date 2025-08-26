@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
 
@@ -9,7 +9,7 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [cartCount, setCartCount] = useState(0);
 
-  const fetchCart = useCallback(async () => {
+  const fetchCart = async () => {
     try {
       const headers = {};
       const token = user?.token;
@@ -25,11 +25,12 @@ export const CartProvider = ({ children }) => {
       setCartItems([]);
       setCartCount(0);
     }
-  }, [user]);
+  };
 
+  // vždy keď sa user zmení (login/logout) fetchni košík
   useEffect(() => {
-    fetchCart(); // vždy pri mountnutí alebo zmene user
-  }, [fetchCart]);
+    fetchCart();
+  }, [user]); // <--- závislosť na user
 
   return (
     <CartContext.Provider value={{ cartItems, cartCount, refreshCart: fetchCart }}>
