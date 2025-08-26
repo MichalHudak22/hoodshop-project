@@ -1,8 +1,10 @@
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useContext } from 'react';
+import { CartContext } from './CartContext';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
+  const { refreshCart } = useContext(CartContext) || {}; // optional, môže byť undefined pri mountnutí
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
@@ -14,10 +16,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const verifyToken = async () => {
-      if (!user) {
-        setLoading(false);
-        return;
-      }
+      if (!user) { setLoading(false); return; }
       try {
         const res = await fetch(import.meta.env.VITE_API_BASE_URL + '/user/profile', {
           headers: { 'Authorization': 'Bearer ' + user.token },
@@ -34,7 +33,6 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
       }
     };
-
     verifyToken();
   }, []);
 
@@ -42,14 +40,14 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', userData.token);
-    // CartProvider sa postará automaticky o fetch košíka
+    if (refreshCart) refreshCart(); // okamžite fetchni košík prihláseného používateľa
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    // CartProvider sa postará automaticky o fetch session košíka
+    if (refreshCart) refreshCart(); // fetchni košík session používateľa
   };
 
   return (
