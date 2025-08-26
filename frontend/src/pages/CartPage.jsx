@@ -6,92 +6,47 @@ import { AuthContext } from '../context/AuthContext';
 import { Link } from "react-router-dom";
 
 const CartPage = () => {
-  const { user } = useContext(AuthContext);
-  const { cartCount, refreshCartCount } = useContext(CartContext);
+const { user } = useContext(AuthContext);
+const { cartItems, refreshCart } = useContext(CartContext);
+const [loading, setLoading] = useState(true);
+const [total, setTotal] = useState(0);
 
-  const [cartItems, setCartItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [total, setTotal] = useState(0);
-  const [sessionId, setSessionId] = useState(null);
+useEffect(() => {
+  calculateTotal(cartItems);
+}, [cartItems]);
 
-  // Pri mountnutí vygeneruj alebo načítaj sessionId
-  useEffect(() => {
-    let sId = localStorage.getItem('sessionId') || localStorage.getItem('session_id');
-    if (!sId) {
-      sId = uuidv4();
-      localStorage.setItem('sessionId', sId);
-    }
-    setSessionId(sId);
-  }, []);
+const calculateTotal = (items) => {
+  const sum = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+  setTotal(sum);
+};
 
-  const fetchCart = async () => {
-    if (!sessionId && !user) return;
-    setLoading(true);
-    try {
-      const headers = {};
-      if (user?.token) headers.Authorization = `Bearer ${user.token}`;
-      else if (sessionId) headers['x-session-id'] = sessionId;
+const handleRemove = async (itemId) => {
+  try {
+    const headers = {};
+    if (user?.token) headers.Authorization = `Bearer ${user.token}`;
+    else headers['x-session-id'] = localStorage.getItem('sessionId');
 
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { headers });
-      setCartItems(res.data);
-      calculateTotal(res.data);
-      refreshCartCount();
-    } catch (err) {
-      console.error('Failed to load cart:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`, { headers });
+    await refreshCart();
+  } catch (err) {
+    console.error('Remove failed:', err);
+  }
+};
 
-  // Fetch vždy pri zmene user alebo sessionId
-  useEffect(() => {
-    fetchCart();
-  }, [user, sessionId]);
+const handleQuantityChange = async (itemId, newQuantity) => {
+  if (newQuantity < 1) return;
+  try {
+    const headers = {};
+    if (user?.token) headers.Authorization = `Bearer ${user.token}`;
+    else headers['x-session-id'] = localStorage.getItem('sessionId');
 
-  const calculateTotal = (items) => {
-    const sum = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-    setTotal(sum);
-  };
+    await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`, { quantity: newQuantity }, { headers });
+    await refreshCart();
+  } catch (err) {
+    console.error('Update failed:', err);
+  }
+};
 
-  const handleRemove = async (itemId) => {
-    try {
-      const headers = {};
-      if (user?.token) headers.Authorization = `Bearer ${user.token}`;
-      else if (sessionId) headers['x-session-id'] = sessionId;
-
-      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`, { headers });
-      const updated = cartItems.filter(item => item.id !== itemId);
-      setCartItems(updated);
-      calculateTotal(updated);
-      refreshCartCount();
-    } catch (err) {
-      console.error('Remove failed:', err);
-    }
-  };
-
-  const handleQuantityChange = async (itemId, newQuantity) => {
-    if (newQuantity < 1) return;
-    try {
-      const headers = {};
-      if (user?.token) headers.Authorization = `Bearer ${user.token}`;
-      else if (sessionId) headers['x-session-id'] = sessionId;
-
-      await axios.patch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`,
-        { quantity: newQuantity },
-        { headers }
-      );
-
-      const updated = cartItems.map(item =>
-        item.id === itemId ? { ...item, quantity: newQuantity } : item
-      );
-      setCartItems(updated);
-      calculateTotal(updated);
-      refreshCartCount();
-    } catch (err) {
-      console.error('Update failed:', err);
-    }
-  };
 
   if (loading) return <p className="p-4">Loading cart...</p>;
   if (cartItems.length === 0) return <p className="p-4 pt-8 text-red-500 text-center text-xl">Your cart is empty.</p>;

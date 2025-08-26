@@ -11,7 +11,7 @@ function Login() {
   const navigate = useNavigate();
 
   const { login } = useContext(AuthContext);
-  const { refreshCartCount } = useContext(CartContext);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -44,9 +44,6 @@ function Login() {
         token: data.token,
       });
 
-      // fetch košíka hneď po login-e
-      if (refreshCartCount) refreshCartCount();
-
       // presmerovanie na profil
       navigate('/profile');
 
@@ -55,6 +52,7 @@ function Login() {
       setError('An error occurred while logging in.');
     }
   };
+
 
   return (
     <div

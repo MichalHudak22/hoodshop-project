@@ -1,10 +1,8 @@
-import { createContext, useState, useEffect, useContext } from 'react';
-import { CartContext } from './CartContext';
+import { createContext, useState, useEffect } from 'react';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const { refreshCartCount } = useContext(CartContext) || {}; // optional, môže byť undefined pri mountnutí
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
@@ -14,7 +12,7 @@ export const AuthProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(true);
 
-  // verify token po načítaní stránky
+  // Overenie tokenu pri načítaní stránky
   useEffect(() => {
     const verifyToken = async () => {
       if (!user) { 
@@ -40,20 +38,16 @@ export const AuthProvider = ({ children }) => {
     verifyToken();
   }, []);
 
-  // login: iba uloženie usera a refreshCartCount
   const login = (userData) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', userData.token);
-    if (refreshCartCount) refreshCartCount(); // fetch košíka hneď po login-e
   };
 
-  // logout: vymazanie usera a refreshCartCount
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    if (refreshCartCount) refreshCartCount(); // fetch košíka session používateľa
   };
 
   return (
