@@ -1,12 +1,11 @@
-import { createContext, useState, useEffect, useContext } from "react";
-import { CartContext } from "./CartContext";
+import { createContext, useState, useEffect } from 'react';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem("user");
-    const storedToken = localStorage.getItem("token");
+    const storedUser = localStorage.getItem('user');
+    const storedToken = localStorage.getItem('token');
     if (storedUser && storedToken) {
       return { ...JSON.parse(storedUser), token: storedToken };
     }
@@ -15,16 +14,6 @@ export const AuthProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(true);
 
-  // 🛠️ načítame CartContext len keď sme inside CartProvider
-  let cartContext;
-  try {
-    cartContext = useContext(CartContext);
-  } catch {
-    cartContext = null; // ak ešte CartProvider neexistuje
-  }
-  const refreshCartCount = cartContext?.refreshCartCount || (() => {});
-  const clearCartCount = cartContext?.clearCartCount || (() => {});
-
   useEffect(() => {
     const verifyToken = async () => {
       if (!user) {
@@ -32,17 +21,17 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       try {
-        const res = await fetch(import.meta.env.VITE_API_BASE_URL + "/user/profile", {
-          headers: { Authorization: "Bearer " + user.token },
+        const res = await fetch(import.meta.env.VITE_API_BASE_URL + '/user/profile', {
+          headers: { 'Authorization': 'Bearer ' + user.token },
         });
-        if (!res.ok) throw new Error("Unauthorized");
+        if (!res.ok) throw new Error('Unauthorized');
         const userData = await res.json();
-        setUser({ ...userData, token: user.token });
-        localStorage.setItem("user", JSON.stringify(userData));
+        setUser({ ...userData, token: user.token }); // user teraz obsahuje aj loyalty_points
+        localStorage.setItem('user', JSON.stringify(userData));
       } catch {
         setUser(null);
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
       } finally {
         setLoading(false);
       }
@@ -53,16 +42,14 @@ export const AuthProvider = ({ children }) => {
 
   const login = (userData) => {
     setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("token", userData.token);
-    refreshCartCount(); // 🔥 už funguje iba ak CartContext existuje
+    localStorage.setItem('user', JSON.stringify(userData));
+    localStorage.setItem('token', userData.token);
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    clearCartCount(); // 🔥 resetne cart ak existuje
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
   return (

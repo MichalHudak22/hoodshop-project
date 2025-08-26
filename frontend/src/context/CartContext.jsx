@@ -1,37 +1,45 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import axios from 'axios';
+import { AuthContext } from './AuthContext';
 
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
+  const { user } = useContext(AuthContext);
   const [cartCount, setCartCount] = useState(0);
 
-  const refreshCartCount = async () => {
-    try {
-      const sessionId = localStorage.getItem('sessionId');
-      const headers = {};
+  const fetchCartCount = useCallback(async () => {
+  try {
+    const headers = {};
+    const token = localStorage.getItem('token');
+    const sessionId = localStorage.getItem('session_id') || localStorage.getItem('sessionId');
 
-      if (sessionId) {
-        headers['x-session-id'] = sessionId;
-      }
-
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/api/cart/count`,
-        { headers }
-      );
-
-      setCartCount(response.data.count || 0);
-    } catch (err) {
-      console.error('Failed to refresh cart count:', err);
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    } else if (sessionId) {
+      headers['x-session-id'] = sessionId;
     }
-  };
+
+    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart/count`, { headers });
+
+    setCartCount(res.data.count || 0);
+  } catch (err) {
+    console.error('Chyba pri načítaní počtu položiek v košíku:', err);
+    setCartCount(0);
+  }
+}, []);
+
+
+  const refreshCartCount = useCallback(() => {
+    fetchCartCount();
+  }, [fetchCartCount]);
 
   useEffect(() => {
-    refreshCartCount();
-  }, []);
+    fetchCartCount();
+  }, [user, fetchCartCount]);
 
   return (
-    <CartContext.Provider value={{ cartCount, setCartCount, refreshCartCount }}>
+    <CartContext.Provider value={{ cartCount, refreshCartCount }}>
       {children}
     </CartContext.Provider>
   );
