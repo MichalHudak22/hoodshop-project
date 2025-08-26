@@ -12,7 +12,7 @@ export const CartProvider = ({ children }) => {
   const [sessionId, setSessionId] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Nastavenie sessionId synchronne pri mountnutí
+  // Nastavenie sessionId pri mountnutí
   useEffect(() => {
     let sId = localStorage.getItem('sessionId') || localStorage.getItem('session_id');
     if (!sId) {
@@ -22,51 +22,94 @@ export const CartProvider = ({ children }) => {
     setSessionId(sId);
   }, []);
 
-  // Fetch košíka vždy, keď sa zmení user alebo sessionId
+  // Načítanie košíka pri zmene user alebo sessionId
   useEffect(() => {
     if (!sessionId) return;
-
-    const fetchCart = async () => {
-      setLoading(true);
-      try {
-        const headers = {};
-        if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
-        else if (sessionId) headers['x-session-id'] = sessionId;
-
-        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { headers });
-        setCartItems(res.data);
-        setCartCount(res.data.reduce((acc, i) => acc + i.quantity, 0));
-      } catch (err) {
-        console.error('Chyba pri načítaní košíka:', err);
-        setCartItems([]);
-        setCartCount(0);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCart();
+    refreshCart();
   }, [user, sessionId]);
 
-  // Funkcia na refresh košíka, vždy overí sessionId
+  // Funkcia na refresh košíka
   const refreshCart = async () => {
     if (!sessionId) return;
-
+    setLoading(true);
     try {
       const headers = {};
       if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
-      else headers['x-session-id'] = sessionId;
+      else if (sessionId) headers['x-session-id'] = sessionId;
 
       const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { headers });
       setCartItems(res.data);
       setCartCount(res.data.reduce((acc, i) => acc + i.quantity, 0));
     } catch (err) {
-      console.error('Chyba pri refreshi košíka:', err);
+      console.error('Chyba pri načítaní košíka:', err);
+      setCartItems([]);
+      setCartCount(0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Pridať položku do košíka
+  const addToCart = async (product, quantity = 1) => {
+    if (!sessionId) return;
+    try {
+      const headers = {};
+      if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
+      else headers['x-session-id'] = sessionId;
+
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
+        productId: product.id,
+        quantity,
+      }, { headers });
+
+      await refreshCart();
+    } catch (err) {
+      console.error('Error adding to cart:', err);
+    }
+  };
+
+  // Odstrániť položku z košíka
+  const removeFromCart = async (productId) => {
+    if (!sessionId) return;
+    try {
+      const headers = {};
+      if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
+      else headers['x-session-id'] = sessionId;
+
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${productId}`, { headers });
+      await refreshCart();
+    } catch (err) {
+      console.error('Error removing from cart:', err);
+    }
+  };
+
+  // Aktualizovať množstvo položky
+  const updateQuantity = async (productId, quantity) => {
+    if (!sessionId) return;
+    try {
+      const headers = {};
+      if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
+      else headers['x-session-id'] = sessionId;
+
+      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${productId}`, { quantity }, { headers });
+      await refreshCart();
+    } catch (err) {
+      console.error('Error updating cart quantity:', err);
     }
   };
 
   return (
-    <CartContext.Provider value={{ cartItems, cartCount, refreshCart, loading }}>
+    <CartContext.Provider
+      value={{
+        cartItems,
+        cartCount,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        refreshCart,
+        loading,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
