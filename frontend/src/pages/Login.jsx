@@ -11,47 +11,46 @@ function Login() {
   const navigate = useNavigate();
 
   const { login } = useContext(AuthContext);
+  const { refreshCartCount } = useContext(CartContext);
 
+  const handleSubmit = (e) => {
+  e.preventDefault();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setMessage('');
-
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
-
+  fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
       if (data.error) {
         setError(data.error);
-        return;
+        setMessage('');
+      } else if (data.message === 'Email is not verified. Please verify your account before logging in.') {
+        setError('Email is not verified. Please verify your account before logging in.');
+        setMessage('');
+      } else {
+        setMessage(data.message);
+        setError('');
+
+        login({
+          email: data.email,
+          name: data.name,
+          role: data.role,
+          token: data.token,
+        });
+
+        refreshCartCount();
+        navigate('/profile');
       }
-
-      if (data.message === 'Email is not verified. Please verify your account before logging in.') {
-        setError(data.message);
-        return;
-      }
-
-      // uloženie usera a tokenu do AuthContext
-      login({
-        email: data.email,
-        name: data.name,
-        role: data.role,
-        token: data.token,
-      });
-
-      // presmerovanie na profil
-      navigate('/profile');
-
-    } catch (err) {
+    })
+    .catch((err) => {
       console.error('Error during login:', err);
       setError('An error occurred while logging in.');
-    }
-  };
+      setMessage('');
+    });
+};
+
 
 
   return (
@@ -111,7 +110,7 @@ function Login() {
           </div>
         </form>
 
-        <div className="mt-4 text-center h-8">
+          <div className="mt-4 text-center h-8">
           {error ? (
             <p className="text-red-400">{error}</p>
           ) : message ? (
@@ -132,6 +131,8 @@ function Login() {
             Create Account
           </Link>
         </div>
+
+      
       </div>
     </div>
   );
