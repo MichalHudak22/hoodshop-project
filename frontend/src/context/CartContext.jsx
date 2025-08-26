@@ -28,14 +28,13 @@ export const CartProvider = ({ children }) => {
     refreshCart();
   }, [user, sessionId]);
 
-  // Funkcia na refresh košíka
   const refreshCart = async () => {
     if (!sessionId) return;
     setLoading(true);
     try {
       const headers = {};
       if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
-      else if (sessionId) headers['x-session-id'] = sessionId;
+      else headers['x-session-id'] = sessionId;
 
       const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { headers });
       setCartItems(res.data);
@@ -49,7 +48,6 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // Pridať položku do košíka
   const addToCart = async (product, quantity = 1) => {
     if (!sessionId) return;
     try {
@@ -68,7 +66,6 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // Odstrániť položku z košíka
   const removeFromCart = async (productId) => {
     if (!sessionId) return;
     try {
@@ -83,7 +80,6 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-  // Aktualizovať množstvo položky
   const updateQuantity = async (productId, quantity) => {
     if (!sessionId) return;
     try {
