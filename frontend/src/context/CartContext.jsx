@@ -12,7 +12,7 @@ export const CartProvider = ({ children }) => {
   const [sessionId, setSessionId] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Nastavenie sessionId pri mountnutí
+  // 1️⃣ Nastavenie sessionId
   useEffect(() => {
     let sId = localStorage.getItem('sessionId') || localStorage.getItem('session_id');
     if (!sId) {
@@ -22,25 +22,62 @@ export const CartProvider = ({ children }) => {
     setSessionId(sId);
   }, []);
 
-  // Načítanie košíka pri zmene user alebo sessionId
+  // 2️⃣ Refresh alebo merge košíka pri zmene user alebo sessionId
   useEffect(() => {
     if (!sessionId) return;
-    refreshCart();
+
+    const loadCart = async () => {
+      setLoading(true);
+      try {
+        // Ak je user prihlásený, najprv merge guest košíka
+        if (user && sessionId) {
+          await mergeCart(sessionId, user.token);
+        }
+
+        // Potom načítame košík pre aktuálny stav
+        await refreshCart();
+      } catch (err) {
+        console.error('Chyba pri načítaní košíka:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCart();
   }, [user, sessionId]);
 
+  // ========================
+  // Merge guest košíka do user košíka
+  // ========================
+  const mergeCart = async (sessionId, token) => {
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/cart/merge`,
+        { sessionId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+    } catch (err) {
+      console.error('Chyba pri merge košíka:', err);
+    }
+  };
+
+  // ========================
+  // Načítanie košíka
+  // ========================
   const refreshCart = async () => {
-    if (!sessionId) return;
+    if (!sessionId && !user) return;
     setLoading(true);
+
     try {
       const headers = {};
       if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
-      else headers['x-session-id'] = sessionId;
+      else if (sessionId) headers['x-session-id'] = sessionId;
 
       const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { headers });
       setCartItems(res.data);
       setCartCount(res.data.reduce((acc, i) => acc + i.quantity, 0));
     } catch (err) {
-      console.error('Chyba pri načítaní košíka:', err);
+      console.error('Chyba pri refreshi košíka:', err);
       setCartItems([]);
       setCartCount(0);
     } finally {
@@ -48,12 +85,15 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  // ========================
+  // Pridať položku do košíka
+  // ========================
   const addToCart = async (product, quantity = 1) => {
-    if (!sessionId) return;
+    if (!sessionId && !user) return;
     try {
       const headers = {};
       if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
-      else headers['x-session-id'] = sessionId;
+      else if (sessionId) headers['x-session-id'] = sessionId;
 
       await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
         productId: product.id,
@@ -66,12 +106,15 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  // ========================
+  // Odstrániť položku z košíka
+  // ========================
   const removeFromCart = async (productId) => {
-    if (!sessionId) return;
+    if (!sessionId && !user) return;
     try {
       const headers = {};
       if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
-      else headers['x-session-id'] = sessionId;
+      else if (sessionId) headers['x-session-id'] = sessionId;
 
       await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${productId}`, { headers });
       await refreshCart();
@@ -80,12 +123,15 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  // ========================
+  // Aktualizovať množstvo
+  // ========================
   const updateQuantity = async (productId, quantity) => {
-    if (!sessionId) return;
+    if (!sessionId && !user) return;
     try {
       const headers = {};
       if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
-      else headers['x-session-id'] = sessionId;
+      else if (sessionId) headers['x-session-id'] = sessionId;
 
       await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${productId}`, { quantity }, { headers });
       await refreshCart();
