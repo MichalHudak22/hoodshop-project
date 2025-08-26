@@ -54,6 +54,7 @@ useEffect(() => {
 }, [user, sessionId, refreshCartCount]);
 
 
+
   const calculateTotal = (items) => {
     const sum = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
     setTotal(sum);
