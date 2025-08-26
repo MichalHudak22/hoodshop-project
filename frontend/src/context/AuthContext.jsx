@@ -6,26 +6,27 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
-    if (storedUser && storedToken) return { ...JSON.parse(storedUser), token: storedToken };
+    if (storedUser && storedToken) {
+      return { ...JSON.parse(storedUser), token: storedToken };
+    }
     return null;
   });
 
   const [loading, setLoading] = useState(true);
 
-  // Overenie tokenu pri načítaní stránky
   useEffect(() => {
     const verifyToken = async () => {
-      if (!user) { 
-        setLoading(false); 
-        return; 
+      if (!user) {
+        setLoading(false);
+        return;
       }
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
-          headers: { 'Authorization': `Bearer ${user.token}` },
+        const res = await fetch(import.meta.env.VITE_API_BASE_URL + '/user/profile', {
+          headers: { 'Authorization': 'Bearer ' + user.token },
         });
         if (!res.ok) throw new Error('Unauthorized');
         const userData = await res.json();
-        setUser({ ...userData, token: user.token });
+        setUser({ ...userData, token: user.token }); // user teraz obsahuje aj loyalty_points
         localStorage.setItem('user', JSON.stringify(userData));
       } catch {
         setUser(null);
@@ -35,6 +36,7 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
       }
     };
+
     verifyToken();
   }, []);
 

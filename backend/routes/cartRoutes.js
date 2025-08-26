@@ -11,6 +11,5 @@ router.patch('/:id', authenticateToken.optional, cartController.updateCartItem);
 router.delete('/:id', authenticateToken.optional, cartController.removeFromCart);
 router.delete('/', authenticateToken.optional, cartController.clearCart);
 
-router.post('/merge', authenticateToken.required, cartController.mergeCart);
 
 module.exports = router;
