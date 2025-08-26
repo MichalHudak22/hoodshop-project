@@ -6,9 +6,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
-    if (storedUser && storedToken) {
-      return { ...JSON.parse(storedUser), token: storedToken };
-    }
+    if (storedUser && storedToken) return { ...JSON.parse(storedUser), token: storedToken };
     return null;
   });
 
@@ -26,7 +24,7 @@ export const AuthProvider = ({ children }) => {
         });
         if (!res.ok) throw new Error('Unauthorized');
         const userData = await res.json();
-        setUser({ ...userData, token: user.token }); // user teraz obsahuje aj loyalty_points
+        setUser({ ...userData, token: user.token });
         localStorage.setItem('user', JSON.stringify(userData));
       } catch {
         setUser(null);
@@ -44,12 +42,14 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', userData.token);
+    // CartProvider sa postará automaticky o fetch košíka
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    // CartProvider sa postará automaticky o fetch session košíka
   };
 
   return (
