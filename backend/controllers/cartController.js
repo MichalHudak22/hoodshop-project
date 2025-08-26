@@ -53,6 +53,33 @@ const addToCart = (req, res) => {
   });
 };
 
+// controllers/cartController.js
+const mergeCart = (req, res) => {
+  const userId = req.userId;
+  const sessionId = req.body.sessionId;
+
+  if (!userId || !sessionId) return res.status(400).json({ error: 'Chýba identifikácia' });
+
+  // Presunieme alebo zvýšime množstvo existujúcich položiek
+  const query = `
+    INSERT INTO cart_items (user_id, product_id, quantity)
+    SELECT ?, product_id, quantity
+    FROM cart_items
+    WHERE session_id = ?
+    ON DUPLICATE KEY UPDATE quantity = quantity + VALUES(quantity)
+  `;
+  db.query(query, [userId, sessionId], (err) => {
+    if (err) return res.status(500).json({ error: 'Chyba pri merge košíka' });
+
+    // Vymažeme guest položky
+    db.query('DELETE FROM cart_items WHERE session_id = ?', [sessionId], (err2) => {
+      if (err2) return res.status(500).json({ error: 'Chyba pri vymazaní guest položiek' });
+      res.status(200).json({ message: 'Košík úspešne merged' });
+    });
+  });
+};
+
+
 
 // ========================
 // Získanie obsahu košíka
@@ -240,6 +267,7 @@ const clearCart = (req, res) => {
 // Export funkcií pre použitie v route súbore
 module.exports = {
   addToCart,
+  mergeCart,
   getCart,
   removeFromCart,
   updateCartItem,

@@ -4,6 +4,8 @@ const cartController = require('../controllers/cartController');
 const authenticateToken = require('../middleware/authenticateToken');
 
 // ✅ Všetky routy s optional autentifikáciou
+router.post('/merge', authenticateToken.required, cartController.mergeCart);
+
 router.get('/', authenticateToken.optional, cartController.getCart);
 router.post('/', authenticateToken.optional, cartController.addToCart);
 router.get('/count', authenticateToken.optional, cartController.getCartCount); // 👈 volaj priamo z controlleru
