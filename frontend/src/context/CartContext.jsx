@@ -55,6 +55,11 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  // ✅ Wrapper pre staršie komponenty
+  const handleAddToCart = async (product) => {
+    await addToCart(product);
+  };
+
   const setCartDirectly = (items) => {
     setCartItems(items);
     setCartCount(items.length);
@@ -63,12 +68,21 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
     const sessionId = localStorage.getItem('sessionId');
     if (!sessionId) return;
-
     fetchCart();
   }, [fetchCart]);
 
   return (
-    <CartContext.Provider value={{ cartCount, cartItems, addToCart, setCartDirectly, fetchCart, cartLoading }}>
+    <CartContext.Provider
+      value={{
+        cartCount,
+        cartItems,
+        addToCart,
+        handleAddToCart, // ← pridáme do contextu, aby staré komponenty fungovali
+        setCartDirectly,
+        fetchCart,
+        cartLoading
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
