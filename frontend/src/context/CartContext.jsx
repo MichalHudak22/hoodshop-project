@@ -7,23 +7,22 @@ export const CartContext = createContext();
 export const CartProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
   const [cartCount, setCartCount] = useState(0);
-  const [cartItems, setCartItems] = useState([]); // 🔹 nové
+  const [cartItems, setCartItems] = useState([]);
   const [cartLoading, setCartLoading] = useState(true);
 
   const fetchCart = useCallback(async () => {
+    setCartLoading(true);
     try {
-      setCartLoading(true);
       const headers = {};
       const sessionId = localStorage.getItem('sessionId');
-      const token = user?.token;
 
-      if (token) headers['Authorization'] = `Bearer ${token}`;
+      if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
       else if (sessionId) headers['x-session-id'] = sessionId;
 
       const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { headers });
 
-      setCartItems(res.data || []); // uložíme celý zoznam
-      setCartCount(res.data.length || 0); // počet položiek
+      setCartItems(res.data || []);
+      setCartCount(res.data?.length || 0);
       console.log('🛒 Cart fetched:', res.data);
     } catch (err) {
       console.error('Chyba pri načítaní košíka:', err);
@@ -41,6 +40,7 @@ export const CartProvider = ({ children }) => {
 
   const refreshCart = useCallback(() => fetchCart(), [fetchCart]);
 
+  // fetch košíka vždy pri mount a pri zmene user
   useEffect(() => {
     fetchCart();
   }, [fetchCart]);
