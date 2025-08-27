@@ -1,3 +1,9 @@
+import { createContext, useState, useEffect, useCallback, useContext } from 'react';
+import axios from 'axios';
+import { AuthContext } from './AuthContext';
+
+export const CartContext = createContext();
+
 export const CartProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
   const [cartCount, setCartCount] = useState(0);
@@ -33,7 +39,6 @@ export const CartProvider = ({ children }) => {
     }
   }, [user?.token]);
 
-  // ✅ Nová funkcia na pridanie položky do košíka
   const addToCart = async (product) => {
     try {
       const headers = {};
@@ -43,7 +48,6 @@ export const CartProvider = ({ children }) => {
 
       const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/cart/add`, product, { headers });
 
-      // Aktualizujeme lokálne
       setCartItems(res.data || []);
       setCartCount(res.data?.length || 0);
     } catch (err) {
