@@ -9,7 +9,7 @@ const CartPage = () => {
   const { cartItems, setCartDirectly, refreshCart, cartLoading } = useContext(CartContext);
   const [total, setTotal] = useState(0);
 
-  // Vypočítame total vždy keď sa zmenia položky košíka
+  // Total sa počíta vždy keď sa zmení košík
   useEffect(() => {
     const sum = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
     setTotal(sum);
@@ -25,8 +25,8 @@ const CartPage = () => {
       await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`, { headers });
 
       const updated = cartItems.filter(item => item.id !== itemId);
-      setCartDirectly(updated);
-      refreshCart();
+      setCartDirectly(updated); // okamžitá zmena v UI
+      refreshCart(); // fetch zo servera
     } catch (err) {
       console.error('Remove failed:', err);
     }
@@ -43,8 +43,8 @@ const CartPage = () => {
       await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`, { quantity: newQuantity }, { headers });
 
       const updated = cartItems.map(item => item.id === itemId ? { ...item, quantity: newQuantity } : item);
-      setCartDirectly(updated);
-      refreshCart();
+      setCartDirectly(updated); // okamžitá zmena
+      refreshCart(); // fetch zo servera
     } catch (err) {
       console.error('Update failed:', err);
     }

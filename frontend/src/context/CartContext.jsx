@@ -19,14 +19,14 @@ export const CartProvider = ({ children }) => {
     }
   }, []);
 
+  // Fetch košíka cez callback
   const fetchCart = useCallback(async () => {
     setCartLoading(true);
     try {
       const headers = {};
       const sessionId = localStorage.getItem('sessionId');
-
       if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
-      else headers['x-session-id'] = sessionId;
+      else if (sessionId) headers['x-session-id'] = sessionId;
 
       const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { headers });
 
@@ -39,7 +39,7 @@ export const CartProvider = ({ children }) => {
     } finally {
       setCartLoading(false);
     }
-  }, [user]);
+  }, [user?.token]);
 
   const setCartDirectly = (items) => {
     setCartItems(items);
@@ -48,12 +48,9 @@ export const CartProvider = ({ children }) => {
 
   const refreshCart = useCallback(() => fetchCart(), [fetchCart]);
 
-  // Fetch vždy po mount a pri zmene user, počkáme až user sa načíta
+  // Fetch vždy po mount a pri zmene user
   useEffect(() => {
-    const sessionReady = !!localStorage.getItem('sessionId');
-    if (!sessionReady) return;
-
-    // fetch len keď user je načítaný (pre login/logout)
+    if (!localStorage.getItem('sessionId')) return;
     fetchCart();
   }, [fetchCart, user?.token]);
 
