@@ -14,15 +14,16 @@ export const AuthProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(true);
 
-  // 🔑 Session ID musí existovať pre každého (aj neprihláseného)
+  // Session ID pre guest
   useEffect(() => {
     let sessionId = localStorage.getItem('sessionId');
     if (!sessionId) {
-      sessionId = crypto.randomUUID(); // alebo Date.now().toString()
+      sessionId = crypto.randomUUID();
       localStorage.setItem('sessionId', sessionId);
     }
   }, []);
 
+  // Verify token pri mount
   useEffect(() => {
     const verifyToken = async () => {
       if (!user) {
@@ -53,14 +54,12 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', userData.token);
-    // ⚡ sessionId sa tu nemení — ostáva rovnaké, aby merge fungoval
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    // sessionId nevymazávame → nechávame ho pre guest košík
   };
 
   return (

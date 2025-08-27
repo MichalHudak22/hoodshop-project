@@ -9,14 +9,14 @@ export const CartProvider = ({ children }) => {
   const [cartCount, setCartCount] = useState(0);
 
   // fetch cart count pre aktuálneho používateľa alebo session
-  const fetchCartCount = useCallback(async () => {
+  const fetchCartCount = useCallback(async (useToken = false) => {
     try {
       const headers = {};
+      const sessionId = localStorage.getItem('sessionId');
       const token = localStorage.getItem('token');
-      const sessionId = localStorage.getItem('session_id') || localStorage.getItem('sessionId');
 
-      if (user?.token || token) {
-        headers['Authorization'] = `Bearer ${user?.token || token}`;
+      if (useToken && user?.token) {
+        headers['Authorization'] = `Bearer ${user.token}`;
       } else if (sessionId) {
         headers['x-session-id'] = sessionId;
       }
@@ -30,20 +30,18 @@ export const CartProvider = ({ children }) => {
     }
   }, [user]);
 
-  // priamo nastaviť košík
-  const setCartDirectly = (count) => {
-    setCartCount(count);
-  };
+  const setCartDirectly = (count) => setCartCount(count);
+  const refreshCartCount = useCallback((useToken = false) => fetchCartCount(useToken), [fetchCartCount]);
 
-  // refresh funkcia
-  const refreshCartCount = useCallback(() => {
-    fetchCartCount();
-  }, [fetchCartCount]);
-
-  // len inicialny fetch pri mount a potom vždy, keď sa user zmení
+  // Inicialny fetch pre session (guest)
   useEffect(() => {
-    fetchCartCount();
-  }, []); // ⚠️ odstraňujeme [user], aby sa nepremenil na session kosik po prihlásení
+    if (!user) fetchCartCount(false); // guest kosik
+  }, [fetchCartCount, user]);
+
+  // Fetch po prihlásení
+  useEffect(() => {
+    if (user?.token) fetchCartCount(true); // user kosik
+  }, [user, fetchCartCount]);
 
   return (
     <CartContext.Provider value={{ cartCount, refreshCartCount, setCartDirectly }}>

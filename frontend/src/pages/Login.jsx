@@ -11,57 +11,56 @@ function Login() {
   const navigate = useNavigate();
 
   const { login } = useContext(AuthContext);
-  const { refreshCartCount, setCartDirectly } = useContext(CartContext);
+  const { setCartDirectly, refreshCartCount } = useContext(CartContext);
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError('');
-  setMessage('');
+    e.preventDefault();
+    setError('');
+    setMessage('');
 
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-session-id': localStorage.getItem('sessionId'),
-      },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      console.log('➡️ Sending login request...', email);
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-session-id': localStorage.getItem('sessionId'),
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Chyba pri prihlasovaní');
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Chyba pri prihlasovaní');
 
-    setMessage(data.message);
+      console.log('⬅️ Login response:', data);
+      setMessage(data.message);
 
-    // reset session kosika
-    setCartDirectly(0);
+      // reset session kosika
+      setCartDirectly(0);
 
-    // uloženie usera do AuthContext
-    login({
-      email: data.email,
-      name: data.name,
-      role: data.role,
-      token: data.token,
-    });
+      // uloženie usera do AuthContext
+      login({
+        email: data.email,
+        name: data.name,
+        role: data.role,
+        token: data.token,
+      });
 
-    // fetch user kosika
-    const cartRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
-      headers: { Authorization: 'Bearer ' + data.token },
-    });
-    const cartData = await cartRes.json();
+      // fetch user kosika hneď po login
+      const cartRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
+        headers: { Authorization: 'Bearer ' + data.token },
+      });
+      const cartData = await cartRes.json();
 
-    // aktualizuj CartContext
-    setCartDirectly(cartData.length);
+      setCartDirectly(cartData.length);
 
-    // teraz až presmerovanie
-    navigate('/profile');
-  } catch (err) {
-    console.error('Error during login:', err);
-    setError(err.message || 'An error occurred while logging in.');
-  }
-};
-
-
+      // teraz presmerovanie na profile
+      navigate('/profile');
+    } catch (err) {
+      console.error('Error during login:', err);
+      setError(err.message || 'An error occurred while logging in.');
+    }
+  };
 
 
   return (
