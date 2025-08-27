@@ -12,63 +12,57 @@ function Login() {
 
   const { login } = useContext(AuthContext);
   const { refreshCartCount } = useContext(CartContext);
-const handleSubmit = (e) => {
-  e.preventDefault();
 
-  fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-session-id': localStorage.getItem('sessionId'),
-    },
-    body: JSON.stringify({ email, password }),
-  })
-    .then((res) => res.json())
-    .then(async (data) => {
-      if (data.error) {
-        setError(data.error);
-        setMessage('');
-      } else if (
-        data.message === 'Email is not verified. Please verify your account before logging in.'
-      ) {
-        setError('Email is not verified. Please verify your account before logging in.');
-        setMessage('');
-      } else {
-        setMessage(data.message);
-        setError('');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setMessage('');
 
-        // uloženie usera do AuthContext
-        login({
-          email: data.email,
-          name: data.name,
-          role: data.role,
-          token: data.token,
-        });
+    try {
+      // POST na login
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-session-id': localStorage.getItem('sessionId'), // session ID necháme pre neprihlásený košík
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-        // 🟢 tu si hneď fetchni košík pre user_id
-        await fetch(`${import.meta.env.VITE_API_BASE_URL}/cart`, {
-          headers: {
-            Authorization: 'Bearer ' + data.token,
-          },
-        })
-          .then((res) => res.json())
-          .then((cartData) => {
-            // update local state alebo context pre cart
-            console.log("Aktualizovaný košík po merge:", cartData);
-            refreshCartCount(cartData.length); // alebo podľa tvojej logiky
-          });
+      const data = await res.json();
 
-        navigate('/profile');
+      if (!res.ok) {
+        // backend vrátil chybu
+        throw new Error(data.error || 'Chyba pri prihlasovaní');
       }
-    })
-    .catch((err) => {
+
+      setMessage(data.message);
+
+      // uloženie usera do AuthContext a localStorage
+      login({
+        email: data.email,
+        name: data.name,
+        role: data.role,
+        token: data.token,
+      });
+
+      // 🟢 fetch user košíka
+      const cartRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cart`, {
+        headers: {
+          Authorization: 'Bearer ' + data.token,
+        },
+      });
+
+      const cartData = await cartRes.json();
+      refreshCartCount(cartData.length); // alebo podľa tvojej logiky
+
+      // presmerovanie až po úspešnom login a načítaní košíka
+      navigate('/profile');
+    } catch (err) {
       console.error('Error during login:', err);
-      setError('An error occurred while logging in.');
-      setMessage('');
-    });
-};
-
-
+      setError(err.message || 'An error occurred while logging in.');
+    }
+  };
 
   return (
     <div
@@ -127,7 +121,7 @@ const handleSubmit = (e) => {
           </div>
         </form>
 
-          <div className="mt-4 text-center h-8">
+        <div className="mt-4 text-center h-8">
           {error ? (
             <p className="text-red-400">{error}</p>
           ) : message ? (
@@ -148,8 +142,6 @@ const handleSubmit = (e) => {
             Create Account
           </Link>
         </div>
-
-      
       </div>
     </div>
   );
