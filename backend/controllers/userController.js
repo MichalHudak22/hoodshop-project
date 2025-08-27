@@ -154,28 +154,17 @@ const loginUser = (req, res) => {
 
   const query = 'SELECT * FROM user WHERE email = ?';
   db.query(query, [email], (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: 'Chyba pri pripojení k databáze' });
-    }
-
-    if (results.length === 0) {
-      return res.status(404).json({ error: 'No user exists with this email.' });
-    }
+    if (err) return res.status(500).json({ error: 'Chyba pri pripojení k databáze' });
+    if (results.length === 0) return res.status(404).json({ error: 'No user exists with this email.' });
 
     const user = results[0];
 
-    if (user.is_verified === 0) {
+    if (user.is_verified === 0)
       return res.status(403).json({ error: 'Email nie je overený. Skontroluj svoj email.' });
-    }
 
     bcrypt.compare(password, user.password, (err, isMatch) => {
-      if (err) {
-        return res.status(500).json({ error: 'Chyba pri porovnávaní hesla' });
-      }
-
-      if (!isMatch) {
-        return res.status(400).json({ error: 'Incorrect password.' });
-      }
+      if (err) return res.status(500).json({ error: 'Chyba pri porovnávaní hesla' });
+      if (!isMatch) return res.status(400).json({ error: 'Incorrect password.' });
 
       const token = jwt.sign(
         { userId: user.id, email: user.email, role: user.role },
@@ -185,42 +174,58 @@ const loginUser = (req, res) => {
 
       const sessionId = req.headers['x-session-id'];
 
-      // 🟢 Najprv merge košíka
-      const mergeQuery = "UPDATE cart_items SET user_id = ?, session_id = NULL WHERE session_id = ?";
-      db.query(mergeQuery, [user.id, sessionId], (err2) => {
-        if (err2) {
-          console.error("Chyba pri merge košíka:", err2);
-        }
-
-        // 🟢 Potom hneď načítaj nový košík už pod user_id
+      if (sessionId) {
+        // Získa položky session košíka
         db.query(
-          `SELECT c.id, c.product_id, c.quantity, p.name, p.price, p.image
-           FROM cart_items c
-           JOIN products p ON c.product_id = p.id
-           WHERE c.user_id = ?`,
-          [user.id],
-          (err3, cartItems) => {
-            if (err3) {
-              console.error("Chyba pri načítaní košíka po logine:", err3);
-              return res.status(500).json({ error: "Chyba pri načítaní košíka" });
+          'SELECT product_id, quantity FROM cart_items WHERE session_id = ?',
+          [sessionId],
+          (errSession, sessionItems) => {
+            if (errSession) console.error(errSession);
+
+            if (sessionItems.length > 0) {
+              // Pre každý item sprav merge do user košíka
+              sessionItems.forEach(item => {
+                db.query(
+                  'SELECT id, quantity FROM cart_items WHERE user_id = ? AND product_id = ?',
+                  [user.id, item.product_id],
+                  (errCheck, results) => {
+                    if (results.length > 0) {
+                      const newQty = results[0].quantity + item.quantity;
+                      db.query('UPDATE cart_items SET quantity = ? WHERE id = ?', [newQty, results[0].id]);
+                    } else {
+                      db.query(
+                        'INSERT INTO cart_items (user_id, product_id, quantity) VALUES (?, ?, ?)',
+                        [user.id, item.product_id, item.quantity]
+                      );
+                    }
+                  }
+                );
+              });
             }
 
-            // 🟢 Pošli user info + token + aktuálny košík
+            // Session košík ostáva nezmenený
             res.status(200).json({
               message: 'Prihlásenie úspešné',
               token,
               email: user.email,
               name: user.name,
               role: user.role,
-              cart: cartItems, // ⬅️ frontend má hneď čerstvý košík
             });
           }
         );
-      });
+      } else {
+        // Žiadny session_id → rovno posielame user info
+        res.status(200).json({
+          message: 'Prihlásenie úspešné',
+          token,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        });
+      }
     });
   });
 };
-
 
 
 
