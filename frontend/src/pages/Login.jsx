@@ -39,23 +39,21 @@ function Login() {
       setCartDirectly(0);
 
       // uloženie usera do AuthContext
-      login({
-        email: data.email,
-        name: data.name,
-        role: data.role,
-        token: data.token,
-      });
+login({
+  email: data.email,
+  name: data.name,
+  role: data.role,
+  token: data.token,
+});
 
-      // fetch user kosika hneď po login
-      const cartRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
-        headers: { Authorization: 'Bearer ' + data.token },
-      });
-      const cartData = await cartRes.json();
+// fetch user kosika hneď
+const cartRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
+  headers: { Authorization: 'Bearer ' + data.token },
+});
+const cartData = await cartRes.json();
 
-      setCartDirectly(cartData.length);
-
-      // teraz presmerovanie na profile
-      navigate('/profile');
+setCartDirectly(cartData); // 🔹 uložíme celý zoznam položiek
+navigate('/profile'); 
     } catch (err) {
       console.error('Error during login:', err);
       setError(err.message || 'An error occurred while logging in.');

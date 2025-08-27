@@ -7,44 +7,46 @@ export const CartContext = createContext();
 export const CartProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
   const [cartCount, setCartCount] = useState(0);
+  const [cartItems, setCartItems] = useState([]); // 🔹 nové
+  const [cartLoading, setCartLoading] = useState(true);
 
-  // fetch cart count pre aktuálneho používateľa alebo session
-  const fetchCartCount = useCallback(async (useToken = false) => {
+  const fetchCart = useCallback(async () => {
     try {
+      setCartLoading(true);
       const headers = {};
       const sessionId = localStorage.getItem('sessionId');
-      const token = localStorage.getItem('token');
+      const token = user?.token;
 
-      if (useToken && user?.token) {
-        headers['Authorization'] = `Bearer ${user.token}`;
-      } else if (sessionId) {
-        headers['x-session-id'] = sessionId;
-      }
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      else if (sessionId) headers['x-session-id'] = sessionId;
 
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart/count`, { headers });
-      setCartCount(res.data.count || 0);
-      console.log('🛒 Cart count fetched:', res.data.count);
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { headers });
+
+      setCartItems(res.data || []); // uložíme celý zoznam
+      setCartCount(res.data.length || 0); // počet položiek
+      console.log('🛒 Cart fetched:', res.data);
     } catch (err) {
-      console.error('Chyba pri načítaní počtu položiek v košíku:', err);
+      console.error('Chyba pri načítaní košíka:', err);
+      setCartItems([]);
       setCartCount(0);
+    } finally {
+      setCartLoading(false);
     }
   }, [user]);
 
-  const setCartDirectly = (count) => setCartCount(count);
-  const refreshCartCount = useCallback((useToken = false) => fetchCartCount(useToken), [fetchCartCount]);
+  const setCartDirectly = (items) => {
+    setCartItems(items);
+    setCartCount(items.length);
+  };
 
-  // Inicialny fetch pre session (guest)
-  useEffect(() => {
-    if (!user) fetchCartCount(false); // guest kosik
-  }, [fetchCartCount, user]);
+  const refreshCart = useCallback(() => fetchCart(), [fetchCart]);
 
-  // Fetch po prihlásení
   useEffect(() => {
-    if (user?.token) fetchCartCount(true); // user kosik
-  }, [user, fetchCartCount]);
+    fetchCart();
+  }, [fetchCart]);
 
   return (
-    <CartContext.Provider value={{ cartCount, refreshCartCount, setCartDirectly }}>
+    <CartContext.Provider value={{ cartCount, cartItems, setCartDirectly, refreshCart, cartLoading }}>
       {children}
     </CartContext.Provider>
   );

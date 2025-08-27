@@ -7,9 +7,8 @@ import { Link } from "react-router-dom";
 
 const CartPage = () => {
   const { user } = useContext(AuthContext);
-  const { refreshCartCount } = useContext(CartContext);
+  const { cartItems, setCartDirectly, refreshCart, cartCount } = useContext(CartContext);
 
-  const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [sessionId, setSessionId] = useState(null);
@@ -24,35 +23,41 @@ const CartPage = () => {
     setSessionId(sId);
   }, []);
 
-useEffect(() => {
-  if (!sessionId) return;
+  // Fetch košíka pri mount a pri zmene user
+  useEffect(() => {
+    if (!sessionId) return;
 
-  const fetchCart = async () => {
-    setLoading(true);
-    try {
-      const headers = {};
-      if (user && user.token) {
-        headers.Authorization = `Bearer ${user.token}`;
-      } else {
-        headers['x-session-id'] = sessionId;
+    const fetchCart = async () => {
+      setLoading(true);
+      try {
+        const headers = {};
+        if (user?.token) {
+          headers.Authorization = `Bearer ${user.token}`;
+        } else {
+          headers['x-session-id'] = sessionId;
+        }
+
+        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { headers });
+        
+        // 🔹 uložíme položky do CartContext
+        setCartDirectly(response.data || []);
+        
+        // 🔹 aktualizujeme total lokálne
+        calculateTotal(response.data || []);
+
+        // 🔹 refresh CartContext count
+        refreshCart();
+      } catch (err) {
+        console.error('Failed to load cart:', err);
+        setCartDirectly([]);
+        setTotal(0);
+      } finally {
+        setLoading(false);
       }
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/api/cart`,
-        { headers }
-      );
-      setCartItems(response.data);
-      calculateTotal(response.data);
-      refreshCartCount();
-    } catch (err) {
-      console.error('Failed to load cart:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
-  fetchCart();
-}, [user, sessionId, refreshCartCount]);
-
+    fetchCart();
+  }, [user, sessionId, setCartDirectly, refreshCart]);
 
   const calculateTotal = (items) => {
     const sum = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
@@ -62,17 +67,15 @@ useEffect(() => {
   const handleRemove = async (itemId) => {
     try {
       const headers = {};
-      if (user && user.token) {
-        headers.Authorization = `Bearer ${user.token}`;
-      } else {
-        headers['x-session-id'] = sessionId;
-      }
-      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}
-/api/cart/${itemId}`, { headers });
+      if (user?.token) headers.Authorization = `Bearer ${user.token}`;
+      else headers['x-session-id'] = sessionId;
+
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`, { headers });
+
       const updated = cartItems.filter(item => item.id !== itemId);
-      setCartItems(updated);
+      setCartDirectly(updated);
       calculateTotal(updated);
-      refreshCartCount();
+      refreshCart();
     } catch (err) {
       console.error('Remove failed:', err);
     }
@@ -83,23 +86,20 @@ useEffect(() => {
 
     try {
       const headers = {};
-      if (user && user.token) {
-        headers.Authorization = `Bearer ${user.token}`;
-      } else {
-        headers['x-session-id'] = sessionId;
-      }
-      await axios.patch(
-        `${import.meta.env.VITE_API_BASE_URL}
-/api/cart/${itemId}`,
-        { quantity: newQuantity },
+      if (user?.token) headers.Authorization = `Bearer ${user.token}`;
+      else headers['x-session-id'] = sessionId;
+
+      await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`, 
+        { quantity: newQuantity }, 
         { headers }
       );
+
       const updated = cartItems.map(item =>
         item.id === itemId ? { ...item, quantity: newQuantity } : item
       );
-      setCartItems(updated);
+      setCartDirectly(updated);
       calculateTotal(updated);
-      refreshCartCount();
+      refreshCart();
     } catch (err) {
       console.error('Update failed:', err);
     }
