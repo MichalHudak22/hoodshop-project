@@ -11,7 +11,7 @@ function Login() {
   const navigate = useNavigate();
 
   const { login } = useContext(AuthContext);
-  const { setCartDirectly } = useContext(CartContext); // ✅ manuálny fetch už nepotrebný
+  const { setCartDirectly } = useContext(CartContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,7 +41,15 @@ function Login() {
         token: data.token,
       });
 
-      // CartContext automaticky načíta košík podľa user?.token
+      // fetch user kosika priamo z backendu
+      const cartRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
+        headers: { Authorization: 'Bearer ' + data.token },
+      });
+      const cartData = await cartRes.json();
+
+      // aktualizuj CartContext
+      setCartDirectly(cartData || []);
+
       navigate('/profile');
     } catch (err) {
       console.error('Error during login:', err);

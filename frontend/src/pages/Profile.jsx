@@ -120,27 +120,33 @@ function Profile() {
 // ...
 
 useEffect(() => {
-  const token = localStorage.getItem('token');
-
-  if (!token) {
+  if (!user?.token) {
     navigate('/login');
     return;
   }
 
-  fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
-    method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
-  })
-    .then((res) => res.json())
-    .then((data) => {
+  const fetchProfile = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const data = await res.json();
+
       if (data.error) {
         setError(data.error);
       } else {
-        setUser(data);
+        setUser(prev => ({ ...prev, ...data })); // zachová existujúce údaje v contextu
       }
-    })
-    .catch(() => setError('Chyba pri načítaní údajov o používateľovi'));
-}, [navigate]);
+    } catch (err) {
+      setError('Chyba pri načítaní údajov o používateľovi');
+      console.error(err);
+    }
+  };
+
+  fetchProfile();
+}, [user?.token, navigate, setUser]);
+
 
 // ...
 
