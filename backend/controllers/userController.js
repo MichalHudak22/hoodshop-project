@@ -186,6 +186,18 @@ const loginUser = (req, res) => {
         { expiresIn: '6h' }
       );
 
+      // 🟢 TU SPRAVÍME MERGE KOŠÍKA
+      const sessionId = req.headers['x-session-id'];
+      if (sessionId) {
+        db.query(
+          "UPDATE cart_items SET user_id = ?, session_id = NULL WHERE session_id = ?",
+          [user.id, sessionId],
+          (err2) => {
+            if (err2) console.error("Chyba pri merge košíka:", err2);
+          }
+        );
+      }
+
       // Posielame token, email, name a role klientovi
       res.status(200).json({
         message: 'Prihlásenie úspešné',
