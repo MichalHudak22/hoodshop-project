@@ -29,22 +29,14 @@ const handleSubmit = async (e) => {
     });
 
     const data = await res.json();
-
     if (!res.ok) throw new Error(data.error || 'Chyba pri prihlasovaní');
 
     setMessage(data.message);
 
-    // 🟢 najprv fetch user košíka
-    const cartRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cart`, {
-      headers: { Authorization: 'Bearer ' + data.token },
-    });
+    // 🟢 pred login vymazať session košík
+    setCartDirectly(0); // CartContext funkcia na reset
 
-    const cartData = await cartRes.json();
-
-    // 🟢 aktualizuj CartContext pred login
-    refreshCartCount(cartData.length); // alebo celý cart state
-
-    // 🟢 až potom uložíme usera do AuthContext
+    // 🟢 uloženie usera do AuthContext
     login({
       email: data.email,
       name: data.name,
@@ -52,12 +44,22 @@ const handleSubmit = async (e) => {
       token: data.token,
     });
 
-    navigate('/profile'); // presmerovanie až po aktualizácii
+    // 🟢 fetch user košíka
+    const cartRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cart`, {
+      headers: { Authorization: 'Bearer ' + data.token },
+    });
+    const cartData = await cartRes.json();
+
+    // 🟢 nastavenie fetched košíka do CartContext
+    setCartDirectly(cartData.length);
+
+    navigate('/profile'); // presmerovanie až po aktualizácii košíka
   } catch (err) {
     console.error('Error during login:', err);
     setError(err.message || 'An error occurred while logging in.');
   }
 };
+
 
 
   return (
