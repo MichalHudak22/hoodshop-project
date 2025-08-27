@@ -19,8 +19,6 @@ function Login() {
   setMessage('');
 
   try {
-    console.log('➡️ Sending login request...', email);
-
     const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
       method: 'POST',
       headers: {
@@ -31,38 +29,34 @@ function Login() {
     });
 
     const data = await res.json();
-    console.log('⬅️ Login response:', data);
-
     if (!res.ok) throw new Error(data.error || 'Chyba pri prihlasovaní');
 
     setMessage(data.message);
 
-    // pred login reset košíka
-    console.log('🧹 Resetting cart count before login');
+    // reset session kosika
     setCartDirectly(0);
 
-    // uloženie usera
+    // uloženie usera do AuthContext
     login({
       email: data.email,
       name: data.name,
       role: data.role,
       token: data.token,
     });
-    console.log('✅ User logged in:', data.email);
 
-    // fetch user košíka
+    // fetch user kosika
     const cartRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
       headers: { Authorization: 'Bearer ' + data.token },
     });
-
     const cartData = await cartRes.json();
-    console.log('🛒 Fetched user cart:', cartData);
 
-    refreshCartCount(cartData.length);
+    // aktualizuj CartContext
+    setCartDirectly(cartData.length);
 
+    // teraz až presmerovanie
     navigate('/profile');
   } catch (err) {
-    console.error('❌ Error during login:', err);
+    console.error('Error during login:', err);
     setError(err.message || 'An error occurred while logging in.');
   }
 };
