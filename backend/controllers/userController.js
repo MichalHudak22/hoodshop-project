@@ -172,57 +172,16 @@ const loginUser = (req, res) => {
         { expiresIn: '6h' }
       );
 
-      const sessionId = req.headers['x-session-id'];
+      // Na login nechať session košík tak, ako je
+      // Nepridávame ani nemažeme session položky
 
-      if (sessionId) {
-        // Získa položky session košíka
-        db.query(
-          'SELECT product_id, quantity FROM cart_items WHERE session_id = ?',
-          [sessionId],
-          (errSession, sessionItems) => {
-            if (errSession) console.error(errSession);
-
-            if (sessionItems.length > 0) {
-              // Pre každý item sprav merge do user košíka
-              sessionItems.forEach(item => {
-                db.query(
-                  'SELECT id, quantity FROM cart_items WHERE user_id = ? AND product_id = ?',
-                  [user.id, item.product_id],
-                  (errCheck, results) => {
-                    if (results.length > 0) {
-                      const newQty = results[0].quantity + item.quantity;
-                      db.query('UPDATE cart_items SET quantity = ? WHERE id = ?', [newQty, results[0].id]);
-                    } else {
-                      db.query(
-                        'INSERT INTO cart_items (user_id, product_id, quantity) VALUES (?, ?, ?)',
-                        [user.id, item.product_id, item.quantity]
-                      );
-                    }
-                  }
-                );
-              });
-            }
-
-            // Session košík ostáva nezmenený
-            res.status(200).json({
-              message: 'Prihlásenie úspešné',
-              token,
-              email: user.email,
-              name: user.name,
-              role: user.role,
-            });
-          }
-        );
-      } else {
-        // Žiadny session_id → rovno posielame user info
-        res.status(200).json({
-          message: 'Prihlásenie úspešné',
-          token,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-        });
-      }
+      res.status(200).json({
+        message: 'Prihlásenie úspešné',
+        token,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      });
     });
   });
 };
