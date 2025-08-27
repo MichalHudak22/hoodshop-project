@@ -1,67 +1,31 @@
-import React, { useEffect, useState, useContext } from 'react';
-import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
+import React, { useState, useContext, useEffect } from 'react';
 import { CartContext } from '../context/CartContext';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-import { Link } from "react-router-dom";
 
 const CartPage = () => {
   const { user } = useContext(AuthContext);
-  const { cartItems, setCartDirectly, refreshCart, cartCount, cartLoading } = useContext(CartContext);
-
+  const { cartItems, setCartDirectly, refreshCart, cartLoading } = useContext(CartContext);
   const [total, setTotal] = useState(0);
-  const [sessionId, setSessionId] = useState(null);
 
-  // Pri mountnutí vygeneruj alebo načítaj sessionId
+  // Vypočítame total vždy keď sa zmenia položky košíka
   useEffect(() => {
-    let sId = localStorage.getItem('sessionId') || localStorage.getItem('session_id');
-    if (!sId) {
-      sId = uuidv4();
-      localStorage.setItem('sessionId', sId);
-    }
-    setSessionId(sId);
-  }, []);
-
-  // Fetch košíka pri mount a pri zmene user
-  useEffect(() => {
-    if (!sessionId) return;
-
-    const fetchCart = async () => {
-      try {
-        const headers = {};
-        if (user?.token) headers.Authorization = `Bearer ${user.token}`;
-        else headers['x-session-id'] = sessionId;
-
-        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { headers });
-        setCartDirectly(response.data || []);
-        calculateTotal(response.data || []);
-        refreshCart();
-      } catch (err) {
-        console.error('Failed to load cart:', err);
-        setCartDirectly([]);
-        setTotal(0);
-      }
-    };
-
-    fetchCart();
-  }, [user, sessionId, setCartDirectly, refreshCart]);
-
-  const calculateTotal = (items) => {
-    const sum = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const sum = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
     setTotal(sum);
-  };
+  }, [cartItems]);
 
   const handleRemove = async (itemId) => {
     try {
       const headers = {};
-      if (user?.token) headers.Authorization = `Bearer ${user.token}`;
+      const sessionId = localStorage.getItem('sessionId');
+      if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
       else headers['x-session-id'] = sessionId;
 
       await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`, { headers });
 
       const updated = cartItems.filter(item => item.id !== itemId);
       setCartDirectly(updated);
-      calculateTotal(updated);
       refreshCart();
     } catch (err) {
       console.error('Remove failed:', err);
@@ -70,22 +34,16 @@ const CartPage = () => {
 
   const handleQuantityChange = async (itemId, newQuantity) => {
     if (newQuantity < 1) return;
-
     try {
       const headers = {};
-      if (user?.token) headers.Authorization = `Bearer ${user.token}`;
+      const sessionId = localStorage.getItem('sessionId');
+      if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
       else headers['x-session-id'] = sessionId;
 
-      await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`, 
-        { quantity: newQuantity }, 
-        { headers }
-      );
+      await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`, { quantity: newQuantity }, { headers });
 
-      const updated = cartItems.map(item =>
-        item.id === itemId ? { ...item, quantity: newQuantity } : item
-      );
+      const updated = cartItems.map(item => item.id === itemId ? { ...item, quantity: newQuantity } : item);
       setCartDirectly(updated);
-      calculateTotal(updated);
       refreshCart();
     } catch (err) {
       console.error('Update failed:', err);
@@ -96,18 +54,10 @@ const CartPage = () => {
   if (!cartItems.length) return <p className="p-4 pt-8 text-red-500 text-center text-xl">Your cart is empty.</p>;
 
   return (
-    <div
-      className="relative bg-cover bg-center md:py-16 min-h-screen"
-      style={{
-        backgroundImage: "url('/img/bg-shop.jpg')",
-        backgroundAttachment: 'fixed',
-      }}
-    >
+    <div className="relative bg-cover bg-center md:py-16 min-h-screen" style={{ backgroundImage: "url('/img/bg-shop.jpg')", backgroundAttachment: 'fixed' }}>
       <div className="absolute inset-0 bg-black opacity-40 z-0" />
       <div className="relative z-10 max-w-4xl mx-auto p-6 bg-black bg-opacity-60 lg:rounded-xl border-2 border-gray-500">
-        <h1 className="text-3xl font-bold mb-4 text-center py-3 text-blue-200">
-          Shopping Cart
-        </h1>
+        <h1 className="text-3xl font-bold mb-4 text-center py-3 text-blue-200">Shopping Cart</h1>
         <ul className="space-y-4">
           {cartItems.map(item => (
             <li key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-100 p-4 shadow rounded-lg space-y-4 sm:space-y-0">
