@@ -12,7 +12,6 @@ function Login() {
 
   const { login } = useContext(AuthContext);
   const { refreshCartCount } = useContext(CartContext);
-
 const handleSubmit = (e) => {
   e.preventDefault();
 
@@ -20,12 +19,12 @@ const handleSubmit = (e) => {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-session-id': localStorage.getItem('sessionId'), // 🔑 pridaj toto
+      'x-session-id': localStorage.getItem('sessionId'),
     },
     body: JSON.stringify({ email, password }),
   })
     .then((res) => res.json())
-    .then((data) => {
+    .then(async (data) => {
       if (data.error) {
         setError(data.error);
         setMessage('');
@@ -38,6 +37,7 @@ const handleSubmit = (e) => {
         setMessage(data.message);
         setError('');
 
+        // uloženie usera do AuthContext
         login({
           email: data.email,
           name: data.name,
@@ -45,7 +45,19 @@ const handleSubmit = (e) => {
           token: data.token,
         });
 
-        refreshCartCount(); // teraz by už mal refresh fungovať hneď po logine
+        // 🟢 tu si hneď fetchni košík pre user_id
+        await fetch(`${import.meta.env.VITE_API_BASE_URL}/cart`, {
+          headers: {
+            Authorization: 'Bearer ' + data.token,
+          },
+        })
+          .then((res) => res.json())
+          .then((cartData) => {
+            // update local state alebo context pre cart
+            console.log("Aktualizovaný košík po merge:", cartData);
+            refreshCartCount(cartData.length); // alebo podľa tvojej logiky
+          });
+
         navigate('/profile');
       }
     })
@@ -55,6 +67,7 @@ const handleSubmit = (e) => {
       setMessage('');
     });
 };
+
 
 
   return (
