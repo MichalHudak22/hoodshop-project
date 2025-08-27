@@ -24,15 +24,22 @@ function Login() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-session-id': localStorage.getItem('sessionId'), // session ID necháme pre neprihlásený košík
+          'x-session-id': localStorage.getItem('sessionId'),
         },
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
+      let data;
+      const contentType = res.headers.get('content-type');
+
+      if (contentType && contentType.includes('application/json')) {
+        data = await res.json();
+      } else {
+        const text = await res.text();
+        throw new Error(`Server returned non-JSON response: ${text}`);
+      }
 
       if (!res.ok) {
-        // backend vrátil chybu
         throw new Error(data.error || 'Chyba pri prihlasovaní');
       }
 
@@ -46,15 +53,19 @@ function Login() {
         token: data.token,
       });
 
-      // 🟢 fetch user košíka
+      // 🟢 fetch user košíka (iba pre prihláseného)
       const cartRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cart`, {
         headers: {
           Authorization: 'Bearer ' + data.token,
         },
       });
 
-      const cartData = await cartRes.json();
-      refreshCartCount(cartData.length); // alebo podľa tvojej logiky
+      let cartData;
+      const cartContentType = cartRes.headers.get('content-type');
+      if (cartContentType && cartContentType.includes('application/json')) {
+        cartData = await cartRes.json();
+        refreshCartCount(cartData.length); // update počtu v kontekošíka
+      }
 
       // presmerovanie až po úspešnom login a načítaní košíka
       navigate('/profile');
@@ -70,12 +81,10 @@ function Login() {
       style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}
     >
       <div className="absolute inset-0 bg-black opacity-60 z-0" />
-
       <div className="relative z-10 bg-black bg-opacity-70 md:border-2 border-gray-600 py-8 lg:py-16 px-5 md:px-12 lg:px-12 rounded-2xl shadow-xl max-w-xl md:max-w-3xl w-full">
         <h1 className="text-3xl font-bold text-center text-blue-200 mb-6">
           Sign In to Your Account
         </h1>
-
         <div className="mb-8 text-white flex flex-col gap-3">
           <h2 className="text-3xl font-bold mb-4 text-blue-200 text-center">
             Welcome back to HoodShop!
