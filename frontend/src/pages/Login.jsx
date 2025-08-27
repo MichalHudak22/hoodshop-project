@@ -9,9 +9,9 @@ function Login() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
+const { login } = useContext(AuthContext);
+const { refreshCartCount, setCartDirectly } = useContext(CartContext);
 
-  const { login } = useContext(AuthContext);
-  const { refreshCartCount } = useContext(CartContext);
 
 const handleSubmit = async (e) => {
   e.preventDefault();
