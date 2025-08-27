@@ -164,12 +164,10 @@ const loginUser = (req, res) => {
 
     const user = results[0];
 
-    // TU PRIDÁME KONTROLU IS_VERIFIED
     if (user.is_verified === 0) {
       return res.status(403).json({ error: 'Email nie je overený. Skontroluj svoj email.' });
     }
 
-    // Porovnanie zadaného hesla s hashovaným heslom v databáze
     bcrypt.compare(password, user.password, (err, isMatch) => {
       if (err) {
         return res.status(500).json({ error: 'Chyba pri porovnávaní hesla' });
@@ -179,36 +177,50 @@ const loginUser = (req, res) => {
         return res.status(400).json({ error: 'Incorrect password.' });
       }
 
-      // Ak je heslo správne, vytvoríme JWT token (v ňom už je aj role)
       const token = jwt.sign(
         { userId: user.id, email: user.email, role: user.role },
         process.env.JWT_SECRET,
         { expiresIn: '6h' }
       );
 
-      // 🟢 TU SPRAVÍME MERGE KOŠÍKA
       const sessionId = req.headers['x-session-id'];
-      if (sessionId) {
+
+      // 🟢 Najprv merge košíka
+      const mergeQuery = "UPDATE cart_items SET user_id = ?, session_id = NULL WHERE session_id = ?";
+      db.query(mergeQuery, [user.id, sessionId], (err2) => {
+        if (err2) {
+          console.error("Chyba pri merge košíka:", err2);
+        }
+
+        // 🟢 Potom hneď načítaj nový košík už pod user_id
         db.query(
-          "UPDATE cart_items SET user_id = ?, session_id = NULL WHERE session_id = ?",
-          [user.id, sessionId],
-          (err2) => {
-            if (err2) console.error("Chyba pri merge košíka:", err2);
+          `SELECT c.id, c.product_id, c.quantity, p.name, p.price, p.image
+           FROM cart_items c
+           JOIN products p ON c.product_id = p.id
+           WHERE c.user_id = ?`,
+          [user.id],
+          (err3, cartItems) => {
+            if (err3) {
+              console.error("Chyba pri načítaní košíka po logine:", err3);
+              return res.status(500).json({ error: "Chyba pri načítaní košíka" });
+            }
+
+            // 🟢 Pošli user info + token + aktuálny košík
+            res.status(200).json({
+              message: 'Prihlásenie úspešné',
+              token,
+              email: user.email,
+              name: user.name,
+              role: user.role,
+              cart: cartItems, // ⬅️ frontend má hneď čerstvý košík
+            });
           }
         );
-      }
-
-      // Posielame token, email, name a role klientovi
-      res.status(200).json({
-        message: 'Prihlásenie úspešné',
-        token,
-        email: user.email,
-        name: user.name,
-        role: user.role,
       });
     });
   });
 };
+
 
 
 
