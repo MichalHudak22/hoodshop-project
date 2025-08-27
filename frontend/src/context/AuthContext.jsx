@@ -14,6 +14,15 @@ export const AuthProvider = ({ children }) => {
 
   const [loading, setLoading] = useState(true);
 
+  // 🔑 Session ID musí existovať pre každého (aj neprihláseného)
+  useEffect(() => {
+    let sessionId = localStorage.getItem('sessionId');
+    if (!sessionId) {
+      sessionId = crypto.randomUUID(); // alebo Date.now().toString()
+      localStorage.setItem('sessionId', sessionId);
+    }
+  }, []);
+
   useEffect(() => {
     const verifyToken = async () => {
       if (!user) {
@@ -26,7 +35,7 @@ export const AuthProvider = ({ children }) => {
         });
         if (!res.ok) throw new Error('Unauthorized');
         const userData = await res.json();
-        setUser({ ...userData, token: user.token }); // user teraz obsahuje aj loyalty_points
+        setUser({ ...userData, token: user.token });
         localStorage.setItem('user', JSON.stringify(userData));
       } catch {
         setUser(null);
@@ -44,12 +53,14 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', userData.token);
+    // ⚡ sessionId sa tu nemení — ostáva rovnaké, aby merge fungoval
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    // sessionId nevymazávame → nechávame ho pre guest košík
   };
 
   return (

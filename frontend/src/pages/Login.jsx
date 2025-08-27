@@ -13,12 +13,15 @@ function Login() {
   const { login } = useContext(AuthContext);
   const { refreshCartCount } = useContext(CartContext);
 
-  const handleSubmit = (e) => {
+const handleSubmit = (e) => {
   e.preventDefault();
 
   fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-session-id': localStorage.getItem('sessionId'), // 🔑 pridaj toto
+    },
     body: JSON.stringify({ email, password }),
   })
     .then((res) => res.json())
@@ -26,7 +29,9 @@ function Login() {
       if (data.error) {
         setError(data.error);
         setMessage('');
-      } else if (data.message === 'Email is not verified. Please verify your account before logging in.') {
+      } else if (
+        data.message === 'Email is not verified. Please verify your account before logging in.'
+      ) {
         setError('Email is not verified. Please verify your account before logging in.');
         setMessage('');
       } else {
@@ -40,7 +45,7 @@ function Login() {
           token: data.token,
         });
 
-        refreshCartCount();
+        refreshCartCount(); // teraz by už mal refresh fungovať hneď po logine
         navigate('/profile');
       }
     })
@@ -50,7 +55,6 @@ function Login() {
       setMessage('');
     });
 };
-
 
 
   return (
