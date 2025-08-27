@@ -12,10 +12,14 @@ export const CartProvider = ({ children }) => {
 
   // SessionId pri mount
   useEffect(() => {
-    let sId = localStorage.getItem('sessionId');
-    if (!sId) {
-      sId = crypto.randomUUID();
-      localStorage.setItem('sessionId', sId);
+    try {
+      let sId = localStorage.getItem('sessionId');
+      if (!sId) {
+        sId = crypto.randomUUID();
+        localStorage.setItem('sessionId', sId);
+      }
+    } catch (err) {
+      console.error('Chyba pri generovaní sessionId:', err);
     }
   }, []);
 
@@ -29,9 +33,11 @@ export const CartProvider = ({ children }) => {
       else headers['x-session-id'] = sessionId;
 
       const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { headers });
+      const items = res.data || [];
+      setCartItems(items);
 
-      setCartItems(res.data || []);
-      setCartCount(res.data?.length || 0);
+      const count = items.reduce((acc, item) => acc + (item.quantity || 1), 0);
+      setCartCount(count);
     } catch (err) {
       console.error('Chyba pri načítaní košíka:', err);
       setCartItems([]);
@@ -43,19 +49,18 @@ export const CartProvider = ({ children }) => {
 
   const setCartDirectly = (items) => {
     setCartItems(items);
-    setCartCount(items.length);
+    const count = items.reduce((acc, item) => acc + (item.quantity || 1), 0);
+    setCartCount(count);
   };
 
-  const refreshCart = useCallback(() => fetchCart(), [fetchCart]);
-
-  // ✅ fetch košíka pri mount a pri zmene user (login/logout)
+  // Fetch košíka pri mount a pri zmene user (login/logout)
   useEffect(() => {
     if (!localStorage.getItem('sessionId')) return;
     fetchCart();
   }, [fetchCart, user?.token]);
 
   return (
-    <CartContext.Provider value={{ cartCount, cartItems, setCartDirectly, refreshCart, cartLoading }}>
+    <CartContext.Provider value={{ cartCount, cartItems, setCartDirectly, refreshCart: fetchCart, cartLoading }}>
       {children}
     </CartContext.Provider>
   );
