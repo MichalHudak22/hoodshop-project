@@ -9,9 +9,9 @@ function Login() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
+
   const { login } = useContext(AuthContext);
   const { refreshCartCount, setCartDirectly } = useContext(CartContext);
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -23,18 +23,18 @@ function Login() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-session-id': localStorage.getItem('sessionId'),
+          'x-session-id': localStorage.getItem('sessionId'), // pre session cart
         },
         body: JSON.stringify({ email, password }),
       });
 
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Chyba pri prihlasovaní');
+      }
+
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Chyba pri prihlasovaní');
-
       setMessage(data.message);
-
-      // 🟢 pred login vymazať session košík
-      setCartDirectly(0); // CartContext funkcia na reset
 
       // 🟢 uloženie usera do AuthContext
       login({
@@ -44,16 +44,17 @@ function Login() {
         token: data.token,
       });
 
-      // 🟢 fetch user košíka
+      // 🟢 fetch user košíka hneď po login
       const cartRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
         headers: { Authorization: 'Bearer ' + data.token },
       });
-
       const cartData = await cartRes.json();
-      refreshCartCount(cartData.length);
 
+      // 🟢 nastav CartContext podľa user košíka
+      setCartDirectly(cartData.length);
 
-      navigate('/profile'); // presmerovanie až po aktualizácii košíka
+      // 🟢 presmerovanie až po nastavení CartContext
+      navigate('/profile');
     } catch (err) {
       console.error('Error during login:', err);
       setError(err.message || 'An error occurred while logging in.');

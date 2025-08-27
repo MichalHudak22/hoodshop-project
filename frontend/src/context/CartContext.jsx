@@ -11,8 +11,8 @@ export const CartProvider = ({ children }) => {
   const fetchCartCount = useCallback(async () => {
     try {
       const headers = {};
-      const token = localStorage.getItem('token');
-      const sessionId = localStorage.getItem('session_id') || localStorage.getItem('sessionId');
+      const token = user?.token || localStorage.getItem('token');
+      const sessionId = !user ? localStorage.getItem('session_id') || localStorage.getItem('sessionId') : null;
 
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
@@ -21,7 +21,6 @@ export const CartProvider = ({ children }) => {
       }
 
       const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart/count`, { headers });
-
       setCartCount(res.data.count || 0);
     } catch (err) {
       console.error('Chyba pri načítaní počtu položiek v košíku:', err);
@@ -29,11 +28,10 @@ export const CartProvider = ({ children }) => {
     }
   }, [user]);
 
-  const refreshCartCount = useCallback(() => {
-    fetchCartCount();
+  const refreshCartCount = useCallback(async () => {
+    await fetchCartCount();
   }, [fetchCartCount]);
 
-  // 🟢 nová funkcia na priame nastavenie počtu alebo prepísanie košíka
   const setCartDirectly = (count) => {
     setCartCount(count);
   };
