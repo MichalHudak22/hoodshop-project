@@ -1,11 +1,8 @@
-import { createContext, useState, useEffect, useContext } from 'react';
-import { CartContext } from './CartContext';
+import { createContext, useState, useEffect } from 'react';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const { refreshCart } = useContext(CartContext); // pridáme refreshCart
-
   const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
@@ -56,18 +53,14 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', userData.token);
-
-    // ✅ okamžite refresh košíka po login
-    if (refreshCart) refreshCart();
+    // ✅ odstránime refreshCart, necháme CartContext reagovať na user?.token
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-
-    // ✅ refresh košíka po logout
-    if (refreshCart) refreshCart();
+    // ✅ refreshCart tu tiež odstránime
   };
 
   return (
