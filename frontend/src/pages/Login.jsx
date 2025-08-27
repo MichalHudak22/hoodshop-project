@@ -14,52 +14,59 @@ function Login() {
   const { refreshCartCount, setCartDirectly } = useContext(CartContext);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setMessage('');
+  e.preventDefault();
+  setError('');
+  setMessage('');
 
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-session-id': localStorage.getItem('sessionId'), // pre session cart
-        },
-        body: JSON.stringify({ email, password }),
-      });
+  try {
+    console.log('➡️ Sending login request...', email);
 
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Chyba pri prihlasovaní');
-      }
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-session-id': localStorage.getItem('sessionId'),
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-      const data = await res.json();
-      setMessage(data.message);
+    const data = await res.json();
+    console.log('⬅️ Login response:', data);
 
-      // 🟢 uloženie usera do AuthContext
-      login({
-        email: data.email,
-        name: data.name,
-        role: data.role,
-        token: data.token,
-      });
+    if (!res.ok) throw new Error(data.error || 'Chyba pri prihlasovaní');
 
-      // 2️⃣ fetch user košíka
-      const cartRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
-        headers: { Authorization: 'Bearer ' + data.token },
-      });
-      const cartData = await cartRes.json();
+    setMessage(data.message);
 
-      // 3️⃣ nastavenie CartContext
-      setCartDirectly(cartData.length);
+    // pred login reset košíka
+    console.log('🧹 Resetting cart count before login');
+    setCartDirectly(0);
 
-      // 4️⃣ presmerovanie
-      navigate('/profile');
-    } catch (err) {
-      console.error('Error during login:', err);
-      setError(err.message || 'An error occurred while logging in.');
-    }
-  };
+    // uloženie usera
+    login({
+      email: data.email,
+      name: data.name,
+      role: data.role,
+      token: data.token,
+    });
+    console.log('✅ User logged in:', data.email);
+
+    // fetch user košíka
+    const cartRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
+      headers: { Authorization: 'Bearer ' + data.token },
+    });
+
+    const cartData = await cartRes.json();
+    console.log('🛒 Fetched user cart:', cartData);
+
+    refreshCartCount(cartData.length);
+
+    navigate('/profile');
+  } catch (err) {
+    console.error('❌ Error during login:', err);
+    setError(err.message || 'An error occurred while logging in.');
+  }
+};
+
 
 
 
