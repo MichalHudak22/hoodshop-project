@@ -13,49 +13,62 @@ function Login() {
   const { login } = useContext(AuthContext);
   const { setCartDirectly } = useContext(CartContext);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setMessage('');
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
+  setMessage('');
 
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-session-id': localStorage.getItem('sessionId'),
-        },
-        body: JSON.stringify({ email, password }),
-      });
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-session-id': localStorage.getItem('sessionId'),
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Chyba pri prihlasovaní');
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Chyba pri prihlasovaní');
 
-      setMessage(data.message);
+    setMessage(data.message);
 
-      // uloženie usera do AuthContext
-      login({
-        email: data.email,
-        name: data.name,
-        role: data.role,
-        token: data.token,
-      });
+    // uloženie usera do AuthContext
+    login({
+      email: data.email,
+      name: data.name,
+      role: data.role,
+      token: data.token,
+    });
 
-      // fetch user kosika priamo z backendu
-      const cartRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
-        headers: { Authorization: 'Bearer ' + data.token },
-      });
-      const cartData = await cartRes.json();
+    // fetch user kosika priamo z backendu
+    const cartRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
+      headers: { Authorization: 'Bearer ' + data.token },
+    });
+    const serverCart = await cartRes.json();
 
-      // aktualizuj CartContext
-      setCartDirectly(cartData || []);
+    // lokálny session košík pred loginom
+    const localCart = JSON.parse(localStorage.getItem('localCart') || '[]');
 
-      navigate('/profile');
-    } catch (err) {
-      console.error('Error during login:', err);
-      setError(err.message || 'An error occurred while logging in.');
-    }
-  };
+    // merge server + local (unikátne položky podľa id)
+    const mergedCart = [...serverCart];
+    localCart.forEach(item => {
+      if (!mergedCart.find(p => p.id === item.id)) mergedCart.push(item);
+    });
+
+    // aktualizuj CartContext
+    setCartDirectly(mergedCart);
+
+    // už nepotrebujeme localCart
+    localStorage.removeItem('localCart');
+
+    navigate('/profile');
+  } catch (err) {
+    console.error('Error during login:', err);
+    setError(err.message || 'An error occurred while logging in.');
+  }
+};
+
 
   return (
     <div

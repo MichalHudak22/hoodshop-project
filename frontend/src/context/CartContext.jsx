@@ -1,16 +1,9 @@
-import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
-import axios from 'axios';
-import { AuthContext } from './AuthContext';
-
-export const CartContext = createContext();
-
 export const CartProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
   const [cartCount, setCartCount] = useState(0);
   const [cartItems, setCartItems] = useState([]);
   const [cartLoading, setCartLoading] = useState(true);
 
-  // SessionId pri mount
   useEffect(() => {
     let sId = localStorage.getItem('sessionId');
     if (!sId) {
@@ -19,7 +12,6 @@ export const CartProvider = ({ children }) => {
     }
   }, []);
 
-  // Fetch košíka
   const fetchCart = useCallback(async () => {
     setCartLoading(true);
     try {
@@ -41,24 +33,38 @@ export const CartProvider = ({ children }) => {
     }
   }, [user?.token]);
 
+  // ✅ Nová funkcia na pridanie položky do košíka
+  const addToCart = async (product) => {
+    try {
+      const headers = {};
+      const sessionId = localStorage.getItem('sessionId');
+      if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
+      else headers['x-session-id'] = sessionId;
+
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/cart/add`, product, { headers });
+
+      // Aktualizujeme lokálne
+      setCartItems(res.data || []);
+      setCartCount(res.data?.length || 0);
+    } catch (err) {
+      console.error('Chyba pri pridávaní do košíka:', err);
+    }
+  };
+
   const setCartDirectly = (items) => {
     setCartItems(items);
     setCartCount(items.length);
   };
 
-  const refreshCart = useCallback(() => fetchCart(), [fetchCart]);
-
-  // Fetch košíka len keď je sessionId a user načítaný
   useEffect(() => {
     const sessionId = localStorage.getItem('sessionId');
     if (!sessionId) return;
-    if (user === undefined) return; // počkáme na user
 
     fetchCart();
-  }, [fetchCart, user]);
+  }, [fetchCart]);
 
   return (
-    <CartContext.Provider value={{ cartCount, cartItems, setCartDirectly, refreshCart, cartLoading }}>
+    <CartContext.Provider value={{ cartCount, cartItems, addToCart, setCartDirectly, fetchCart, cartLoading }}>
       {children}
     </CartContext.Provider>
   );
