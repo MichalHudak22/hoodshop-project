@@ -13,67 +13,52 @@ function Login() {
   const { login } = useContext(AuthContext);
   const { refreshCartCount } = useContext(CartContext);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setMessage('');
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError('');
+  setMessage('');
 
-    try {
-      // POST na login
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-session-id': localStorage.getItem('sessionId'),
-        },
-        body: JSON.stringify({ email, password }),
-      });
+  try {
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-session-id': localStorage.getItem('sessionId'),
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-      let data;
-      const contentType = res.headers.get('content-type');
+    const data = await res.json();
 
-      if (contentType && contentType.includes('application/json')) {
-        data = await res.json();
-      } else {
-        const text = await res.text();
-        throw new Error(`Server returned non-JSON response: ${text}`);
-      }
+    if (!res.ok) throw new Error(data.error || 'Chyba pri prihlasovaní');
 
-      if (!res.ok) {
-        throw new Error(data.error || 'Chyba pri prihlasovaní');
-      }
+    setMessage(data.message);
 
-      setMessage(data.message);
+    // 🟢 najprv fetch user košíka
+    const cartRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cart`, {
+      headers: { Authorization: 'Bearer ' + data.token },
+    });
 
-      // uloženie usera do AuthContext a localStorage
-      login({
-        email: data.email,
-        name: data.name,
-        role: data.role,
-        token: data.token,
-      });
+    const cartData = await cartRes.json();
 
-      // 🟢 fetch user košíka (iba pre prihláseného)
-      const cartRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/cart`, {
-        headers: {
-          Authorization: 'Bearer ' + data.token,
-        },
-      });
+    // 🟢 aktualizuj CartContext pred login
+    refreshCartCount(cartData.length); // alebo celý cart state
 
-      let cartData;
-      const cartContentType = cartRes.headers.get('content-type');
-      if (cartContentType && cartContentType.includes('application/json')) {
-        cartData = await cartRes.json();
-        refreshCartCount(cartData.length); // update počtu v kontekošíka
-      }
+    // 🟢 až potom uložíme usera do AuthContext
+    login({
+      email: data.email,
+      name: data.name,
+      role: data.role,
+      token: data.token,
+    });
 
-      // presmerovanie až po úspešnom login a načítaní košíka
-      navigate('/profile');
-    } catch (err) {
-      console.error('Error during login:', err);
-      setError(err.message || 'An error occurred while logging in.');
-    }
-  };
+    navigate('/profile'); // presmerovanie až po aktualizácii
+  } catch (err) {
+    console.error('Error during login:', err);
+    setError(err.message || 'An error occurred while logging in.');
+  }
+};
+
 
   return (
     <div
