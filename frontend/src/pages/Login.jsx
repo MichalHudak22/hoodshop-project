@@ -44,16 +44,16 @@ function Login() {
         token: data.token,
       });
 
-      // 🟢 fetch user košíka hneď po login
+      // 2️⃣ fetch user košíka
       const cartRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
         headers: { Authorization: 'Bearer ' + data.token },
       });
       const cartData = await cartRes.json();
 
-      // 🟢 nastav CartContext podľa user košíka
+      // 3️⃣ nastavenie CartContext
       setCartDirectly(cartData.length);
 
-      // 🟢 presmerovanie až po nastavení CartContext
+      // 4️⃣ presmerovanie
       navigate('/profile');
     } catch (err) {
       console.error('Error during login:', err);
