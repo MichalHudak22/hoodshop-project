@@ -25,8 +25,8 @@ const CartPage = () => {
       await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`, { headers });
 
       const updated = cartItems.filter(item => item.id !== itemId);
-      setCartDirectly(updated); // okamžitá zmena v UI
-      refreshCart(); // fetch zo servera
+      setCartDirectly(updated);
+      refreshCart();
     } catch (err) {
       console.error('Remove failed:', err);
     }
@@ -43,8 +43,8 @@ const CartPage = () => {
       await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`, { quantity: newQuantity }, { headers });
 
       const updated = cartItems.map(item => item.id === itemId ? { ...item, quantity: newQuantity } : item);
-      setCartDirectly(updated); // okamžitá zmena
-      refreshCart(); // fetch zo servera
+      setCartDirectly(updated);
+      refreshCart();
     } catch (err) {
       console.error('Update failed:', err);
     }

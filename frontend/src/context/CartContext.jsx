@@ -10,7 +10,7 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [cartLoading, setCartLoading] = useState(true);
 
-  // Zabezpečíme sessionId pri mount
+  // SessionId pri mount
   useEffect(() => {
     let sId = localStorage.getItem('sessionId');
     if (!sId) {
@@ -19,14 +19,14 @@ export const CartProvider = ({ children }) => {
     }
   }, []);
 
-  // Fetch košíka cez callback
+  // Fetch košíka
   const fetchCart = useCallback(async () => {
     setCartLoading(true);
     try {
       const headers = {};
       const sessionId = localStorage.getItem('sessionId');
       if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
-      else if (sessionId) headers['x-session-id'] = sessionId;
+      else headers['x-session-id'] = sessionId;
 
       const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { headers });
 
@@ -48,7 +48,7 @@ export const CartProvider = ({ children }) => {
 
   const refreshCart = useCallback(() => fetchCart(), [fetchCart]);
 
-  // Fetch vždy po mount a pri zmene user
+  // ✅ fetch košíka pri mount a pri zmene user (login/logout)
   useEffect(() => {
     if (!localStorage.getItem('sessionId')) return;
     fetchCart();
