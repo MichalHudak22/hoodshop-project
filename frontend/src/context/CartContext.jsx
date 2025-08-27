@@ -48,10 +48,14 @@ export const CartProvider = ({ children }) => {
 
   const refreshCart = useCallback(() => fetchCart(), [fetchCart]);
 
-  // Fetch pri mount a pri zmene user
+  // Fetch vždy po mount a pri zmene user, počkáme až user sa načíta
   useEffect(() => {
+    const sessionReady = !!localStorage.getItem('sessionId');
+    if (!sessionReady) return;
+
+    // fetch len keď user je načítaný (pre login/logout)
     fetchCart();
-  }, [fetchCart]);
+  }, [fetchCart, user?.token]);
 
   return (
     <CartContext.Provider value={{ cartCount, cartItems, setCartDirectly, refreshCart, cartLoading }}>
