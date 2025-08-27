@@ -8,39 +8,42 @@ export const CartProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
   const [cartCount, setCartCount] = useState(0);
 
+  // fetch cart count pre aktuálneho používateľa alebo session
   const fetchCartCount = useCallback(async () => {
-  try {
-    const headers = {};
-    const token = localStorage.getItem('token');
-    const sessionId = localStorage.getItem('session_id') || localStorage.getItem('sessionId');
+    try {
+      const headers = {};
+      const token = localStorage.getItem('token');
+      const sessionId = localStorage.getItem('session_id') || localStorage.getItem('sessionId');
 
-    if (token) headers['Authorization'] = `Bearer ${token}`;
-    else if (sessionId) headers['x-session-id'] = sessionId;
+      if (user?.token || token) {
+        headers['Authorization'] = `Bearer ${user?.token || token}`;
+      } else if (sessionId) {
+        headers['x-session-id'] = sessionId;
+      }
 
-    console.log('🔄 Fetching cart count with headers:', headers);
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart/count`, { headers });
+      setCartCount(res.data.count || 0);
+      console.log('🛒 Cart count fetched:', res.data.count);
+    } catch (err) {
+      console.error('Chyba pri načítaní počtu položiek v košíku:', err);
+      setCartCount(0);
+    }
+  }, [user]);
 
-    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart/count`, { headers });
-
-    console.log('🛒 Cart count fetched:', res.data.count);
-    setCartCount(res.data.count || 0);
-  } catch (err) {
-    console.error('❌ Error fetching cart count:', err);
-    setCartCount(0);
-  }
-}, [user]);
-
-
-  const refreshCartCount = useCallback(async () => {
-    await fetchCartCount();
-  }, [fetchCartCount]);
-
+  // priamo nastaviť košík
   const setCartDirectly = (count) => {
     setCartCount(count);
   };
 
+  // refresh funkcia
+  const refreshCartCount = useCallback(() => {
+    fetchCartCount();
+  }, [fetchCartCount]);
+
+  // len inicialny fetch pri mount a potom vždy, keď sa user zmení
   useEffect(() => {
     fetchCartCount();
-  }, [user, fetchCartCount]);
+  }, []); // ⚠️ odstraňujeme [user], aby sa nepremenil na session kosik po prihlásení
 
   return (
     <CartContext.Provider value={{ cartCount, refreshCartCount, setCartDirectly }}>
