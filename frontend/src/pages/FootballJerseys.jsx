@@ -8,66 +8,32 @@ import ProductSection from '../components/ProductSection';
 
 const FootballJerseys = () => {
   const [jerseys, setJerseys] = useState([]);
-  const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
+  const { handleAddToCart } = useContext(CartContext); // 🔹 používame CartContext
 
- useEffect(() => {
-  axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/football/jersey`)
-    .then(response => {
-      setJerseys(response.data);
-    })
-    .catch(error => {
-      console.error('Chyba pri načítavaní football dresov:', error);
-    });
-}, []);
+  useEffect(() => {
+    axios
+      .get(`${import.meta.env.VITE_API_BASE_URL}/products/football/jersey`)
+      .then((res) => setJerseys(res.data))
+      .catch((err) => console.error('Chyba pri načítavaní football dresov:', err));
+  }, []);
 
-const handleAddToCart = async (product) => {
-  try {
-    // token pre prihlásených
-    const token = localStorage.getItem("token");
-
-    // sessionId pre neprihlásených
-    let sessionId = localStorage.getItem("sessionId");
-    if (!sessionId && !token) {
-      sessionId = crypto.randomUUID();
-      localStorage.setItem("sessionId", sessionId);
+  const addProduct = async (product) => {
+    try {
+      await handleAddToCart(product); // pridávanie cez context
+      setMessage('Product added to cart!');
+    } catch (err) {
+      console.error('Error adding to cart:', err);
+      setMessage('Error adding to cart');
     }
+    setTimeout(() => setMessage(''), 3000);
+  };
 
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
-      method: 'POST',
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-        ...(!token && sessionId && { "x-session-id": sessionId }),
-      },
-      body: JSON.stringify({
-        productId: product.id,
-        quantity: 1, // vždy číslo
-      }),
-    });
+  const highlightedJerseys = jerseys.filter((j) => j.highlight_title && j.description);
+  const featuredJersey = highlightedJerseys[0];
+  const featuredJersey2 = highlightedJerseys[1];
 
-    const data = await response.json();
-
-    if (response.ok) {
-      setMessage("Product added to cart!");
-      refreshCartCount(); // aktualizuje počet v CartContext
-    } else {
-      setMessage("Failed to add to cart: " + (data.message || "Unknown error"));
-    }
-
-  } catch (error) {
-    console.error("Error adding to cart:", error);
-    setMessage("Error adding to cart");
-  }
-
-  // Zobraz message na 3 sekundy
-  setTimeout(() => setMessage(''), 3000);
-};
-
-
-
-  // ✅ Carousel 
-  const slides = jerseys.map(product => ({
+  const slides = jerseys.map((product) => ({
     id: product.id,
     name: product.name,
     brand: product.brand,
@@ -75,16 +41,10 @@ const handleAddToCart = async (product) => {
     image: product.image,
   }));
 
-  const highlightedJerseys = jerseys.filter(jersey => jersey.highlight_title && jersey.description);
-  const featuredJersey = highlightedJerseys[0];
-  const featuredJersey2 = highlightedJerseys[1];
-
   return (
     <div>
       {/* HEAD TITLE */}
-      <section
-        className="relative text-center py-10 px-4 bg-gradient-to-br  from-green-600 via-black to-green-700 text-white overflow-hidden border-b-4 border-black"
-      >
+      <section className="relative text-center py-10 px-4 bg-gradient-to-br from-green-600 via-black to-green-700 text-white overflow-hidden border-b-4 border-black">
         <div className="absolute inset-0"></div>
         <div className="relative z-10 max-w-4xl mx-auto">
           <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
@@ -99,23 +59,22 @@ const handleAddToCart = async (product) => {
         </div>
       </section>
 
-
       {/* 1st FEATURED JERSEY */}
       <FeaturedProduct
         product={featuredJersey}
-        handleAddToCart={handleAddToCart}
+        handleAddToCart={addProduct}
         backgroundImage="/img/bg-football3.jpg"
       />
 
       {/* CAROUSEL */}
       <div className="py-10 bg-black">
-        <ProductsCarousel slides={slides} handleAddToCart={handleAddToCart} />
+        <ProductsCarousel slides={slides} handleAddToCart={addProduct} />
       </div>
 
       {/* 2nd FEATURED JERSEY */}
       <FeaturedProductReversed
         product={featuredJersey2}
-        handleAddToCart={handleAddToCart}
+        handleAddToCart={addProduct}
         backgroundImage="/img/bg-football3.jpg"
       />
 
@@ -124,10 +83,10 @@ const handleAddToCart = async (product) => {
         title="All Football Jerseys"
         backgroundImage="/img/bg-football5.jpg"
         products={jerseys}
-        onAddToCart={handleAddToCart}
+        onAddToCart={addProduct}
       />
 
-      {/* ✅ MESSAGE NA STRED OBRAZOVKY */}
+      {/* MESSAGE */}
       {message && (
         <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
           {message}
