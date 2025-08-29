@@ -6,6 +6,18 @@ const FeaturedProductReversed = ({ product, handleAddToCart, backgroundImage }) 
 
   const productSlug = product.name.toLowerCase().replace(/\s+/g, '-');
 
+  const handleAdd = () => {
+    if (typeof handleAddToCart === 'function') {
+      handleAddToCart({
+        productId: product.id, // iba ID
+        quantity: 1            // pevné množstvo
+      });
+    } else {
+      console.warn('handleAddToCart nie je definované');
+    }
+  };
+
+
   return (
     <section className="relative py-16 px-6 mb-10 bg-black overflow-hidden border-b-4 border-black">
       <div
@@ -24,7 +36,7 @@ const FeaturedProductReversed = ({ product, handleAddToCart, backgroundImage }) 
           {product.highlight_title}
         </h1>
         <div className="flex flex-col md:flex-row-reverse items-center justify-center gap-8">
-          
+
           {/* OBÁLENIE obrázku do Link komponentu */}
           <Link to={`/product/${productSlug}`}>
             <img
@@ -40,11 +52,12 @@ ${product.image}`}
             <p className="text-lg text-gray-100 pb-2"><strong>Brand:</strong> {product.brand}</p>
             <div className="flex flex-row-reverse md:flex-row gap-3 items-center w-[250px] m-auto md:w-full md:justify-end">
               <button
-                onClick={() => handleAddToCart(product)}
+                onClick={handleAdd}
                 className="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 mb-2 font-bold rounded-xl text-lg transition duration-300"
               >
                 Add to Cart
               </button>
+
               <p className="text-lg md:text-2xl bg-black bg-opacity-70 p-3 rounded-xl text-green-500 font-bold mb-2">
                 {product.price} €
               </p>
