@@ -5,23 +5,15 @@ export default ({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   return defineConfig({
-    base: '/',
+    base: '/', // zmena z './' na '/'
     plugins: [react()],
     css: {
       postcss: './postcss.config.js',
     },
     server: {
       proxy: {
-        '/products': {
-          target: env.VITE_API_BASE_URL,
-          changeOrigin: true,
-          secure: false,
-        },
-        '/api': {
-          target: env.VITE_API_BASE_URL,
-          changeOrigin: true,
-          secure: false,
-        },
+        '/products': env.VITE_API_BASE_URL,
+        '/api': env.VITE_API_BASE_URL,
       },
     },
   });

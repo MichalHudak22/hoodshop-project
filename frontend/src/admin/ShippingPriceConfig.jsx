@@ -74,11 +74,10 @@ const handleSubmit = async (e) => {
     await Promise.all(
       changedMethods.map(name => {
         console.log('Saving price for method:', name, 'with price:', prices[name]);
-return axios.post(`${API}/api/config/shipping-prices`, {
-  name,
-  price: prices[name] === '' ? 0 : parseFloat(prices[name])
-});
-
+        return axios.post('/api/config/shipping-prices', {
+          name,
+          price: prices[name] === '' ? 0 : parseFloat(prices[name])
+        });
       })
     );
 

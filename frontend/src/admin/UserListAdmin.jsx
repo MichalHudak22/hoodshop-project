@@ -26,6 +26,8 @@ const fetchUsers = async () => {
     if (!res.ok) throw new Error('Nepodarilo sa načítať používateľov');
     const data = await res.json();
 
+    console.log('Fetched users data:', data);
+
     if (Array.isArray(data)) {
       setUsers(data);
       setError(null);

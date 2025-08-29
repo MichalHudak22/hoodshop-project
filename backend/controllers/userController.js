@@ -39,9 +39,6 @@ const transporter = nodemailer.createTransport({
 const createUser = (req, res) => {
   const { name, email, password } = req.body;
 
-  const defaultUrl = 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1755594977/default-avatar_z3c30l.jpg';
-  const defaultPublicId = 'default-avatar_z3c30l';
-
   const checkEmailQuery = 'SELECT * FROM user WHERE email = ?';
   db.query(checkEmailQuery, [email], (err, results) => {
     if (err) return res.status(500).json({ error: 'Chyba pri overovaní emailu.' });
@@ -50,12 +47,8 @@ const createUser = (req, res) => {
     bcrypt.hash(password, 10, (err, hashedPassword) => {
       if (err) return res.status(500).json({ error: 'Chyba pri hashovaní hesla.' });
 
-      const insertUserQuery = `
-        INSERT INTO user (name, email, password, is_verified, user_photo, user_photo_public_id)
-        VALUES (?, ?, ?, false, ?, ?)
-      `;
-
-      db.query(insertUserQuery, [name, email, hashedPassword, defaultUrl, defaultPublicId], (err, result) => {
+      const insertUserQuery = 'INSERT INTO user (name, email, password, is_verified) VALUES (?, ?, ?, false)';
+      db.query(insertUserQuery, [name, email, hashedPassword], (err, result) => {
         if (err) return res.status(500).json({ error: 'Chyba pri ukladaní používateľa.' });
 
         const userId = result.insertId;
@@ -63,16 +56,19 @@ const createUser = (req, res) => {
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
         const expiresAtFormatted = expiresAt.toISOString().slice(0, 19).replace('T', ' ');
 
+        // VLOŽENIE IBA RAZ
         db.query(
           'INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
           [userId, token, expiresAtFormatted],
           (err) => {
-            if (err) {
-              console.error('Chyba pri ukladaní tokenu:', err);
-              return res.status(500).json({ error: 'Chyba pri ukladaní tokenu.' });
-            }
+           if (err) {
+  console.error('Chyba pri ukladaní tokenu:', err);
+  return res.status(500).json({ error: 'Chyba pri ukladaní tokenu.' });
+}
 
-            const verificationLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${token}`;
+
+          const verificationLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/verify-email?token=${token}`;
+
 
             transporter.sendMail({
               to: email,
@@ -154,27 +150,39 @@ const loginUser = (req, res) => {
 
   const query = 'SELECT * FROM user WHERE email = ?';
   db.query(query, [email], (err, results) => {
-    if (err) return res.status(500).json({ error: 'Chyba pri pripojení k databáze' });
-    if (results.length === 0) return res.status(404).json({ error: 'No user exists with this email.' });
+    if (err) {
+      return res.status(500).json({ error: 'Chyba pri pripojení k databáze' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'No user exists with this email.' });
+    }
 
     const user = results[0];
 
-    if (user.is_verified === 0)
+    // TU PRIDÁME KONTROLU IS_VERIFIED
+    if (user.is_verified === 0) {
       return res.status(403).json({ error: 'Email nie je overený. Skontroluj svoj email.' });
+    }
 
+    // Porovnanie zadaného hesla s hashovaným heslom v databáze
     bcrypt.compare(password, user.password, (err, isMatch) => {
-      if (err) return res.status(500).json({ error: 'Chyba pri porovnávaní hesla' });
-      if (!isMatch) return res.status(400).json({ error: 'Incorrect password.' });
+      if (err) {
+        return res.status(500).json({ error: 'Chyba pri porovnávaní hesla' });
+      }
 
+      if (!isMatch) {
+        return res.status(400).json({ error: 'Incorrect password.' });
+      }
+
+      // Ak je heslo správne, vytvoríme JWT token (v ňom už je aj role)
       const token = jwt.sign(
         { userId: user.id, email: user.email, role: user.role },
         process.env.JWT_SECRET,
         { expiresIn: '6h' }
       );
 
-      // Na login nechať session košík tak, ako je
-      // Nepridávame ani nemažeme session položky
-
+      // Posielame token, email, name a role klientovi
       res.status(200).json({
         message: 'Prihlásenie úspešné',
         token,

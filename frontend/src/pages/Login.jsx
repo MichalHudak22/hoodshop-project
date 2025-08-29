@@ -11,63 +11,46 @@ function Login() {
   const navigate = useNavigate();
 
   const { login } = useContext(AuthContext);
-  const { setCartDirectly } = useContext(CartContext);
+  const { refreshCartCount } = useContext(CartContext);
 
-const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
   e.preventDefault();
-  setError('');
-  setMessage('');
 
-  try {
-    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-session-id': localStorage.getItem('sessionId'),
-      },
-      body: JSON.stringify({ email, password }),
+  fetch(`${import.meta.env.VITE_API_BASE_URL}/user/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.error) {
+        setError(data.error);
+        setMessage('');
+      } else if (data.message === 'Email is not verified. Please verify your account before logging in.') {
+        setError('Email is not verified. Please verify your account before logging in.');
+        setMessage('');
+      } else {
+        setMessage(data.message);
+        setError('');
+
+        login({
+          email: data.email,
+          name: data.name,
+          role: data.role,
+          token: data.token,
+        });
+
+        refreshCartCount();
+        navigate('/profile');
+      }
+    })
+    .catch((err) => {
+      console.error('Error during login:', err);
+      setError('An error occurred while logging in.');
+      setMessage('');
     });
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Chyba pri prihlasovaní');
-
-    setMessage(data.message);
-
-    // uloženie usera do AuthContext
-    login({
-      email: data.email,
-      name: data.name,
-      role: data.role,
-      token: data.token,
-    });
-
-    // fetch user kosika priamo z backendu
-    const cartRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
-      headers: { Authorization: 'Bearer ' + data.token },
-    });
-    const serverCart = await cartRes.json();
-
-    // lokálny session košík pred loginom
-    const localCart = JSON.parse(localStorage.getItem('localCart') || '[]');
-
-    // merge server + local (unikátne položky podľa id)
-    const mergedCart = [...serverCart];
-    localCart.forEach(item => {
-      if (!mergedCart.find(p => p.id === item.id)) mergedCart.push(item);
-    });
-
-    // aktualizuj CartContext
-    setCartDirectly(mergedCart);
-
-    // už nepotrebujeme localCart
-    localStorage.removeItem('localCart');
-
-    navigate('/profile');
-  } catch (err) {
-    console.error('Error during login:', err);
-    setError(err.message || 'An error occurred while logging in.');
-  }
 };
+
 
 
   return (
@@ -76,10 +59,12 @@ const handleSubmit = async (e) => {
       style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}
     >
       <div className="absolute inset-0 bg-black opacity-60 z-0" />
+
       <div className="relative z-10 bg-black bg-opacity-70 md:border-2 border-gray-600 py-8 lg:py-16 px-5 md:px-12 lg:px-12 rounded-2xl shadow-xl max-w-xl md:max-w-3xl w-full">
         <h1 className="text-3xl font-bold text-center text-blue-200 mb-6">
           Sign In to Your Account
         </h1>
+
         <div className="mb-8 text-white flex flex-col gap-3">
           <h2 className="text-3xl font-bold mb-4 text-blue-200 text-center">
             Welcome back to HoodShop!
@@ -125,7 +110,7 @@ const handleSubmit = async (e) => {
           </div>
         </form>
 
-        <div className="mt-4 text-center h-8">
+          <div className="mt-4 text-center h-8">
           {error ? (
             <p className="text-red-400">{error}</p>
           ) : message ? (
@@ -146,6 +131,8 @@ const handleSubmit = async (e) => {
             Create Account
           </Link>
         </div>
+
+      
       </div>
     </div>
   );

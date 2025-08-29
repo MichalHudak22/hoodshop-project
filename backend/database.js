@@ -1,33 +1,27 @@
 const mysql = require('mysql2');
 const util = require('util');
-const fs = require('fs');             // <-- pridaj
-const path = require('path');         // <-- pridaj
 require('dotenv').config();
 
 const pool = mysql.createPool({
-  host: process.env.DB_HOST,       // gateway TiDB
-  port: Number(process.env.DB_PORT), 
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
+  host: process.env.DB_HOST,          // mainline.proxy.rlwy.net
+  port: Number(process.env.DB_PORT),  // 20728
+  user: process.env.DB_USER,          // root
+  password: process.env.DB_PASSWORD,  // heslo
+  database: process.env.DB_NAME,      // railway
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  ssl: {
-    ca: fs.readFileSync(path.join(__dirname, 'ssl', 'isrgrootx1.pem'))  // cesta k certu
-  }
 });
-
-// Promisify pre async/await
-pool.query = util.promisify(pool.query);
 
 pool.getConnection((err, connection) => {
   if (err) {
-    console.error('❌ Chyba pripojenia k TiDB:', err);
+    console.error('❌ Chyba pripojenia k databáze:', err);
   } else {
-    console.log('✅ Pripojený k TiDB');
+    console.log('✅ Pripojený k databáze');
     connection.release();
   }
 });
+
+pool.query = util.promisify(pool.query);
 
 module.exports = pool;

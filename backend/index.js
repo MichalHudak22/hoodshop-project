@@ -2,50 +2,74 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const path = require('path');
+const fs = require('fs');  // import fs
 
-const pool = require('./database');  
+const pool = require('./database');  // TU naimportuj pool
+console.log('pool object:', pool);
 
-// Routes
 const userRoutes = require('./routes/userRoutes');     
 const productRoutes = require('./routes/productRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const orderRoutes = require('./routes/orderRoutes'); 
 const orderHistoryRoutes = require('./routes/orderHistoryRoutes');
 const brandsRoutes = require('./routes/brandsRoutes');
-const uploadRoutes = require('./routes/uploadRoutes'); 
+const uploadRoutes = require('./routes/uploadRoutes'); // 💥 Toto ti chýba!
 const adminConfigRoutes = require('./routes/adminConfigRoutes');
 
 const app = express();
 
-// Render / Heroku proxy fix
-app.set('trust proxy', 1);
+app.set('trust proxy', 1);  // Toto pridaj hneď po vytvorení Express app
+
+const imgFile = path.join(__dirname, 'src/img/brands/nike.jpg');
+fs.access(imgFile, fs.constants.F_OK, (err) => {
+  console.log(err ? 'Súbor neexistuje' : 'Súbor existuje');
+});
 
 const PORT = process.env.PORT || 3001;
+
 
 app.use(cors());
 app.use(express.json());
 
-// Routes
+// Pripojenie admin config routes
 app.use('/api/config', adminConfigRoutes);
-app.use('/user/upload', uploadRoutes);  // => /user/upload/photo
-app.use('/api/brands', brandsRoutes);
-app.use('/user', userRoutes);
-app.use('/products', productRoutes);
-app.use('/api/cart', cartRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/api/order-history', orderHistoryRoutes);
 
-// Static files
+// Sprístupnenie obrázkov zo `src/img/`
 app.use('/img', express.static(path.join(__dirname, 'src/img')));
+
+// Sprístupnenie videí zo `src/video/`
 app.use('/video', express.static(path.join(__dirname, 'src/video')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/user/upload', uploadRoutes);  // => /user/upload/photo
+
+// Sprístupnenie vsetkych znaciek
+app.use('/api/brands', brandsRoutes);
+
+
+// Debug: vypíšeme absolútnu cestu a súbory vo video priečinku
+const videoPath = path.join(__dirname, 'src/video');
+
+fs.readdir(videoPath, (err, files) => {
+  if (err) {
+    console.error('Chyba pri čítaní priečinka videí:', err);
+  } else {
+    console.log('Súbory vo video priečinku:', files);
+  }
+});
 
 // Root endpoint
 app.get('/', (req, res) => {
   res.send('Vitaj na serveri!');
 });
 
-// DB test endpoint
+// Endpointy
+app.use('/user', userRoutes);
+app.use('/products', productRoutes);
+app.use('/api/cart', cartRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/order-history', orderHistoryRoutes);
+
+
 app.get('/test-db', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT 1 + 1 AS solution');
@@ -57,5 +81,6 @@ app.get('/test-db', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ Server beží na porte ${PORT}`);
+  console.log(`Server beží na porte ${PORT}`);
 });
+

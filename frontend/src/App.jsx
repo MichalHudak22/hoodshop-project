@@ -4,7 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { CartProvider } from './context/CartContext'; // <- pridaj import
-import { AuthProvider } from './context/AuthContext';
 
 // Lazy load stránok
 const Home = lazy(() => import('./pages/Home'));
