@@ -9,23 +9,23 @@ const FeaturedProduct = ({ product, backgroundImage }) => {
 
   const productSlug = product.name.toLowerCase().replace(/\s+/g, '-');
 
+  const handleAdd = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-  const handleAdd = () => {
-    console.log('Adding to cart - product:', product);
-    console.log('Sending payload:', { productId: product.id, quantity: 1 });
+    const payload = {
+      ...product,
+      quantity: product.quantity ?? 1,
+    };
+
+    console.log('FeaturedProduct Add to Cart payload:', payload);
 
     if (typeof handleAddToCart === 'function') {
-      handleAddToCart({
-        productId: product.id,
-        quantity: 1
-      });
+      handleAddToCart(payload);
     } else {
       console.warn('handleAddToCart nie je definované');
     }
   };
-
-
-
 
   return (
     <section className="relative py-16 px-6 bg-black overflow-hidden border-b-4 border-black">
@@ -44,6 +44,7 @@ const FeaturedProduct = ({ product, backgroundImage }) => {
         <h1 className="text-center text-xl md:text-2xl lg:text-4xl font-bold text-white mb-4 lg:mb-10">
           {product.highlight_title}
         </h1>
+
         <div className="flex flex-col md:flex-row items-center justify-center gap-8">
           <Link to={`/product/${productSlug}`}>
             <img
@@ -63,17 +64,11 @@ const FeaturedProduct = ({ product, backgroundImage }) => {
                 {product.price} €
               </p>
               <button
-                onClick={e => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const payload = { productId: product.id, quantity: 1 };
-                  console.log('ProductSection Add to Cart payload:', payload);
-                  if (onAddToCart) onAddToCart(payload);
-                }}
+                onClick={handleAdd}
+                className="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 rounded-xl transition duration-300"
               >
                 Add to Cart
               </button>
-
             </div>
             <p className="text-lg text-white p-3 rounded-xl">{product.description}</p>
           </div>

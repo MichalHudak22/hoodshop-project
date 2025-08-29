@@ -1,25 +1,28 @@
 import React from 'react';
-import { Link } from 'react-router-dom'; // nezabudni na import
+import { Link } from 'react-router-dom';
 
 const FeaturedProductReversed = ({ product, handleAddToCart, backgroundImage }) => {
   if (!product) return null;
 
   const productSlug = product.name.toLowerCase().replace(/\s+/g, '-');
 
-const handleAdd = () => {
-  if (typeof handleAddToCart === 'function') {
+  const handleAdd = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
     const payload = {
-      productId: product.id, // iba ID
-      quantity: 1            // pevné množstvo
+      ...product,
+      quantity: product.quantity ?? 1,
     };
+
     console.log('FeaturedProductReversed Add to Cart payload:', payload);
-    handleAddToCart(payload);
-  } else {
-    console.warn('handleAddToCart nie je definované');
-  }
-};
 
-
+    if (typeof handleAddToCart === 'function') {
+      handleAddToCart(payload);
+    } else {
+      console.warn('handleAddToCart nie je definované');
+    }
+  };
 
   return (
     <section className="relative py-16 px-6 mb-10 bg-black overflow-hidden border-b-4 border-black">
@@ -38,13 +41,11 @@ const handleAdd = () => {
         <h1 className="text-center text-xl md:text-2xl lg:text-4xl font-bold text-white mb-4 lg:mb-10">
           {product.highlight_title}
         </h1>
-        <div className="flex flex-col md:flex-row-reverse items-center justify-center gap-8">
 
-          {/* OBÁLENIE obrázku do Link komponentu */}
+        <div className="flex flex-col md:flex-row-reverse items-center justify-center gap-8">
           <Link to={`/product/${productSlug}`}>
             <img
-              src={`${import.meta.env.VITE_API_BASE_URL}
-${product.image}`}
+              src={`${import.meta.env.VITE_API_BASE_URL}${product.image}`}
               alt={product.name}
               className="max-w-sm rounded-lg shadow-xl object-contain hover:brightness-110"
             />
@@ -53,6 +54,7 @@ ${product.image}`}
           <div className="max-w-xl text-center md:text-right">
             <h2 className="text-2xl font-bold mb-2 text-gray-100">{product.name}</h2>
             <p className="text-lg text-gray-100 pb-2"><strong>Brand:</strong> {product.brand}</p>
+
             <div className="flex flex-row-reverse md:flex-row gap-3 items-center w-[250px] m-auto md:w-full md:justify-end">
               <button
                 onClick={handleAdd}
@@ -65,6 +67,7 @@ ${product.image}`}
                 {product.price} €
               </p>
             </div>
+
             <p className="text-lg text-white p-3 rounded-xl text-center md:text-left">{product.description}</p>
           </div>
         </div>

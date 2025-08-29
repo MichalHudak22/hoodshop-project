@@ -34,6 +34,13 @@ const ProductSection = ({ title, products, backgroundImage, onAddToCart }) => {
               imageUrl = `${import.meta.env.VITE_API_BASE_URL}${imageUrl}`;
             }
 
+            const handleAdd = (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('ProductSection Add to Cart payload:', product);
+              if (onAddToCart) onAddToCart(product);
+            };
+
             return (
               <div
                 key={product.id}
@@ -56,18 +63,11 @@ const ProductSection = ({ title, products, backgroundImage, onAddToCart }) => {
                 {/* Tlačidlo mimo Link */}
                 <div className="px-4 pb-4 text-center">
                   <button
-                    onClick={e => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      const payload = { productId: product.id, quantity: 1 };
-                      console.log('ProductSection Add to Cart payload:', payload);
-                      if (onAddToCart) onAddToCart(payload);
-                    }}
+                    onClick={handleAdd}
                     className="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 rounded-full text-sm transition duration-300"
                   >
                     Add to Cart
                   </button>
-
                 </div>
               </div>
             );

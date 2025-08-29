@@ -12,23 +12,27 @@ const baseURL = import.meta.env.VITE_API_BASE_URL || '';
 const ProductsCarousel = ({ slides, handleAddToCart }) => {
   const [loadingIds, setLoadingIds] = useState([]);
 
-const handleClick = async (product) => {
-  console.log('ProductsCarousel - Add to Cart clicked for product:', product);
-  const payload = { productId: product.id, quantity: 1 };
-  console.log('ProductsCarousel - payload to send:', payload);
+  const handleClick = async (product) => {
+    console.log('ProductsCarousel - Add to Cart clicked for product:', product);
 
-  setLoadingIds((prev) => [...prev, product.id]);
+    const payload = {
+      ...product,
+      quantity: product.quantity ?? 1,
+    };
+    console.log('ProductsCarousel - payload to send:', payload);
 
-  try {
-    await handleAddToCart(payload);
-    console.log('ProductsCarousel - Add to Cart success for product:', product.id);
-  } catch (error) {
-    console.error('ProductsCarousel - Error adding to cart:', error);
-    alert('Chyba pri pridávaní do košíka');
-  } finally {
-    setLoadingIds((prev) => prev.filter((id) => id !== product.id));
-  }
-};
+    setLoadingIds((prev) => [...prev, product.id]);
+
+    try {
+      await handleAddToCart(payload);
+      console.log('ProductsCarousel - Add to Cart success for product:', product.id);
+    } catch (error) {
+      console.error('ProductsCarousel - Error adding to cart:', error);
+      alert('Chyba pri pridávaní do košíka');
+    } finally {
+      setLoadingIds((prev) => prev.filter((id) => id !== product.id));
+    }
+  };
 
   return (
     <>
@@ -53,18 +57,18 @@ const handleClick = async (product) => {
         }}
         className="w-full h-[420px] relative z-20"
       >
-      {slides.map((slide, index) => {
-  const productSlug = slide.name.toLowerCase().replace(/\s+/g, '-');
-  const isLoading = loadingIds.includes(slide.id);
+        {slides.map((slide, index) => {
+          const productSlug = slide.name.toLowerCase().replace(/\s+/g, '-');
+          const isLoading = loadingIds.includes(slide.id);
 
-  // ✅ Oprava URL obrázka
-  let imageUrl = slide.image;
-  if (imageUrl.startsWith('https//')) {
-    imageUrl = imageUrl.replace('https//', 'https://');
-  }
-  if (!imageUrl.startsWith('http')) {
-    imageUrl = `${baseURL}${imageUrl}`;
-  }
+          // Oprava URL obrázka
+          let imageUrl = slide.image;
+          if (imageUrl.startsWith('https//')) {
+            imageUrl = imageUrl.replace('https//', 'https://');
+          }
+          if (!imageUrl.startsWith('http')) {
+            imageUrl = `${baseURL}${imageUrl}`;
+          }
 
           return (
             <SwiperSlide key={index}>
