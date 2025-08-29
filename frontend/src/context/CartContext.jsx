@@ -63,27 +63,28 @@ const addToCart = async (product) => {
     if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
     else headers['x-session-id'] = sessionId;
 
+    // Skontrolujeme, či už produkt existuje
+    const existingItem = cartItems.find(
+      (item) => item.productId === (product.productId ?? product.id)
+    );
+
     const payload = {
       productId: product.productId ?? product.id,
-      quantity: product.quantity ?? 1,
+      quantity: existingItem
+        ? existingItem.quantity + (product.quantity ?? 1)
+        : product.quantity ?? 1,
     };
 
     const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, payload, { headers });
 
-    // backend môže vrátiť pole alebo objekt { cartItems: [...] }
     const items = Array.isArray(res.data)
       ? res.data
       : Array.isArray(res.data.cartItems)
       ? res.data.cartItems
       : [];
 
-    // **Dôležité**: aktualizujeme stav aj count
     setCartItems(items);
     setCartCount(items.length);
-
-    // Voliteľne: zavoláme fetchCart, aby sme mali úplne aktuálny stav z backendu
-    fetchCart();
-
     console.log('Cart updated after add:', items);
   } catch (err) {
     console.error('Chyba pri pridávaní do košíka:', err);

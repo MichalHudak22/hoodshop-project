@@ -6,7 +6,7 @@ import { AuthContext } from '../context/AuthContext';
 
 const CartPage = () => {
   const { user } = useContext(AuthContext);
-  const { cartItems, setCartDirectly, refreshCart, cartLoading } = useContext(CartContext);
+  const { cartItems, setCartDirectly, fetchCart, cartLoading } = useContext(CartContext);
   const [total, setTotal] = useState(0);
 
   // Total sa počíta vždy keď sa zmení košík
@@ -15,36 +15,37 @@ const CartPage = () => {
     setTotal(sum);
   }, [cartItems]);
 
-  const handleRemove = async (itemId) => {
+  const handleRemove = async (productId) => {
     try {
       const headers = {};
       const sessionId = localStorage.getItem('sessionId');
       if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
       else headers['x-session-id'] = sessionId;
 
-      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`, { headers });
-
-      const updated = cartItems.filter(item => item.id !== itemId);
-      setCartDirectly(updated);
-      refreshCart();
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${productId}`, { headers });
+      await fetchCart();
     } catch (err) {
       console.error('Remove failed:', err);
     }
   };
 
-  const handleQuantityChange = async (itemId, newQuantity) => {
-    if (newQuantity < 1) return;
+  const handleQuantityChange = async (item, delta) => {
+    const newQuantity = item.quantity + delta;
+    if (newQuantity < 1) return handleRemove(item.productId);
+
     try {
       const headers = {};
       const sessionId = localStorage.getItem('sessionId');
       if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
       else headers['x-session-id'] = sessionId;
 
-      await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${itemId}`, { quantity: newQuantity }, { headers });
+      await axios.patch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/cart/${item.productId}`,
+        { quantity: newQuantity },
+        { headers }
+      );
 
-      const updated = cartItems.map(item => item.id === itemId ? { ...item, quantity: newQuantity } : item);
-      setCartDirectly(updated);
-      refreshCart();
+      await fetchCart();
     } catch (err) {
       console.error('Update failed:', err);
     }
@@ -60,26 +61,26 @@ const CartPage = () => {
         <h1 className="text-3xl font-bold mb-4 text-center py-3 text-blue-200">Shopping Cart</h1>
         <ul className="space-y-4">
           {cartItems.map(item => (
-            <li key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-100 p-4 shadow rounded-lg space-y-4 sm:space-y-0">
+            <li key={item.productId} className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-100 p-4 shadow rounded-lg space-y-4 sm:space-y-0">
               <div className="flex items-center space-x-4">
                 <img src={`${import.meta.env.VITE_API_BASE_URL}${item.image}`} alt={item.name} className="w-16 h-16 object-cover rounded" />
                 <div>
                   <h2 className="text-base sm:text-lg font-semibold">{item.name}</h2>
-                  <p className="text-sm">${item.price}</p>
+                  <p className="text-sm">{item.price} €</p>
                 </div>
               </div>
               <div className="flex items-center justify-center sm:justify-end space-x-2 sm:space-x-3">
-                <button type="button" onClick={() => handleQuantityChange(item.id, item.quantity - 1)} className="px-2 py-1 bg-blue-100 hover:bg-blue-200 rounded text-lg">−</button>
+                <button type="button" onClick={() => handleQuantityChange(item, -1)} className="px-2 py-1 bg-blue-100 hover:bg-blue-200 rounded text-lg">−</button>
                 <span className="min-w-[24px] text-center text-lg font-semibold">{item.quantity}</span>
-                <button type="button" onClick={() => handleQuantityChange(item.id, item.quantity + 1)} className="px-2 py-1 bg-blue-100 hover:bg-blue-200 rounded text-lg">+</button>
-                <button type="button" onClick={() => handleRemove(item.id)} className="ml-2 text-red-500 text-[16px] hover:text-red-500 hover:scale-105">Remove</button>
+                <button type="button" onClick={() => handleQuantityChange(item, +1)} className="px-2 py-1 bg-blue-100 hover:bg-blue-200 rounded text-lg">+</button>
+                <button type="button" onClick={() => handleRemove(item.productId)} className="ml-2 text-red-500 text-[16px] hover:text-red-500 hover:scale-105">Remove</button>
               </div>
             </li>
           ))}
         </ul>
         <div className="text-center flex flex-col space-y-3 py-5">
           <h2 className="text-white text-lg lg:text-2xl font-semibold">
-            Total: <span className="text-green-500 text-2xl font-semibold">${total.toFixed(2)}</span>
+            Total: <span className="text-green-500 text-2xl font-semibold">{total.toFixed(2)} €</span>
           </h2>
           <Link to="/checkout">
             <button type="button" className="w-full md:w-[50%] lg:w-80 lg:text-xl bg-green-700 hover:bg-green-600 text-white font-semibold py-3 rounded-xl">
