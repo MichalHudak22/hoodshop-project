@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'; // nezabudni pridať import
+import { Link } from 'react-router-dom';
 
 const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
   if (!product) return null;
@@ -7,12 +7,7 @@ const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
 
   const handleAdd = () => {
     if (typeof handleAddToCart === 'function') {
-      let sessionId = localStorage.getItem("sessionId");
-      if (!sessionId) {
-        sessionId = crypto.randomUUID();
-        localStorage.setItem("sessionId", sessionId);
-      }
-      handleAddToCart({ ...product, sessionId });
+      handleAddToCart(product); // len produkt, sessionId sa spravuje vo funkcii vo FootballJerseys
     } else {
       console.warn('handleAddToCart nie je definované');
     }
@@ -36,8 +31,6 @@ const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
           {product.highlight_title}
         </h1>
         <div className="flex flex-col md:flex-row items-center justify-center gap-8">
-          
-          {/* OBÁLENIE obrázku do Link komponentu */}
           <Link to={`/product/${productSlug}`}>
             <img
               src={`${import.meta.env.VITE_API_BASE_URL}${product.image}`}

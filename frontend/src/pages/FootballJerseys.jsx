@@ -21,11 +21,18 @@ const FootballJerseys = () => {
     });
 }, []);
 
-const handleAddToCart = async (jersey) => {
-  const sessionId = localStorage.getItem("sessionId");
-  const token = localStorage.getItem("token");
-
+const handleAddToCart = async (product) => {
   try {
+    // token pre prihlásených
+    const token = localStorage.getItem("token");
+
+    // sessionId pre neprihlásených
+    let sessionId = localStorage.getItem("sessionId");
+    if (!sessionId && !token) {
+      sessionId = crypto.randomUUID();
+      localStorage.setItem("sessionId", sessionId);
+    }
+
     const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
       method: 'POST',
       headers: {
@@ -34,27 +41,29 @@ const handleAddToCart = async (jersey) => {
         ...(!token && sessionId && { "x-session-id": sessionId }),
       },
       body: JSON.stringify({
-        productId: jersey.id,
-        quantity: 1,
+        productId: product.id,
+        quantity: 1, // vždy číslo
       }),
     });
 
     const data = await response.json();
+
     if (response.ok) {
       setMessage("Product added to cart!");
-      refreshCartCount();
-
-      setTimeout(() => setMessage(''), 3000);
+      refreshCartCount(); // aktualizuje počet v CartContext
     } else {
-      setMessage("Failed to add to cart: " + data.message);
-      setTimeout(() => setMessage(''), 3000);
+      setMessage("Failed to add to cart: " + (data.message || "Unknown error"));
     }
+
   } catch (error) {
     console.error("Error adding to cart:", error);
     setMessage("Error adding to cart");
-    setTimeout(() => setMessage(''), 3000);
   }
+
+  // Zobraz message na 3 sekundy
+  setTimeout(() => setMessage(''), 3000);
 };
+
 
 
   // ✅ Carousel 
