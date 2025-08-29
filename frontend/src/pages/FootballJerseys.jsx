@@ -19,16 +19,20 @@ const FootballJerseys = () => {
   }, []);
 
   // Wrapper pre hlášku
-  const addToCartWithMessage = async (product) => {
-    try {
-      await handleAddToCart(product);
-      setMessage('Product added to cart!');
-    } catch (err) {
-      console.error('Error adding to cart:', err);
-      setMessage('Error adding to cart');
-    }
-    setTimeout(() => setMessage(''), 3000);
-  };
+const addToCartWithMessage = async (product) => {
+  try {
+    await handleAddToCart({
+      productId: product.id, // iba ID
+      quantity: 1            // pevné množstvo
+    });
+    setMessage('Product added to cart!');
+  } catch (err) {
+    console.error('Error adding to cart:', err);
+    setMessage('Error adding to cart');
+  }
+  setTimeout(() => setMessage(''), 3000);
+};
+
 
   const highlightedJerseys = jerseys.filter((j) => j.highlight_title && j.description);
   const featuredJersey = highlightedJerseys[0];
