@@ -8,6 +8,8 @@ const FeaturedProduct = ({ product, backgroundImage }) => {
   const { handleAddToCart } = useContext(CartContext);
 
   const productSlug = product.name.toLowerCase().replace(/\s+/g, '-');
+
+  
 const handleAdd = () => {
   if (typeof handleAddToCart === 'function') {
     handleAddToCart({

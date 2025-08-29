@@ -10,13 +10,13 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [cartLoading, setCartLoading] = useState(true);
 
-  useEffect(() => {
-    let sId = localStorage.getItem('sessionId');
-    if (!sId) {
-      sId = crypto.randomUUID();
-      localStorage.setItem('sessionId', sId);
-    }
-  }, []);
+useEffect(() => {
+  let sId = localStorage.getItem('sessionId');
+  if (!sId) {
+    sId = crypto.randomUUID();
+    localStorage.setItem('sessionId', sId);
+  }
+}, []);
 
   const fetchCart = useCallback(async () => {
     setCartLoading(true);
@@ -39,21 +39,34 @@ export const CartProvider = ({ children }) => {
     }
   }, [user?.token]);
 
-  const addToCart = async (product) => {
-    try {
-      const headers = {};
-      const sessionId = localStorage.getItem('sessionId');
-      if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
-      else headers['x-session-id'] = sessionId;
+const addToCart = async (product) => {
+  try {
+    const headers = {};
+    let sessionId = localStorage.getItem('sessionId');
 
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, product, { headers });
-
-      setCartItems(res.data || []);
-      setCartCount(res.data?.length || 0);
-    } catch (err) {
-      console.error('Chyba pri pridávaní do košíka:', err);
+    // Ak náhodou sessionId chýba (extra bezpečnosť)
+    if (!sessionId) {
+      sessionId = crypto.randomUUID();
+      localStorage.setItem('sessionId', sessionId);
     }
-  };
+
+    if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
+    else headers['x-session-id'] = sessionId;
+
+    const payload = {
+      productId: product.id,
+      quantity: 1,
+    };
+
+    const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, payload, { headers });
+
+    setCartItems(res.data || []);
+    setCartCount(res.data?.length || 0);
+  } catch (err) {
+    console.error('Chyba pri pridávaní do košíka:', err);
+  }
+};
+
 
   // ✅ Wrapper pre staršie komponenty
   const handleAddToCart = async (product) => {
