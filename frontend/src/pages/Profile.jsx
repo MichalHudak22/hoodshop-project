@@ -1,6 +1,7 @@
-import { useEffect, useState, useRef, useContext } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProfileNavigation from '../components/ProfileNavigation';
+import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 
 const inputs = [
@@ -14,42 +15,44 @@ const inputs = [
 ];
 
 function Profile() {
-  const { user, setUser, logout } = useContext(AuthContext); // 🔥 správne použitie contextu
+  const [user, setUser] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [uploadError, setUploadError] = useState('');
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
 
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
   };
 
   const handleAccountDeletion = () => {
-    const token = localStorage.getItem('token');
+  const token = localStorage.getItem('token');
 
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success) {
+        logout();
+        navigate('/login');
+      } else {
+        setError(data.error || 'Nepodarilo sa vymazať účet.');
+      }
     })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          logout(); // pochádza z contextu
-          navigate('/login');
-        } else {
-          setError(data.error || 'Nepodarilo sa vymazať účet.');
-        }
-      })
-      .catch(() => setError('Chyba pri komunikácii so serverom.'));
-  };
+    .catch(() => setError('Chyba pri komunikácii so serverom.'));
+};
 
-  // ...ďalšia logika
 
+
+  // Upload Photo
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploadError, setUploadError] = useState('');
+  const fileInputRef = useRef(null);
 
   const uploadPhoto = () => {
     if (!selectedFile) {
@@ -198,6 +201,8 @@ const handleChange = (e) => {
         setSuccess('');
       });
   };
+
+  const { logout } = useContext(AuthContext);
 
 
 

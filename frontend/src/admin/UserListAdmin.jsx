@@ -11,39 +11,41 @@ export default function UserListWithDelete() {
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
 
-  const API = import.meta.env.VITE_API_BASE_URL;
-
-const fetchUsers = async () => {
-  if (!token) {
-    setError('Nie ste prihlásený');
-    return;
-  }
-  setLoading(true);
-  try {
-    const res = await fetch(`${API}/user`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) throw new Error('Nepodarilo sa načítať používateľov');
-    const data = await res.json();
-
-    console.log('Fetched users data:', data);
-
-    if (Array.isArray(data)) {
-      setUsers(data);
-      setError(null);
-    } else if (data.users && Array.isArray(data.users)) {
-      setUsers(data.users);
-      setError(null);
-    } else {
-      setUsers([]);
-      setError('Neočakávaný formát dát zo servera');
+  const fetchUsers = () => {
+    if (!token) {
+      setError('Nie ste prihlásený');
+      return;
     }
-  } catch (e) {
-    setError(e.message);
-  } finally {
-    setLoading(false);
-  }
-};
+    setLoading(true);
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/user`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Nepodarilo sa načítať používateľov');
+        return res.json();
+      })
+      .then((data) => {
+        console.log('Fetched users data:', data);
+        // Kontrola, či je data pole alebo obsahuje pole v nejakom poli (napr. data.users)
+        if (Array.isArray(data)) {
+          setUsers(data);
+          setError(null);
+        } else if (data.users && Array.isArray(data.users)) {
+          setUsers(data.users);
+          setError(null);
+        } else {
+          setUsers([]);
+          setError('Neočakávaný formát dát zo servera');
+        }
+        setLoading(false);
+      })
+      .catch((e) => {
+        setError(e.message);
+        setLoading(false);
+      });
+  };
 
   useEffect(() => {
     fetchUsers();

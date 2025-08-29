@@ -10,23 +10,22 @@ const SearchBar = ({ onResultClick }) => {
   const wrapperRef = useRef(null);
 
   // Debounce vyhľadávanie
-useEffect(() => {
-  const delayDebounce = setTimeout(() => {
-    if (query.trim().length > 0) {
-      axios
-        .get(`${API_BASE_URL}/products/search?q=${query}`)
-        .then((res) => {
-          setResults(Array.isArray(res.data) ? res.data : []);
-        })
-        .catch(() => setResults([]));
-    } else {
-      setResults([]);
-    }
-  }, 300);
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (query.trim().length > 0) {
+        axios
+          .get(`/products/search?q=${query}`)
+          .then((res) => {
+            setResults(Array.isArray(res.data) ? res.data : []);
+          })
+          .catch(() => setResults([]));
+      } else {
+        setResults([]);
+      }
+    }, 300);
 
-  return () => clearTimeout(delayDebounce);
-}, [query]);
-
+    return () => clearTimeout(delayDebounce);
+  }, [query]);
 
   // Zatvorenie pri kliknutí mimo komponent
   useEffect(() => {

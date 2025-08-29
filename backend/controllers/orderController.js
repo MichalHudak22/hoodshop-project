@@ -159,23 +159,22 @@ const getOrdersSummary = (req, res) => {
     }
 
     const summary = results[0];
-
     res.json({
-      totalOrders: Number(summary.totalOrders) || 0,
-      totalRevenue: Number(summary.totalRevenue) || 0,
-      totalUsedPoints: Number(summary.totalUsedPoints) || 0,
+      totalOrders: summary.totalOrders || 0,
+      totalRevenue: summary.totalRevenue || 0,
+      totalUsedPoints: summary.totalUsedPoints || 0,
     });
   });
 };
-
-
-
 // --------------------  ----------------
 const getTopProducts = async (req, res) => {
+  if (!req.user || req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Prístup zamietnutý' });
+  }
+
   try {
-    const rows = await db.query(`
+    const [rows] = await db.query(`
       SELECT 
-        p.id AS id,
         p.name AS name,
         SUM(oi.quantity) AS quantity
       FROM order_items oi
@@ -185,18 +184,7 @@ const getTopProducts = async (req, res) => {
       LIMIT 10
     `);
 
-    console.log('Top products from DB:', rows);  // Zistíme, či je to pole alebo objekt
-
-    // Ak rows nie je pole, zmeň na pole:
-    const topProducts = Array.isArray(rows) ? rows : [rows];
-
-    // Pre istotu quantity z stringu na number:
-    const normalizedProducts = topProducts.map(p => ({
-      ...p,
-      quantity: Number(p.quantity),
-    }));
-
-    res.json(normalizedProducts);
+    res.json(rows);
 
   } catch (err) {
     console.error('Chyba pri získavaní top produktov:', err);
