@@ -9,17 +9,21 @@ const FeaturedProduct = ({ product, backgroundImage }) => {
 
   const productSlug = product.name.toLowerCase().replace(/\s+/g, '-');
 
-  
+
 const handleAdd = () => {
+  console.log('Adding to cart - product:', product);
+  console.log('Sending payload:', { productId: product.id, quantity: 1 });
+  
   if (typeof handleAddToCart === 'function') {
     handleAddToCart({
-      productId: product.id,  // <-- iba ID
-      quantity: 1             // <-- pevné množstvo
+      productId: product.id,
+      quantity: 1
     });
   } else {
     console.warn('handleAddToCart nie je definované');
   }
 };
+
 
 
 

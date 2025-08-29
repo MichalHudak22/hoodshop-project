@@ -40,14 +40,20 @@ useEffect(() => {
   }, [user?.token]);
 
 const addToCart = async (product) => {
+  console.log('=== CartContext.addToCart ===');
+  console.log('Product received:', product);
+
   try {
     const headers = {};
     let sessionId = localStorage.getItem('sessionId');
+    console.log('Session ID:', sessionId);
+    console.log('User token:', user?.token);
 
     // Ak náhodou sessionId chýba (extra bezpečnosť)
     if (!sessionId) {
       sessionId = crypto.randomUUID();
       localStorage.setItem('sessionId', sessionId);
+      console.log('Generated new sessionId:', sessionId);
     }
 
     if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
@@ -57,8 +63,11 @@ const addToCart = async (product) => {
       productId: product.id,
       quantity: 1,
     };
+    console.log('Payload to send:', payload);
+    console.log('Headers to send:', headers);
 
     const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, payload, { headers });
+    console.log('Response from backend:', res.data);
 
     setCartItems(res.data || []);
     setCartCount(res.data?.length || 0);
@@ -66,6 +75,7 @@ const addToCart = async (product) => {
     console.error('Chyba pri pridávaní do košíka:', err);
   }
 };
+
 
 
   // ✅ Wrapper pre staršie komponenty
