@@ -12,17 +12,23 @@ const baseURL = import.meta.env.VITE_API_BASE_URL || '';
 const ProductsCarousel = ({ slides, handleAddToCart }) => {
   const [loadingIds, setLoadingIds] = useState([]);
 
-  const handleClick = async (product) => {
-    setLoadingIds((prev) => [...prev, product.id]);
+const handleClick = async (product) => {
+  console.log('ProductsCarousel - Add to Cart clicked for product:', product);
+  const payload = { productId: product.id, quantity: 1 };
+  console.log('ProductsCarousel - payload to send:', payload);
 
-    try {
-      await handleAddToCart(product);
-    } catch (error) {
-      alert('Chyba pri pridávaní do košíka');
-    } finally {
-      setLoadingIds((prev) => prev.filter((id) => id !== product.id));
-    }
-  };
+  setLoadingIds((prev) => [...prev, product.id]);
+
+  try {
+    await handleAddToCart(payload);
+    console.log('ProductsCarousel - Add to Cart success for product:', product.id);
+  } catch (error) {
+    console.error('ProductsCarousel - Error adding to cart:', error);
+    alert('Chyba pri pridávaní do košíka');
+  } finally {
+    setLoadingIds((prev) => prev.filter((id) => id !== product.id));
+  }
+};
 
   return (
     <>

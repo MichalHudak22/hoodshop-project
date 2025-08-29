@@ -6,16 +6,19 @@ const FeaturedProductReversed = ({ product, handleAddToCart, backgroundImage }) 
 
   const productSlug = product.name.toLowerCase().replace(/\s+/g, '-');
 
-  const handleAdd = () => {
-    if (typeof handleAddToCart === 'function') {
-      handleAddToCart({
-        productId: product.id, // iba ID
-        quantity: 1            // pevné množstvo
-      });
-    } else {
-      console.warn('handleAddToCart nie je definované');
-    }
-  };
+const handleAdd = () => {
+  if (typeof handleAddToCart === 'function') {
+    const payload = {
+      productId: product.id, // iba ID
+      quantity: 1            // pevné množstvo
+    };
+    console.log('FeaturedProductReversed Add to Cart payload:', payload);
+    handleAddToCart(payload);
+  } else {
+    console.warn('handleAddToCart nie je definované');
+  }
+};
+
 
 
   return (

@@ -58,13 +58,16 @@ const ProductSection = ({ title, products, backgroundImage, onAddToCart }) => {
                   <button
                     onClick={e => {
                       e.preventDefault();
-                      e.stopPropagation(); // zabránime šíreniu eventu na rodiča (link)
-                      if (onAddToCart) onAddToCart({ productId: product.id, quantity: 1 });
+                      e.stopPropagation();
+                      const payload = { productId: product.id, quantity: 1 };
+                      console.log('ProductSection Add to Cart payload:', payload);
+                      if (onAddToCart) onAddToCart(payload);
                     }}
                     className="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 rounded-full text-sm transition duration-300"
                   >
                     Add to Cart
                   </button>
+
                 </div>
               </div>
             );

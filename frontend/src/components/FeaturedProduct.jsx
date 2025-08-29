@@ -10,19 +10,19 @@ const FeaturedProduct = ({ product, backgroundImage }) => {
   const productSlug = product.name.toLowerCase().replace(/\s+/g, '-');
 
 
-const handleAdd = () => {
-  console.log('Adding to cart - product:', product);
-  console.log('Sending payload:', { productId: product.id, quantity: 1 });
-  
-  if (typeof handleAddToCart === 'function') {
-    handleAddToCart({
-      productId: product.id,
-      quantity: 1
-    });
-  } else {
-    console.warn('handleAddToCart nie je definované');
-  }
-};
+  const handleAdd = () => {
+    console.log('Adding to cart - product:', product);
+    console.log('Sending payload:', { productId: product.id, quantity: 1 });
+
+    if (typeof handleAddToCart === 'function') {
+      handleAddToCart({
+        productId: product.id,
+        quantity: 1
+      });
+    } else {
+      console.warn('handleAddToCart nie je definované');
+    }
+  };
 
 
 
@@ -63,11 +63,17 @@ const handleAdd = () => {
                 {product.price} €
               </p>
               <button
-                onClick={handleAdd}
-                className="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 mb-2 font-bold rounded-xl text-lg transition duration-300"
+                onClick={e => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const payload = { productId: product.id, quantity: 1 };
+                  console.log('ProductSection Add to Cart payload:', payload);
+                  if (onAddToCart) onAddToCart(payload);
+                }}
               >
                 Add to Cart
               </button>
+
             </div>
             <p className="text-lg text-white p-3 rounded-xl">{product.description}</p>
           </div>

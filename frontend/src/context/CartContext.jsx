@@ -10,14 +10,17 @@ export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
   const [cartLoading, setCartLoading] = useState(true);
 
-useEffect(() => {
-  let sId = localStorage.getItem('sessionId');
-  if (!sId) {
-    sId = crypto.randomUUID();
-    localStorage.setItem('sessionId', sId);
-  }
-}, []);
+  // Inicializácia sessionId
+  useEffect(() => {
+    let sId = localStorage.getItem('sessionId');
+    if (!sId) {
+      sId = crypto.randomUUID();
+      localStorage.setItem('sessionId', sId);
+      console.log('Generated new sessionId:', sId);
+    }
+  }, []);
 
+  // Načítanie obsahu košíka
   const fetchCart = useCallback(async () => {
     setCartLoading(true);
     try {
@@ -27,9 +30,9 @@ useEffect(() => {
       else headers['x-session-id'] = sessionId;
 
       const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { headers });
-
       setCartItems(res.data || []);
       setCartCount(res.data?.length || 0);
+      console.log('Cart fetched:', res.data);
     } catch (err) {
       console.error('Chyba pri načítaní košíka:', err);
       setCartItems([]);
@@ -39,46 +42,44 @@ useEffect(() => {
     }
   }, [user?.token]);
 
-const addToCart = async (product) => {
-  console.log('=== CartContext.addToCart ===');
-  console.log('Product received:', product);
+  // Pridanie produktu do košíka
+  const addToCart = async (product) => {
+    console.log('=== CartContext.addToCart ===');
+    console.log('Product received:', product);
 
-  try {
-    const headers = {};
-    let sessionId = localStorage.getItem('sessionId');
-    console.log('Session ID:', sessionId);
-    console.log('User token:', user?.token);
+    try {
+      const headers = {};
+      let sessionId = localStorage.getItem('sessionId');
 
-    // Ak náhodou sessionId chýba (extra bezpečnosť)
-    if (!sessionId) {
-      sessionId = crypto.randomUUID();
-      localStorage.setItem('sessionId', sessionId);
-      console.log('Generated new sessionId:', sessionId);
+      if (!sessionId) {
+        sessionId = crypto.randomUUID();
+        localStorage.setItem('sessionId', sessionId);
+        console.log('Generated new sessionId:', sessionId);
+      }
+
+      if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
+      else headers['x-session-id'] = sessionId;
+
+      // ✅ Tu zaručíme, že productId vždy existuje
+      const payload = {
+        productId: product.productId ?? product.id, // podpora oboch tvarov
+        quantity: product.quantity ?? 1,
+      };
+
+      console.log('Payload to send:', payload);
+      console.log('Headers to send:', headers);
+
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, payload, { headers });
+      console.log('Response from backend:', res.data);
+
+      setCartItems(res.data || []);
+      setCartCount(res.data?.length || 0);
+    } catch (err) {
+      console.error('Chyba pri pridávaní do košíka:', err);
     }
+  };
 
-    if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
-    else headers['x-session-id'] = sessionId;
-
-    const payload = {
-      productId: product.id,
-      quantity: 1,
-    };
-    console.log('Payload to send:', payload);
-    console.log('Headers to send:', headers);
-
-    const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, payload, { headers });
-    console.log('Response from backend:', res.data);
-
-    setCartItems(res.data || []);
-    setCartCount(res.data?.length || 0);
-  } catch (err) {
-    console.error('Chyba pri pridávaní do košíka:', err);
-  }
-};
-
-
-
-  // ✅ Wrapper pre staršie komponenty
+  // Wrapper pre staršie komponenty
   const handleAddToCart = async (product) => {
     await addToCart(product);
   };
@@ -100,7 +101,7 @@ const addToCart = async (product) => {
         cartCount,
         cartItems,
         addToCart,
-        handleAddToCart, // ← pridáme do contextu, aby staré komponenty fungovali
+        handleAddToCart,
         setCartDirectly,
         fetchCart,
         cartLoading
