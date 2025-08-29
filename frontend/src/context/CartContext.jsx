@@ -43,41 +43,50 @@ export const CartProvider = ({ children }) => {
   }, [user?.token]);
 
   // Pridanie produktu do košíka
-  const addToCart = async (product) => {
-    console.log('=== CartContext.addToCart ===');
-    console.log('Product received:', product);
+const addToCart = async (product) => {
+  console.log('=== CartContext.addToCart ===');
+  console.log('Product received:', product);
 
-    try {
-      const headers = {};
-      let sessionId = localStorage.getItem('sessionId');
+  try {
+    const headers = {};
+    let sessionId = localStorage.getItem('sessionId');
+    console.log('Current sessionId:', sessionId);
+    console.log('User token:', user?.token);
 
-      if (!sessionId) {
-        sessionId = crypto.randomUUID();
-        localStorage.setItem('sessionId', sessionId);
-        console.log('Generated new sessionId:', sessionId);
-      }
-
-      if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
-      else headers['x-session-id'] = sessionId;
-
-      // ✅ Tu zaručíme, že productId vždy existuje
-      const payload = {
-        productId: product.productId ?? product.id, // podpora oboch tvarov
-        quantity: product.quantity ?? 1,
-      };
-
-      console.log('Payload to send:', payload);
-      console.log('Headers to send:', headers);
-
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, payload, { headers });
-      console.log('Response from backend:', res.data);
-
-      setCartItems(res.data || []);
-      setCartCount(res.data?.length || 0);
-    } catch (err) {
-      console.error('Chyba pri pridávaní do košíka:', err);
+    // Ak sessionId chýba (pre neprihlásených)
+    if (!sessionId) {
+      sessionId = crypto.randomUUID();
+      localStorage.setItem('sessionId', sessionId);
+      console.log('Generated new sessionId:', sessionId);
     }
-  };
+
+    if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
+    else headers['x-session-id'] = sessionId;
+
+    // Použijeme buď productId (ak existuje) alebo id
+    const payload = {
+      productId: product.productId ?? product.id,
+      quantity: product.quantity ?? 1,
+    };
+
+    console.log('Payload to send:', payload);
+    console.log('Headers to send:', headers);
+
+    const res = await axios.post(
+      `${import.meta.env.VITE_API_BASE_URL}/api/cart`,
+      payload,
+      { headers }
+    );
+
+    console.log('Response from backend:', res.data);
+
+    setCartItems(res.data || []);
+    setCartCount(res.data?.length || 0);
+  } catch (err) {
+    console.error('Chyba pri pridávaní do košíka:', err);
+  }
+};
+
 
   // Wrapper pre staršie komponenty
   const handleAddToCart = async (product) => {
