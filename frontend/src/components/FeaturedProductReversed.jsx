@@ -10,18 +10,20 @@ const FeaturedProductReversed = ({ product, backgroundImage }) => {
   const productSlug = product.slug || product.name.toLowerCase().replace(/\s+/g, '-');
 
   const handleAdd = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  e.preventDefault();
+  e.stopPropagation();
 
-    const payload = {
-      productId: product.productId ?? product.id,
-      quantity: product.quantity ?? 1,
-    };
-
-    console.log('FeaturedProductReversed Add to Cart payload:', payload);
-
-    handleAddToCart(payload);
+  // vždy iba productId a quantity
+  const payload = {
+    productId: product.id,       // použijeme id produktu
+    quantity: product.quantity ?? 1, // default 1
   };
+
+  console.log('FeaturedProductReversed Add to Cart payload:', payload);
+
+  handleAddToCart(payload);
+};
+
 
   return (
     <section className="relative py-16 px-6 mb-10 bg-black overflow-hidden border-b-4 border-black">

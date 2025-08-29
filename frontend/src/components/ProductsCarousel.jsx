@@ -15,24 +15,25 @@ const ProductsCarousel = ({ slides }) => {
   const { handleAddToCart } = useContext(CartContext);
   const [loadingIds, setLoadingIds] = useState([]);
 
-  const handleClick = async (product) => {
-    const payload = {
-      productId: product.productId ?? product.id,
-      quantity: product.quantity ?? 1,
-    };
-
-    setLoadingIds((prev) => [...prev, product.id]);
-
-    try {
-      await handleAddToCart(payload);
-      console.log('ProductsCarousel - Add to Cart success for product:', product.id);
-    } catch (error) {
-      console.error('ProductsCarousel - Error adding to cart:', error);
-      alert('Chyba pri pridávaní do košíka');
-    } finally {
-      setLoadingIds((prev) => prev.filter((id) => id !== product.id));
-    }
+const handleClick = async (product) => {
+  const payload = {
+    productId: product.id,             // iba id
+    quantity: product.quantity ?? 1,   // default 1
   };
+
+  setLoadingIds((prev) => [...prev, product.id]);
+
+  try {
+    await handleAddToCart(payload);
+    console.log('ProductsCarousel - Add to Cart success for product:', product.id);
+  } catch (error) {
+    console.error('ProductsCarousel - Error adding to cart:', error);
+    alert('Chyba pri pridávaní do košíka');
+  } finally {
+    setLoadingIds((prev) => prev.filter((id) => id !== product.id));
+  }
+};
+
 
   return (
     <>

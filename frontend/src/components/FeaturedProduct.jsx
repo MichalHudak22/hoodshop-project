@@ -9,20 +9,21 @@ const FeaturedProduct = ({ product, backgroundImage }) => {
   const { handleAddToCart } = useContext(CartContext);
 
   const productSlug = product.slug || product.name.toLowerCase().replace(/\s+/g, '-');
+const handleAdd = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
 
-  const handleAdd = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const payload = {
-      productId: product.productId ?? product.id,
-      quantity: product.quantity ?? 1,
-    };
-
-    console.log('FeaturedProduct Add to Cart payload:', payload);
-
-    handleAddToCart(payload);
+  // vždy iba productId a quantity
+  const payload = {
+    productId: product.id,       // použijeme id produktu
+    quantity: product.quantity ?? 1, // default 1
   };
+
+  console.log('FeaturedProductReversed Add to Cart payload:', payload);
+
+  handleAddToCart(payload);
+};
+
 
   return (
     <section className="relative py-16 px-6 bg-black overflow-hidden border-b-4 border-black">

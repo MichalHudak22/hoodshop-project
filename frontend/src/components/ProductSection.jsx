@@ -6,20 +6,21 @@ import { CartContext } from '../context/CartContext';
 const ProductSection = ({ title, products, backgroundImage }) => {
   const { handleAddToCart } = useContext(CartContext);
 
-  const handleAdd = (product, e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (typeof handleAddToCart === 'function') {
-      const payload = {
-        productId: product.productId ?? product.id,
-        quantity: 1,
-      };
-      console.log('ProductSection Add to Cart payload:', payload);
-      handleAddToCart(payload);
-    } else {
-      console.warn('handleAddToCart nie je definované');
-    }
+const handleAdd = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+
+  // vždy iba productId a quantity
+  const payload = {
+    productId: product.id,       // použijeme id produktu
+    quantity: product.quantity ?? 1, // default 1
   };
+
+  console.log('FeaturedProductReversed Add to Cart payload:', payload);
+
+  handleAddToCart(payload);
+};
+
 
   return (
     <section className="relative py-12 px-6 bg-black overflow-hidden">
