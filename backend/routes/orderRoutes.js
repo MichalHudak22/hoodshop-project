@@ -18,7 +18,7 @@ router.post('/', authenticateToken.optional, placeOrder);
 router.get('/summary', authenticateToken, getOrdersSummary);
 
 // GET /api/orders/top-products - najpredávanejšie produkty
-router.get('/top-products', authenticateToken, getTopProducts);
+router.get('/top-products', getTopProducts);
 
 // ✅ GET /api/orders/admin - všetky objednávky pre adminov
 router.get('/admin', authenticateToken, authorizeAdmin, getAllOrders);

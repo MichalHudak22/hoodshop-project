@@ -1,7 +1,6 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProfileNavigation from '../components/ProfileNavigation';
-import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 
 const inputs = [
@@ -15,44 +14,42 @@ const inputs = [
 ];
 
 function Profile() {
-  const [user, setUser] = useState(null);
+  const { user, setUser, logout } = useContext(AuthContext); // 🔥 správne použitie contextu
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const navigate = useNavigate();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploadError, setUploadError] = useState('');
+  const navigate = useNavigate();
+  const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
   };
 
   const handleAccountDeletion = () => {
-  const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token');
 
-  fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.success) {
-        logout();
-        navigate('/login');
-      } else {
-        setError(data.error || 'Nepodarilo sa vymazať účet.');
-      }
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
-    .catch(() => setError('Chyba pri komunikácii so serverom.'));
-};
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          logout(); // pochádza z contextu
+          navigate('/login');
+        } else {
+          setError(data.error || 'Nepodarilo sa vymazať účet.');
+        }
+      })
+      .catch(() => setError('Chyba pri komunikácii so serverom.'));
+  };
 
+  // ...ďalšia logika
 
-
-  // Upload Photo
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [uploadError, setUploadError] = useState('');
-  const fileInputRef = useRef(null);
 
   const uploadPhoto = () => {
     if (!selectedFile) {
@@ -123,27 +120,33 @@ function Profile() {
 // ...
 
 useEffect(() => {
-  const token = localStorage.getItem('token');
-
-  if (!token) {
+  if (!user?.token) {
     navigate('/login');
     return;
   }
 
-  fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
-    method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
-  })
-    .then((res) => res.json())
-    .then((data) => {
+  const fetchProfile = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      const data = await res.json();
+
       if (data.error) {
         setError(data.error);
       } else {
-        setUser(data);
+        setUser(prev => ({ ...prev, ...data })); // zachová existujúce údaje v contextu
       }
-    })
-    .catch(() => setError('Chyba pri načítaní údajov o používateľovi'));
-}, [navigate]);
+    } catch (err) {
+      setError('Chyba pri načítaní údajov o používateľovi');
+      console.error(err);
+    }
+  };
+
+  fetchProfile();
+}, [user?.token, navigate, setUser]);
+
 
 // ...
 
@@ -202,8 +205,6 @@ const handleChange = (e) => {
       });
   };
 
-  const { logout } = useContext(AuthContext);
-
 
 
   if (!user) return <div>Načítavam...</div>;
@@ -256,12 +257,12 @@ const handleChange = (e) => {
 
               {/* Miesto na zobrazenie fotky */}
               <div className="w-56 h-56 rounded-full overflow-hidden border-2 border-gray-400">
-                <img
-                  src={user.user_photo ? `${import.meta.env.VITE_API_BASE_URL}
-${user.user_photo}` : "/img/default-avatar.jpg"}
-                  alt="Profilová fotka"
-                  className="w-full h-full object-cover"
-                />
+              <img
+  src={user.user_photo ? user.user_photo : "/img/default-avatar.jpg"}
+  alt="Profilová fotka"
+  className="w-full h-full object-cover"
+/>
+
               </div>
 
               {/* Tlačidlo Default Photo */}

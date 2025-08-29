@@ -1,105 +1,97 @@
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
 const db = require('../database');
+const upload = require('../cloudinaryUpload');
+const cloudinary = require('../cloudinary');
+const util = require('util');
 
-// Nastavenie úložiska
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const userId = req.userId;
-    const userFolder = path.join(__dirname, '..', 'uploads', 'profile_photos', userId.toString());
-    if (!fs.existsSync(userFolder)) {
-      fs.mkdirSync(userFolder, { recursive: true });
-    }
-    cb(null, userFolder);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = Date.now() + '-' + file.originalname;
-    cb(null, uniqueName);
-  },
-});
+// Promisify multer
+const uploadAsync = util.promisify(upload.single('photo'));
 
-const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    const allowed = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.jfif'];
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (allowed.includes(ext)) cb(null, true);
-    else cb(new Error('Nepovolený formát obrázku'));
-  },
-}).single('photo');
+exports.uploadProfilePhoto = async (req, res) => {
+  const userId = req.userId;
+  if (!userId) return res.status(401).json({ success: false, message: 'Neautorizovaný prístup.' });
 
-// Hlavná funkcia
-exports.uploadProfilePhoto = (req, res) => {
-  console.log('User ID:', req.userId);
+  try {
+    // Zisti starý public_id
+    const [rows] = await db.query('SELECT user_photo_public_id FROM user WHERE id = ?', [userId]);
+    const oldPublicId = rows[0]?.user_photo_public_id;
 
-  upload(req, res, async function (err) {
-    if (err) {
-      console.error('Multer error:', err);
-      return res.status(400).json({ success: false, message: err.message });
-    }
-
-    const userId = req.userId;
-    if (!userId) return res.status(401).json({ success: false, message: 'Neautorizovaný prístup.' });
+    // Použijeme multer upload
+    await uploadAsync(req, res);
 
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'Súbor nebol odoslaný.' });
     }
 
-    const fileName = req.file.filename;
-    const relativePath = `/uploads/profile_photos/${userId}/${fileName}`;
-    const userFolder = path.join(__dirname, '..', 'uploads', 'profile_photos', userId.toString());
+    const cloudinaryUrl = req.file.path;     // celá URL pre zobrazenie
+    const publicId = req.file.filename;      // správny public_id pre mazanie
 
-    try {
-      // ⚠️ Vymažeme všetky súbory v priečinku používateľa okrem aktuálne nahraného
-      const allFiles = fs.readdirSync(userFolder);
-      allFiles.forEach(file => {
-        if (file !== fileName) {
-          const filePath = path.join(userFolder, file);
-          fs.unlinkSync(filePath);
-          console.log('Vymazaný starý súbor:', filePath);
-        }
-      });
-
-      // 💾 Ulož cestu do databázy
-      await db.query('UPDATE user SET user_photo = ? WHERE id = ?', [relativePath, userId]);
-
-      console.log('Fotka nahraná, cesta:', relativePath);
-      return res.json({ success: true, photo: relativePath });
-    } catch (error) {
-      console.error('Chyba pri mazaní alebo ukladaní obrázka:', error);
-      return res.status(500).json({ success: false, message: 'Chyba pri ukladaní do databázy.' });
+    // Zmaž starý obrázok až po upload
+    if (oldPublicId && !oldPublicId.includes('default-avatar')) {
+      try {
+        await cloudinary.uploader.destroy(oldPublicId);
+      } catch (err) {
+        console.error("Chyba pri mazaní starého obrázka:", err.message);
+      }
     }
-  });
+
+    // Ulož nový do DB
+    try {
+      await db.query(
+        'UPDATE user SET user_photo = ?, user_photo_public_id = ? WHERE id = ?',
+        [cloudinaryUrl, publicId, userId]
+      );
+    } catch (err) {
+      console.error("Chyba pri ukladaní do DB:", err.message);
+      return res.status(500).json({ success: false, message: 'Chyba pri ukladaní fotky.' });
+    }
+
+    return res.json({ success: true, photo: cloudinaryUrl });
+  } catch (err) {
+    console.error("Chyba vo funkcii uploadProfilePhoto:", err.message);
+    return res.status(500).json({ success: false, message: 'Neočakovaná chyba.' });
+  }
 };
 
 
+
+// Nastavenie defaultnej profilovej fotky
 exports.setDefaultProfilePhoto = async (req, res) => {
   const userId = req.userId;
-  if (!userId) return res.status(401).json({ success: false, message: 'Neautorizovaný prístup.' });
+  if (!userId) {
+    return res.status(401).json({ success: false, message: 'Neautorizovaný prístup.' });
+  }
 
-  const defaultPath = '/uploads/profile_photos/default-avatar.jpg';
+  // Cloudinary údaje pre default avatar
+  const defaultPublicId = 'default-avatar_z3c30l';
+  const defaultUrl = 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1755594977/default-avatar_z3c30l.jpg';
 
   try {
-    // Uprav cestu v databáze
-    await db.query('UPDATE user SET user_photo = ? WHERE id = ?', [defaultPath, userId]);
+    // Najprv zistíme starý obrázok
+    const [rows] = await db.query('SELECT user_photo_public_id FROM user WHERE id = ?', [userId]);
+    const oldPublicId = rows[0]?.user_photo_public_id;
 
-    // Môžeme tiež vymazať všetky fotky v osobnom priečinku používateľa
-    const userFolder = path.join(__dirname, '..', 'uploads', 'profile_photos', userId.toString());
-    if (fs.existsSync(userFolder)) {
-      fs.readdirSync(userFolder).forEach(file => {
-        const filePath = path.join(userFolder, file);
-        fs.unlinkSync(filePath);
-      });
-      console.log('Vymazané všetky vlastné profilové fotky pre používateľa:', userId);
+    // Ak mal predtým iný obrázok ako default, zmaž ho
+    if (oldPublicId && oldPublicId !== defaultPublicId) {
+      try {
+        await cloudinary.uploader.destroy(oldPublicId);
+        console.log('Vymazaný starý obrázok:', oldPublicId);
+      } catch (err) {
+        console.error('Chyba pri mazaní starého obrázka:', err.message);
+      }
     }
 
-    return res.json({ success: true, photo: defaultPath });
+    // Ulož default do DB
+    await db.query(
+      'UPDATE user SET user_photo = ?, user_photo_public_id = ? WHERE id = ?',
+      [defaultUrl, defaultPublicId, userId]
+    );
+
+    return res.json({ success: true, photo: defaultUrl });
   } catch (error) {
     console.error('Chyba pri nastavovaní defaultnej fotky:', error);
     return res.status(500).json({ success: false, message: 'Chyba pri nastavovaní defaultnej fotky.' });
   }
 };
+
 
 
