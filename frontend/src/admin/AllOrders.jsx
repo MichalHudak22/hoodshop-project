@@ -8,49 +8,33 @@ const AllOrders = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-   const fetchOrders = async () => {
-  try {
-    const res = await axios.get('/api/orders/admin', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    });
-
-    // Skontrolujeme, či res.data je pole
-    if (Array.isArray(res.data)) {
-      setOrders(res.data);
-    } else if (Array.isArray(res.data.orders)) {
-      // Ak vracia objekt s kľúčom orders, nastavíme ho
-      setOrders(res.data.orders);
-    } else {
-      // Inak nastavíme prázdne pole a vypíšeme varovanie
-      console.warn('Neočakávaný formát dát z API:', res.data);
-      setOrders([]);
-    }
-  } catch (err) {
-    console.error('Chyba pri načítaní objednávok:', err);
-    setError('Nepodarilo sa načítať objednávky.');
-    setOrders([]); // pre istotu, aby sa stav nezasekol
-  } finally {
-    setLoading(false);
-  }
-};
-
+    const fetchOrders = async () => {
+      try {
+        const res = await axios.get('/api/orders/admin', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+        setOrders(res.data);
+      } catch (err) {
+        console.error('Chyba pri načítaní objednávok:', err);
+        setError('Nepodarilo sa načítať objednávky.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
     fetchOrders();
   }, []);
 
   const terms = searchTerm.toLowerCase().split(' ').filter(Boolean);
 
-  const filteredOrders = Array.isArray(orders) 
-  ? orders.filter(order => 
-      terms.every(term =>
-        (order.order_number || '').toLowerCase().includes(term) ||
-        (order.user_email || '').toLowerCase().includes(term)
-      )
+  const filteredOrders = orders.filter(order =>
+    terms.every(term =>
+      (order.order_number || '').toLowerCase().includes(term) ||
+      (order.user_email || '').toLowerCase().includes(term)
     )
-  : [];
-
+  );
 
   return (
     <div className="bg-black bg-opacity-70 md:rounded-xl p-5 border border-gray-700">

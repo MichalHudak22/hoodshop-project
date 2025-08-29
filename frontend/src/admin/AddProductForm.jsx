@@ -102,10 +102,6 @@ const AddProductForm = () => {
     }
   };
 
-   // Tu pridaj console.log na kontrolu pred renderom
-  console.log('Selected category:', formData.category);
-  console.log('Types for category:', typeOptions[formData.category]);
-
   return (
     <div className="bg-black bg-opacity-70  md:rounded-xl py-10 px-4 text-white border border-gray-700">
       <h3 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-8 text-center text-blue-200">Add New Product</h3>
@@ -212,11 +208,10 @@ const AddProductForm = () => {
               disabled={!formData.category}
             >
               <option value="">-- Select Type --</option>
-            {formData.category && Array.isArray(typeOptions[formData.category]) &&
-  typeOptions[formData.category].map((t) => (
-    <option key={t} value={t}>{t}</option>
-))}
-
+              {formData.category &&
+                typeOptions[formData.category].map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
             </select>
           </div>
         </div>

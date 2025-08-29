@@ -16,35 +16,20 @@ export default function UserListWithDelete() {
       setError('Nie ste prihlásený');
       return;
     }
-    setLoading(true);
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/user`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+   fetch(`${import.meta.env.VITE_API_BASE_URL}/user`, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+})
       .then((res) => {
         if (!res.ok) throw new Error('Nepodarilo sa načítať používateľov');
         return res.json();
       })
       .then((data) => {
-        console.log('Fetched users data:', data);
-        // Kontrola, či je data pole alebo obsahuje pole v nejakom poli (napr. data.users)
-        if (Array.isArray(data)) {
-          setUsers(data);
-          setError(null);
-        } else if (data.users && Array.isArray(data.users)) {
-          setUsers(data.users);
-          setError(null);
-        } else {
-          setUsers([]);
-          setError('Neočakávaný formát dát zo servera');
-        }
-        setLoading(false);
+        setUsers(data);
+        setError(null);
       })
-      .catch((e) => {
-        setError(e.message);
-        setLoading(false);
-      });
+      .catch((e) => setError(e.message));
   };
 
   useEffect(() => {
@@ -52,11 +37,10 @@ export default function UserListWithDelete() {
   }, []);
 
   // Upravený handler na kliknutie Delete - zobrazí modal
-const handleDeleteClick = () => {
-  if (!selectedUserId) return;
-  setShowConfirmModal(true);
-};
-
+  const handleDeleteClick = () => {
+    if (!selectedUserId) return;
+    setShowConfirmModal(true);
+  };
 
   const handleDeleteUser = () => {
     if (!selectedUserId) return;
@@ -66,7 +50,8 @@ const handleDeleteClick = () => {
     }
     setLoading(true);
     setError(null);
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/user/admin/user/${selectedUserId}`, {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}
+/user/admin/user/${selectedUserId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -107,7 +92,8 @@ const handleDeleteClick = () => {
     }
     setLoading(true);
     setError(null);
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/user/admin/user/${userId}/role`, {
+    fetch(`${import.meta.env.VITE_API_BASE_URL}
+/user/admin/user/${userId}/role`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -115,7 +101,6 @@ const handleDeleteClick = () => {
       },
       body: JSON.stringify({ role: newRole }),
     })
-
       .then((res) => {
         if (!res.ok) {
           return res.json().then(data => { throw new Error(data.error || 'Chyba pri zmene roly'); });
