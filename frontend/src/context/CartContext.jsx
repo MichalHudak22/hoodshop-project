@@ -46,7 +46,7 @@ export const CartProvider = ({ children }) => {
       if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
       else headers['x-session-id'] = sessionId;
 
-      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/cart/add`, product, { headers });
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, product, { headers });
 
       setCartItems(res.data || []);
       setCartCount(res.data?.length || 0);
