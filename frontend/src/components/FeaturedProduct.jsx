@@ -5,6 +5,19 @@ const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
 
   const productSlug = product.name.toLowerCase().replace(/\s+/g, '-');
 
+  const handleAdd = () => {
+    if (typeof handleAddToCart === 'function') {
+      let sessionId = localStorage.getItem("sessionId");
+      if (!sessionId) {
+        sessionId = crypto.randomUUID();
+        localStorage.setItem("sessionId", sessionId);
+      }
+      handleAddToCart({ ...product, sessionId });
+    } else {
+      console.warn('handleAddToCart nie je definované');
+    }
+  };
+
   return (
     <section className="relative py-16 px-6 bg-black overflow-hidden border-b-4 border-black">
       <div
@@ -27,8 +40,7 @@ const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
           {/* OBÁLENIE obrázku do Link komponentu */}
           <Link to={`/product/${productSlug}`}>
             <img
-              src={`${import.meta.env.VITE_API_BASE_URL}
-${product.image}`}
+              src={`${import.meta.env.VITE_API_BASE_URL}${product.image}`}
               alt={product.name}
               className="max-w-sm rounded-lg shadow-xl object-contain hover:brightness-110"
             />
@@ -44,7 +56,7 @@ ${product.image}`}
                 {product.price} €
               </p>
               <button
-                onClick={() => handleAddToCart(product)}
+                onClick={handleAdd}
                 className="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 mb-2 font-bold rounded-xl text-lg transition duration-300"
               >
                 Add to Cart
@@ -57,6 +69,5 @@ ${product.image}`}
     </section>
   );
 };
-
 
 export default FeaturedProduct;
