@@ -1,27 +1,26 @@
-import React from 'react';
+// src/components/FeaturedProductReversed.jsx
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { CartContext } from '../context/CartContext';
 
-const FeaturedProductReversed = ({ product, handleAddToCart, backgroundImage }) => {
+const FeaturedProductReversed = ({ product, backgroundImage }) => {
   if (!product) return null;
 
-  const productSlug = product.name.toLowerCase().replace(/\s+/g, '-');
+  const { handleAddToCart } = useContext(CartContext);
+  const productSlug = product.slug || product.name.toLowerCase().replace(/\s+/g, '-');
 
   const handleAdd = (e) => {
     e.preventDefault();
     e.stopPropagation();
 
     const payload = {
-      ...product,
+      productId: product.productId ?? product.id,
       quantity: product.quantity ?? 1,
     };
 
     console.log('FeaturedProductReversed Add to Cart payload:', payload);
 
-    if (typeof handleAddToCart === 'function') {
-      handleAddToCart(payload);
-    } else {
-      console.warn('handleAddToCart nie je definované');
-    }
+    handleAddToCart(payload);
   };
 
   return (

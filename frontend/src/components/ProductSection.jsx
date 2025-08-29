@@ -1,8 +1,26 @@
 // src/components/ProductSection.jsx
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { CartContext } from '../context/CartContext';
 
-const ProductSection = ({ title, products, backgroundImage, onAddToCart }) => {
+const ProductSection = ({ title, products, backgroundImage }) => {
+  const { handleAddToCart } = useContext(CartContext);
+
+  const handleAdd = (product, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (typeof handleAddToCart === 'function') {
+      const payload = {
+        productId: product.productId ?? product.id,
+        quantity: 1,
+      };
+      console.log('ProductSection Add to Cart payload:', payload);
+      handleAddToCart(payload);
+    } else {
+      console.warn('handleAddToCart nie je definované');
+    }
+  };
+
   return (
     <section className="relative py-12 px-6 bg-black overflow-hidden">
       {/* Overlay pozadie */}
@@ -26,27 +44,18 @@ const ProductSection = ({ title, products, backgroundImage, onAddToCart }) => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-screen-xl mx-auto">
           {products.map(product => {
-            const productSlug =
-              product.slug || product.name.toLowerCase().replace(/\s+/g, '-');
+            const productSlug = product.slug || product.name.toLowerCase().replace(/\s+/g, '-');
 
             let imageUrl = product.image;
             if (!imageUrl.startsWith('http')) {
               imageUrl = `${import.meta.env.VITE_API_BASE_URL}${imageUrl}`;
             }
 
-            const handleAdd = (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              console.log('ProductSection Add to Cart payload:', product);
-              if (onAddToCart) onAddToCart(product);
-            };
-
             return (
               <div
                 key={product.id}
                 className="bg-white rounded-lg shadow-md overflow-hidden transition transform hover:-translate-y-1 hover:shadow-lg"
               >
-                {/* Link okolo obrázka a názvu */}
                 <Link to={`/product/${productSlug}`} className="block">
                   <img
                     src={imageUrl}
@@ -60,10 +69,9 @@ const ProductSection = ({ title, products, backgroundImage, onAddToCart }) => {
                   </div>
                 </Link>
 
-                {/* Tlačidlo mimo Link */}
                 <div className="px-4 pb-4 text-center">
                   <button
-                    onClick={handleAdd}
+                    onClick={(e) => handleAdd(product, e)}
                     className="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 rounded-full text-sm transition duration-300"
                   >
                     Add to Cart

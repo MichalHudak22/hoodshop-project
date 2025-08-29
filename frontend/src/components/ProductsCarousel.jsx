@@ -1,7 +1,9 @@
+// src/components/ProductsCarousel.jsx
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { CartContext } from '../context/CartContext';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -9,17 +11,15 @@ import 'swiper/css/pagination';
 
 const baseURL = import.meta.env.VITE_API_BASE_URL || '';
 
-const ProductsCarousel = ({ slides, handleAddToCart }) => {
+const ProductsCarousel = ({ slides }) => {
+  const { handleAddToCart } = useContext(CartContext);
   const [loadingIds, setLoadingIds] = useState([]);
 
   const handleClick = async (product) => {
-    console.log('ProductsCarousel - Add to Cart clicked for product:', product);
-
     const payload = {
-      ...product,
+      productId: product.productId ?? product.id,
       quantity: product.quantity ?? 1,
     };
-    console.log('ProductsCarousel - payload to send:', payload);
 
     setLoadingIds((prev) => [...prev, product.id]);
 
@@ -39,10 +39,7 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
       <Swiper
         modules={[Autoplay, Navigation, Pagination]}
         loop={true}
-        autoplay={{
-          delay: 6000,
-          disableOnInteraction: false,
-        }}
+        autoplay={{ delay: 6000, disableOnInteraction: false }}
         speed={1000}
         navigation
         pagination={{ clickable: true }}
@@ -57,21 +54,16 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
         }}
         className="w-full h-[420px] relative z-20"
       >
-        {slides.map((slide, index) => {
-          const productSlug = slide.name.toLowerCase().replace(/\s+/g, '-');
+        {slides.map((slide) => {
+          const productSlug = slide.slug || slide.name.toLowerCase().replace(/\s+/g, '-');
           const isLoading = loadingIds.includes(slide.id);
 
-          // Oprava URL obrázka
           let imageUrl = slide.image;
-          if (imageUrl.startsWith('https//')) {
-            imageUrl = imageUrl.replace('https//', 'https://');
-          }
-          if (!imageUrl.startsWith('http')) {
-            imageUrl = `${baseURL}${imageUrl}`;
-          }
+          if (imageUrl.startsWith('https//')) imageUrl = imageUrl.replace('https//', 'https://');
+          if (!imageUrl.startsWith('http')) imageUrl = `${baseURL}${imageUrl}`;
 
           return (
-            <SwiperSlide key={index}>
+            <SwiperSlide key={slide.id}>
               <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-start p-4 text-center hover:shadow-xl transition relative">
                 <Link to={`/product/${productSlug}`} className="flex-grow hover:brightness-110">
                   <h2 className="text-lg font-bold mb-1 text-black">{slide.name}</h2>
@@ -107,11 +99,9 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
           margin: 6px;
           transition: background-color 0.3s ease;
         }
-
         .swiper-pagination-bullet-active {
           background-color: #2563eb;
         }
-
         .swiper-pagination {
           bottom: -5px !important;
           z-index: 20; 
