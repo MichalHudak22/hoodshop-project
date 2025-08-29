@@ -1,9 +1,22 @@
 import { Link } from 'react-router-dom';
+import { useContext } from 'react';
+import { CartContext } from '../context/CartContext';
 
-const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
+const FeaturedProduct = ({ product, backgroundImage }) => {
   if (!product) return null;
 
+  const { handleAddToCart } = useContext(CartContext);
+
   const productSlug = product.name.toLowerCase().replace(/\s+/g, '-');
+  
+const handleAdd = () => {
+  if (typeof handleAddToCart === 'function') {
+    handleAddToCart(product); // celý produkt
+  } else {
+    console.warn('handleAddToCart nie je definované');
+  }
+};
+
 
   return (
     <section className="relative py-16 px-6 bg-black overflow-hidden border-b-4 border-black">
@@ -41,7 +54,7 @@ const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
                 {product.price} €
               </p>
               <button
-                onClick={() => handleAddToCart(product)}
+                onClick={handleAdd}
                 className="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 mb-2 font-bold rounded-xl text-lg transition duration-300"
               >
                 Add to Cart

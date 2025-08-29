@@ -9,7 +9,7 @@ import ProductSection from '../components/ProductSection';
 const FootballJerseys = () => {
   const [jerseys, setJerseys] = useState([]);
   const [message, setMessage] = useState('');
-  const { handleAddToCart } = useContext(CartContext); // 🔹 používame CartContext
+  const { handleAddToCart } = useContext(CartContext);
 
   useEffect(() => {
     axios
@@ -18,9 +18,10 @@ const FootballJerseys = () => {
       .catch((err) => console.error('Chyba pri načítavaní football dresov:', err));
   }, []);
 
-  const addProduct = async (product) => {
+  // Wrapper pre hlášku
+  const addToCartWithMessage = async (product) => {
     try {
-      await handleAddToCart(product); // pridávanie cez context
+      await handleAddToCart(product);
       setMessage('Product added to cart!');
     } catch (err) {
       console.error('Error adding to cart:', err);
@@ -62,19 +63,19 @@ const FootballJerseys = () => {
       {/* 1st FEATURED JERSEY */}
       <FeaturedProduct
         product={featuredJersey}
-        handleAddToCart={addProduct}
+        handleAddToCart={addToCartWithMessage}
         backgroundImage="/img/bg-football3.jpg"
       />
 
       {/* CAROUSEL */}
       <div className="py-10 bg-black">
-        <ProductsCarousel slides={slides} handleAddToCart={addProduct} />
+        <ProductsCarousel slides={slides} handleAddToCart={addToCartWithMessage} />
       </div>
 
       {/* 2nd FEATURED JERSEY */}
       <FeaturedProductReversed
         product={featuredJersey2}
-        handleAddToCart={addProduct}
+        handleAddToCart={addToCartWithMessage}
         backgroundImage="/img/bg-football3.jpg"
       />
 
@@ -83,7 +84,7 @@ const FootballJerseys = () => {
         title="All Football Jerseys"
         backgroundImage="/img/bg-football5.jpg"
         products={jerseys}
-        onAddToCart={addProduct}
+        onAddToCart={addToCartWithMessage}
       />
 
       {/* MESSAGE */}
