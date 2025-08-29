@@ -30,9 +30,17 @@ export const CartProvider = ({ children }) => {
       else headers['x-session-id'] = sessionId;
 
       const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, { headers });
-      setCartItems(res.data || []);
-      setCartCount(res.data?.length || 0);
-      console.log('Cart fetched:', res.data);
+
+      // backend môže vrátiť { message, cartItems } alebo rovno pole
+      const items = Array.isArray(res.data)
+        ? res.data
+        : Array.isArray(res.data.cartItems)
+        ? res.data.cartItems
+        : [];
+
+      setCartItems(items);
+      setCartCount(items.length);
+      console.log('Cart fetched:', items);
     } catch (err) {
       console.error('Chyba pri načítaní košíka:', err);
       setCartItems([]);
@@ -43,64 +51,50 @@ export const CartProvider = ({ children }) => {
   }, [user?.token]);
 
   // Pridanie produktu do košíka
-const addToCart = async (product) => {
-  console.log('=== CartContext.addToCart ===');
-  console.log('Product received:', product);
+  const addToCart = async (product) => {
+    try {
+      const headers = {};
+      let sessionId = localStorage.getItem('sessionId');
+      if (!sessionId) {
+        sessionId = crypto.randomUUID();
+        localStorage.setItem('sessionId', sessionId);
+      }
 
-  try {
-    const headers = {};
-    let sessionId = localStorage.getItem('sessionId');
-    console.log('Current sessionId:', sessionId);
-    console.log('User token:', user?.token);
+      if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
+      else headers['x-session-id'] = sessionId;
 
-    // Ak sessionId chýba (pre neprihlásených)
-    if (!sessionId) {
-      sessionId = crypto.randomUUID();
-      localStorage.setItem('sessionId', sessionId);
-      console.log('Generated new sessionId:', sessionId);
+      const payload = {
+        productId: product.productId ?? product.id,
+        quantity: product.quantity ?? 1,
+      };
+
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, payload, { headers });
+
+      const items = Array.isArray(res.data)
+        ? res.data
+        : Array.isArray(res.data.cartItems)
+        ? res.data.cartItems
+        : [];
+
+      setCartItems(items);
+      setCartCount(items.length);
+      console.log('Cart updated after add:', items);
+    } catch (err) {
+      console.error('Chyba pri pridávaní do košíka:', err);
     }
+  };
 
-    if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
-    else headers['x-session-id'] = sessionId;
-
-    // Použijeme buď productId (ak existuje) alebo id
-    const payload = {
-      productId: product.productId ?? product.id,
-      quantity: product.quantity ?? 1,
-    };
-
-    console.log('Payload to send:', payload);
-    console.log('Headers to send:', headers);
-
-    const res = await axios.post(
-      `${import.meta.env.VITE_API_BASE_URL}/api/cart`,
-      payload,
-      { headers }
-    );
-
-    console.log('Response from backend:', res.data);
-
-    setCartItems(res.data || []);
-    setCartCount(res.data?.length || 0);
-  } catch (err) {
-    console.error('Chyba pri pridávaní do košíka:', err);
-  }
-};
-
-
-  // Wrapper pre staršie komponenty
   const handleAddToCart = async (product) => {
     await addToCart(product);
   };
 
   const setCartDirectly = (items) => {
+    if (!Array.isArray(items)) items = [];
     setCartItems(items);
     setCartCount(items.length);
   };
 
   useEffect(() => {
-    const sessionId = localStorage.getItem('sessionId');
-    if (!sessionId) return;
     fetchCart();
   }, [fetchCart]);
 
