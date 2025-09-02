@@ -12,45 +12,46 @@ const FootballBalls = () => {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-  axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/football/ball`)
-    .then(response => setBalls(response.data))
-    .catch(error => console.error('Chyba pri načítavaní football lôpt:', error));
-}, []);
+    axios.get('http://localhost:3001/products/football/ball')
+      .then(response => setBalls(response.data))
+      .catch(error => console.error('Chyba pri načítavaní football lôpt:', error));
+  }, []);
 
-const handleAddToCart = async (jersey) => {
-  const sessionId = localStorage.getItem("sessionId");
-  const token = localStorage.getItem("token");
+   const handleAddToCart = async (jersey) => {
+    const sessionId = localStorage.getItem("sessionId");
+    const token = localStorage.getItem("token");
 
-  try {
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
-      method: 'POST',
-      headers: {
-        "Content-Type": "application/json",
-        ...(token && { Authorization: `Bearer ${token}` }),
-        ...(!token && sessionId && { "x-session-id": sessionId }),
-      },
-      body: JSON.stringify({
-        productId: jersey.id,
-        quantity: 1,
-      }),
-    });
+    try {
+      const response = await fetch('http://localhost:3001/api/cart', {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+          ...(!token && sessionId && { "x-session-id": sessionId }),
+        },
+        body: JSON.stringify({
+          productId: jersey.id,
+          quantity: 1,
+        }),
+      });
 
-    const data = await response.json();
-    if (response.ok) {
-      setMessage("Product added to cart!");
-      refreshCartCount();
+      const data = await response.json();
+      if (response.ok) {
+        setMessage("Product added to cart!");
+        refreshCartCount();
 
-      setTimeout(() => setMessage(''), 3000);
-    } else {
-      setMessage("Failed to add to cart: " + data.message);
+        // automaticky zmizne po 3 sekundách
+        setTimeout(() => setMessage(''), 3000);
+      } else {
+        setMessage("Failed to add to cart: " + data.message);
+        setTimeout(() => setMessage(''), 3000);
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      setMessage("Error adding to cart");
       setTimeout(() => setMessage(''), 3000);
     }
-  } catch (error) {
-    console.error("Error adding to cart:", error);
-    setMessage("Error adding to cart");
-    setTimeout(() => setMessage(''), 3000);
-  }
-};
+  };
 
   // Carousel slides
   const slides = balls.map(product => ({
@@ -58,8 +59,7 @@ const handleAddToCart = async (jersey) => {
     name: product.name,
     brand: product.brand,
     price: product.price,
-    image: `${import.meta.env.VITE_API_BASE_URL}
-${product.image}`, // absolútna URL
+    image: `http://localhost:3001${product.image}`, // absolútna URL
   }));
 
   const highlightedBalls = balls.filter(ball => ball.highlight_title && ball.description);
@@ -72,7 +72,7 @@ ${product.image}`, // absolútna URL
       <section
         className="relative text-center py-10 px-4 bg-gradient-to-br  from-green-600 via-black to-green-700 text-white overflow-hidden border-b-4 border-black"
       >
-        <div className="absolute inset-0"></div>
+        <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
         <div className="relative z-10 max-w-4xl mx-auto">
           <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
             Discover Legendary <span className="text-blue-200">Football Balls</span>

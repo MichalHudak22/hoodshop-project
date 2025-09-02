@@ -13,19 +13,18 @@ function UserDetailPage() {
   const [ordersError, setOrdersError] = useState(null);
 
   // 1) Načítanie cien dopravy z DB
-useEffect(() => {
-  axios
-    .get(`${import.meta.env.VITE_API_BASE_URL}/api/config/shipping-prices`)
-    .then(res => {
-      const opts = (res.data || []).map(o => ({
-        name: o.name,
-        price: parseFloat(o.price),
-      }));
-      setShippingOptions(opts);
-    })
-    .catch(err => console.error('Chyba pri načítaní cien dopravy:', err));
-}, []);
-
+  useEffect(() => {
+    axios
+      .get('http://localhost:3001/api/config/shipping-prices')
+      .then(res => {
+        const opts = (res.data || []).map(o => ({
+          name: o.name,
+          price: parseFloat(o.price),
+        }));
+        setShippingOptions(opts);
+      })
+      .catch(err => console.error('Chyba pri načítaní cien dopravy:', err));
+  }, []);
 
   // 2) Načítanie používateľa
   useEffect(() => {
@@ -33,8 +32,7 @@ useEffect(() => {
       setError('Missing token – you are not logged in');
       return;
     }
-    fetch(`${import.meta.env.VITE_API_BASE_URL}
-/user/admin/user/${id}`, {
+    fetch(`http://localhost:3001/user/admin/user/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => {
@@ -48,8 +46,7 @@ useEffect(() => {
   // 3) Načítanie histórie objednávok
   useEffect(() => {
     if (!token) return;
-    fetch(`${import.meta.env.VITE_API_BASE_URL}
-/api/order-history/history/${id}`, {
+    fetch(`http://localhost:3001/api/order-history/history/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => {

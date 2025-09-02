@@ -11,10 +11,11 @@ const FootballPage = () => {
   const [paragraphFromDB, setParagraphFromDB] = useState('');
   const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
+  
 
   useEffect(() => {
     // Načítanie carousel produktov
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/football/carousel`)
+    axios.get('http://localhost:3001/products/football/carousel')
       .then(response => {
         setCarouselProducts(response.data);
       })
@@ -23,7 +24,7 @@ const FootballPage = () => {
       });
 
     // Načítanie titulku a paragrafu z backendu
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/config/section/football-home-header`)
+    axios.get('http://localhost:3001/api/config/section/football-home-header')
       .then(response => {
         setTitleFromDB(response.data.title || '');
         setParagraphFromDB(response.data.paragraph || '');
@@ -38,12 +39,12 @@ const FootballPage = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
+      const response = await fetch('http://localhost:3001/api/cart', {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          ...(!token && sessionId ? { "x-session-id": sessionId } : {}),
+          ...(token && { Authorization: `Bearer ${token}` }),
+          ...(!token && sessionId && { "x-session-id": sessionId }),
         },
         body: JSON.stringify({
           productId: jersey.id,
@@ -52,7 +53,6 @@ const FootballPage = () => {
       });
 
       const data = await response.json();
-
       if (response.ok) {
         setMessage("Product added to cart!");
         refreshCartCount();
@@ -60,7 +60,7 @@ const FootballPage = () => {
         // automaticky zmizne po 3 sekundách
         setTimeout(() => setMessage(''), 3000);
       } else {
-        setMessage("Failed to add to cart: " + (data.message || 'Unknown error'));
+        setMessage("Failed to add to cart: " + data.message);
         setTimeout(() => setMessage(''), 3000);
       }
     } catch (error) {
@@ -109,7 +109,7 @@ const FootballPage = () => {
      <section
   className="relative text-center py-10 px-4 bg-gradient-to-br from-green-600 via-black to-green-700 text-white overflow-hidden border-b-4 border-black"
 >
-  <div className="absolute inset-0"></div>
+  <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
   <div className="relative z-10 max-w-4xl mx-auto">
     <h1 className="text-xl md:text-3xl lg:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
       {parseColorTags(titleFromDB)}

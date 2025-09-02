@@ -11,35 +11,19 @@ const DeleteProduct = () => {
   const [showModal, setShowModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
 
-  const token = localStorage.getItem('token');
-  const API = import.meta.env.VITE_API_BASE_URL;
-
   useEffect(() => {
     const fetchProducts = async () => {
-      if (!token) {
-        setMessage('Nie ste prihlásený.');
-        setLoading(false);
-        return;
-      }
       try {
-        const res = await axios.get(`${API}/products/all`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+        const res = await axios.get('/products/all');
         setAllProducts(res.data);
         setFiltered(res.data);
-        setMessage('');
       } catch (err) {
         setMessage('Chyba pri načítavaní produktov');
-        console.error(err);
-      } finally {
-        setLoading(false);
       }
+      setLoading(false);
     };
     fetchProducts();
-  }, [API, token]);
-
-  // ...zvyšok komponentu
-
+  }, []);
 
   // Auto-clear message after 3 seconds
   useEffect(() => {

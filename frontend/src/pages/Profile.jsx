@@ -1,6 +1,7 @@
-import { useEffect, useState, useRef, useContext } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProfileNavigation from '../components/ProfileNavigation';
+import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 
 const inputs = [
@@ -14,14 +15,12 @@ const inputs = [
 ];
 
 function Profile() {
-  const { user, setUser, logout } = useContext(AuthContext); // 🔥 správne použitie contextu
+  const [user, setUser] = useState(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [uploadError, setUploadError] = useState('');
   const navigate = useNavigate();
-  const fileInputRef = useRef(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
 
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
@@ -30,7 +29,7 @@ function Profile() {
   const handleAccountDeletion = () => {
     const token = localStorage.getItem('token');
 
-    fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
+    fetch('http://localhost:3001/user/profile', {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -39,7 +38,7 @@ function Profile() {
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          logout(); // pochádza z contextu
+          logout();
           navigate('/login');
         } else {
           setError(data.error || 'Nepodarilo sa vymazať účet.');
@@ -48,8 +47,11 @@ function Profile() {
       .catch(() => setError('Chyba pri komunikácii so serverom.'));
   };
 
-  // ...ďalšia logika
 
+  // Upload Photo
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploadError, setUploadError] = useState('');
+  const fileInputRef = useRef(null);
 
   const uploadPhoto = () => {
     if (!selectedFile) {
@@ -62,8 +64,8 @@ function Profile() {
     const formData = new FormData();
     formData.append('photo', selectedFile);
 
-  fetch(`${import.meta.env.VITE_API_BASE_URL}/user/upload/photo`, {
-    method: 'POST',
+    fetch('http://localhost:3001/user/upload/photo', {
+      method: 'POST',
       headers: {
         Authorization: 'Bearer ' + token,
         // Content-Type sa NEPRIDÁVA pri FormData, nechaj to takto
@@ -91,73 +93,65 @@ function Profile() {
   };
 
 
- const setDefaultPhoto = async () => {
-  try {
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/upload/default-photo`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-    });
-
-    const data = await response.json();
-    if (data.success) {
-      setUser(prev => ({ ...prev, user_photo: data.photo }));
-      setSelectedFile(null);
-
-      // 🧼 Resetuj file input, aby bolo možné znova nahrať rovnaký súbor
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    } else {
-      console.error('Chyba pri nastavovaní default fotky:', data.message);
-    }
-  } catch (error) {
-    console.error('Server error:', error);
-  }
-};
-
-// ...
-
-useEffect(() => {
-  if (!user?.token) {
-    navigate('/login');
-    return;
-  }
-
-  const fetchProfile = async () => {
+  // Default Phodo funkcia pre nastavenie defaultnej fotky pre avatara 
+  const setDefaultPhoto = async () => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
-        method: 'GET',
-        headers: { Authorization: `Bearer ${user.token}` },
+      const response = await fetch('http://localhost:3001/user/upload/default-photo', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
       });
-      const data = await res.json();
 
-      if (data.error) {
-        setError(data.error);
+      const data = await response.json();
+      if (data.success) {
+        setUser(prev => ({ ...prev, user_photo: data.photo }));
+        setSelectedFile(null);
+
+        // 🧼 Resetuj file input, aby bolo možné znova nahrať rovnaký súbor
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
       } else {
-        setUser(prev => ({ ...prev, ...data })); // zachová existujúce údaje v contextu
+        console.error('Chyba pri nastavovaní default fotky:', data.message);
       }
-    } catch (err) {
-      setError('Chyba pri načítaní údajov o používateľovi');
-      console.error(err);
+    } catch (error) {
+      console.error('Server error:', error);
     }
   };
 
-  fetchProfile();
-}, [user?.token, navigate, setUser]);
+  // Formular
+  useEffect(() => {
+    const token = localStorage.getItem('token');
 
+    if (!token) {
+      navigate('/login');
+      return;
+    }
 
-// ...
+    fetch('http://localhost:3001/user/profile', {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          setError(data.error);
+        } else {
+          setUser(data);
+        }
+      })
+      .catch(() => setError('Chyba pri načítaní údajov o používateľovi'));
+  }, [navigate]);
 
-const handleChange = (e) => {
-  const { name, value } = e.target;
-  setUser((prev) => ({
-    ...prev,
-    [name]: value,
-  }));
-};
-
+  // Handler pre update stavov políčok
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUser((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   // Handler pre uloženie zmien
   const handleSave = () => {
@@ -173,8 +167,8 @@ const handleChange = (e) => {
       return acc;
     }, {});
 
-   fetch(`${import.meta.env.VITE_API_BASE_URL}/user/profile`, {
-  method: 'PUT',
+    fetch('http://localhost:3001/user/profile', {
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
@@ -204,6 +198,8 @@ const handleChange = (e) => {
         setSuccess('');
       });
   };
+
+  const { logout } = useContext(AuthContext);
 
 
 
@@ -257,12 +253,11 @@ const handleChange = (e) => {
 
               {/* Miesto na zobrazenie fotky */}
               <div className="w-56 h-56 rounded-full overflow-hidden border-2 border-gray-400">
-              <img
-  src={user.user_photo ? user.user_photo : "/img/default-avatar.jpg"}
-  alt="Profilová fotka"
-  className="w-full h-full object-cover"
-/>
-
+                <img
+                  src={user.user_photo ? `http://localhost:3001${user.user_photo}` : "/img/default-avatar.jpg"}
+                  alt="Profilová fotka"
+                  className="w-full h-full object-cover"
+                />
               </div>
 
               {/* Tlačidlo Default Photo */}

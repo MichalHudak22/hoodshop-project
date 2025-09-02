@@ -16,8 +16,7 @@ const VerifyEmailPage = () => {
 
     console.log('Overujem email s tokenom:', token);
 
-    fetch(`${import.meta.env.VITE_API_BASE_URL}
-/user/verify-email?token=${token}`)
+    fetch(`http://localhost:3001/user/verify-email?token=${token}`)
       .then((res) => res.json())
       .then((data) => {
         console.log('Odpoveď z overenia:', data);

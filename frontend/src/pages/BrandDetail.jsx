@@ -3,7 +3,6 @@ import { useEffect, useState, useContext } from "react";
 import ProductsCarousel from "../components/ProductsCarousel";
 import ProductSection from "../components/ProductSection"; // Dôležité
 import { CartContext } from "../context/CartContext";
-import { Link } from "react-router-dom";
 
 const BrandDetail = () => {
   const { slug } = useParams();
@@ -13,20 +12,10 @@ const BrandDetail = () => {
   const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
 
-  // Pomocná funkcia na skladanie full URL k obrázkom
-  function buildImageUrl(path) {
-    if (!path) return null;
-    const baseUrl = import.meta.env.VITE_API_BASE_URL.replace(/\/$/, '');
-    if (path.startsWith('http://') || path.startsWith('https://')) {
-      return path;
-    }
-    return `${baseUrl}/${path.replace(/^\//, '')}`;
-  }
-
   useEffect(() => {
     const fetchAllBrands = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/brands`);
+        const res = await fetch(`http://localhost:3001/api/brands`);
         const data = await res.json();
         setBrands(data);
       } catch (error) {
@@ -39,17 +28,13 @@ const BrandDetail = () => {
   useEffect(() => {
     const fetchBrand = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/brands/${slug}`);
+        const res = await fetch(`http://localhost:3001/api/brands/${slug}`);
         const data = await res.json();
         setBrand(data);
 
-        if (data && data.name) {
-          const productRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/products/brand/${data.name}`);
-          const productData = await productRes.json();
-          setProducts(productData);
-        } else {
-          setProducts([]);
-        }
+        const productRes = await fetch(`http://localhost:3001/products/brand/${data.name}`);
+        const productData = await productRes.json();
+        setProducts(productData);
       } catch (error) {
         console.error("Chyba pri načítaní:", error);
       }
@@ -57,12 +42,12 @@ const BrandDetail = () => {
     fetchBrand();
   }, [slug]);
 
-  const handleAddToCart = async (product) => {
+  const handleAddToCart = async (jersey) => {
     const sessionId = localStorage.getItem("sessionId");
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
+      const response = await fetch('http://localhost:3001/api/cart', {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -70,7 +55,7 @@ const BrandDetail = () => {
           ...(!token && sessionId && { "x-session-id": sessionId }),
         },
         body: JSON.stringify({
-          productId: product.id,
+          productId: jersey.id,
           quantity: 1,
         }),
       });
@@ -80,6 +65,7 @@ const BrandDetail = () => {
         setMessage("Product added to cart!");
         refreshCartCount();
 
+        // automaticky zmizne po 3 sekundách
         setTimeout(() => setMessage(''), 3000);
       } else {
         setMessage("Failed to add to cart: " + data.message);
@@ -102,7 +88,7 @@ const BrandDetail = () => {
       <section
         className="relative py-16 px-6 bg-black overflow-hidden"
         style={{
-          backgroundImage: `url(${buildImageUrl(brand.background_image) || '/img/bg-default.jpg'})`,
+          backgroundImage: `url(http://localhost:3001${brand.background_image || "/img/bg-default.jpg"})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
@@ -114,7 +100,7 @@ const BrandDetail = () => {
 
         <div className="relative z-10 max-w-4xl mx-auto text-white text-center mb-16">
           <img
-            src={buildImageUrl(brand.brand_image)}
+            src={`http://localhost:3001${brand.brand_image}`}
             alt={brand.name}
             className="mx-auto h-40 object-contain mb-6 rounded-xl"
           />
@@ -133,22 +119,19 @@ const BrandDetail = () => {
         </div>
       )}
 
+
       {/* Lišta s logami značiek mimo overlay sekcie */}
       <div className="bg-white py-2 px-4 shadow-inner my-8">
         <h1 className="text-4xl font-semibold text-center py-5">Our Brand Collection</h1>
         <div className="flex flex-wrap justify-center gap-2 sm:gap-4 xl:gap-8">
           {brands.map((brand) => (
-            <Link
-              key={brand.id}
-              to={`/brands/${brand.name.toLowerCase()}`}
-            >
+            <a key={brand.id} href={`/brands/${brand.name.toLowerCase()}`}>
               <img
-                src={buildImageUrl(brand.brand_image)}
+                src={`${import.meta.env.VITE_API_BASE_URL}${brand.brand_image}`}
                 alt={brand.name}
                 className="sm:h-10 w-[94px] lg:h-full object-contain transition-transform duration-300 hover:scale-110"
               />
-            </Link>
-
+            </a>
           ))}
         </div>
       </div>
@@ -157,11 +140,12 @@ const BrandDetail = () => {
       <ProductSection
         title={`Explore ${brand.name} Products`}
         products={products}
-        backgroundImage={buildImageUrl(brand.background_image) || '/img/bg-default.jpg'}
+        backgroundImage={`http://localhost:3001${brand.background_image || "/img/bg-default.jpg"}`}
+
         onAddToCart={handleAddToCart}
       />
 
-      {/* ✅ MESSAGE NA STRED OBRAZOVKY */}
+       {/* ✅ MESSAGE NA STRED OBRAZOVKY */}
       {message && (
         <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
           {message}

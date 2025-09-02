@@ -12,17 +12,17 @@ const HockeySticks = () => {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/hockey/sticks`)
+    axios.get('http://localhost:3001/products/hockey/sticks')
       .then(response => setSticks(response.data))
       .catch(error => console.error('Chyba pri načítavaní hokejok:', error));
   }, []);
 
-  const handleAddToCart = async (stick) => {
+  const handleAddToCart = async (jersey) => {
     const sessionId = localStorage.getItem("sessionId");
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
+      const response = await fetch('http://localhost:3001/api/cart', {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -30,7 +30,7 @@ const HockeySticks = () => {
           ...(!token && sessionId && { "x-session-id": sessionId }),
         },
         body: JSON.stringify({
-          productId: stick.id,
+          productId: jersey.id,
           quantity: 1,
         }),
       });
@@ -39,6 +39,8 @@ const HockeySticks = () => {
       if (response.ok) {
         setMessage("Product added to cart!");
         refreshCartCount();
+
+        // automaticky zmizne po 3 sekundách
         setTimeout(() => setMessage(''), 3000);
       } else {
         setMessage("Failed to add to cart: " + data.message);
@@ -70,7 +72,7 @@ const HockeySticks = () => {
 <section
   className="relative text-center py-10 px-4 bg-gradient-to-br from-blue-600 via-black to-blue-900 text-white overflow-hidden border-b-4 border-black"
 >
-  <div className="absolute inset-0"></div>
+  <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
   <div className="relative z-10 max-w-4xl mx-auto">
     <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
       Discover Elite <span className="text-blue-200">Hockey Sticks</span>

@@ -21,8 +21,7 @@ const ColorfulTextEditor = ({
 
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}
-/api/config/section/${sectionKey}`);
+        const response = await axios.get(`http://localhost:3001/api/config/section/${sectionKey}`);
         const data = response.data || {};
         setTitle(data.title || '');
         setParagraph(data.paragraph || '');
@@ -96,7 +95,7 @@ const saveToBackend = async () => {
   }
 
   try {
-    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/config/section`, {
+    await axios.post('http://localhost:3001/api/config/section', {
       section_key: sectionKey,
       title,
       paragraph,

@@ -3,40 +3,23 @@ import { createContext, useState, useEffect } from 'react';
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem('user');
-    const storedToken = localStorage.getItem('token');
-    if (storedUser && storedToken) {
-      return { ...JSON.parse(storedUser), token: storedToken };
-    }
-    return null;
-  });
-
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Session ID pre guest
-  useEffect(() => {
-    let sessionId = localStorage.getItem('sessionId');
-    if (!sessionId) {
-      sessionId = crypto.randomUUID();
-      localStorage.setItem('sessionId', sessionId);
-    }
-  }, []);
-
-  // Verify token pri mount
   useEffect(() => {
     const verifyToken = async () => {
-      if (!user) {
+      const storedToken = localStorage.getItem('token');
+      if (!storedToken) {
         setLoading(false);
         return;
       }
       try {
-        const res = await fetch(import.meta.env.VITE_API_BASE_URL + '/user/profile', {
-          headers: { 'Authorization': 'Bearer ' + user.token },
+        const res = await fetch('http://localhost:3001/user/profile', {
+          headers: { 'Authorization': 'Bearer ' + storedToken },
         });
         if (!res.ok) throw new Error('Unauthorized');
         const userData = await res.json();
-        setUser({ ...userData, token: user.token });
+        setUser({ ...userData, token: storedToken });
         localStorage.setItem('user', JSON.stringify(userData));
       } catch {
         setUser(null);
@@ -46,6 +29,7 @@ export const AuthProvider = ({ children }) => {
         setLoading(false);
       }
     };
+
     verifyToken();
   }, []);
 
@@ -53,18 +37,16 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', userData.token);
-    // ✅ odstránime refreshCart, necháme CartContext reagovať na user?.token
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('token');
-    // ✅ refreshCart tu tiež odstránime
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

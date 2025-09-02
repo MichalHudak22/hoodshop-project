@@ -1,27 +1,9 @@
-// src/components/FeaturedProduct.jsx
-import { Link } from 'react-router-dom';
-import { useContext } from 'react';
-import { CartContext } from '../context/CartContext';
+import { Link } from 'react-router-dom'; // nezabudni pridať import
 
-const FeaturedProduct = ({ product, backgroundImage }) => {
+const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
   if (!product) return null;
 
-  const { handleAddToCart } = useContext(CartContext);
-
-  const productSlug = product.slug || product.name.toLowerCase().replace(/\s+/g, '-');
-const handleAdd = (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-
-  const payload = {
-    productId: product.id,
-    quantity: 1, // vždy 1 pri featured producte
-  };
-
-  handleAddToCart(payload);
-};
-
-
+  const productSlug = product.name.toLowerCase().replace(/\s+/g, '-');
 
   return (
     <section className="relative py-16 px-6 bg-black overflow-hidden border-b-4 border-black">
@@ -40,11 +22,12 @@ const handleAdd = (e) => {
         <h1 className="text-center text-xl md:text-2xl lg:text-4xl font-bold text-white mb-4 lg:mb-10">
           {product.highlight_title}
         </h1>
-
         <div className="flex flex-col md:flex-row items-center justify-center gap-8">
+          
+          {/* OBÁLENIE obrázku do Link komponentu */}
           <Link to={`/product/${productSlug}`}>
             <img
-              src={`${import.meta.env.VITE_API_BASE_URL}${product.image}`}
+              src={`http://localhost:3001${product.image}`}
               alt={product.name}
               className="max-w-sm rounded-lg shadow-xl object-contain hover:brightness-110"
             />
@@ -60,8 +43,8 @@ const handleAdd = (e) => {
                 {product.price} €
               </p>
               <button
-                onClick={handleAdd}
-                className="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 rounded-xl transition duration-300"
+                onClick={() => handleAddToCart(product)}
+                className="bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 mb-2 font-bold rounded-xl text-lg transition duration-300"
               >
                 Add to Cart
               </button>
@@ -73,5 +56,6 @@ const handleAdd = (e) => {
     </section>
   );
 };
+
 
 export default FeaturedProduct;

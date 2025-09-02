@@ -49,13 +49,13 @@ const CyclingPage = () => {
   const sectionKey = 'cycling-home-header';
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/cycling/carousel`)
+    axios.get('http://localhost:3001/products/cycling/carousel')
       .then(response => setCarouselProducts(response.data))
       .catch(error => console.error('Chyba pri načítavaní carousel produktov:', error));
   }, []);
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/config/section/${sectionKey}`)
+    axios.get(`http://localhost:3001/api/config/section/${sectionKey}`)
       .then(response => {
         const data = response.data || {};
         setTitle(data.title || '');
@@ -66,26 +66,25 @@ const CyclingPage = () => {
       });
   }, [sectionKey]);
 
-  const handleAddToCart = async (product) => {
+  const handleAddToCart = async (jersey) => {
     const sessionId = localStorage.getItem("sessionId");
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
+      const response = await fetch('http://localhost:3001/api/cart', {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          ...(!token && sessionId ? { "x-session-id": sessionId } : {}),
+          ...(token && { Authorization: `Bearer ${token}` }),
+          ...(!token && sessionId && { "x-session-id": sessionId }),
         },
         body: JSON.stringify({
-          productId: product.id,
+          productId: jersey.id,
           quantity: 1,
         }),
       });
 
       const data = await response.json();
-
       if (response.ok) {
         setMessage("Product added to cart!");
         refreshCartCount();
@@ -93,7 +92,7 @@ const CyclingPage = () => {
         // automaticky zmizne po 3 sekundách
         setTimeout(() => setMessage(''), 3000);
       } else {
-        setMessage("Failed to add to cart: " + (data.message || 'Unknown error'));
+        setMessage("Failed to add to cart: " + data.message);
         setTimeout(() => setMessage(''), 3000);
       }
     } catch (error) {
@@ -117,7 +116,7 @@ const CyclingPage = () => {
       <section
         className="relative text-center py-10 px-4 bg-gradient-to-br from-orange-400 via-black to-orange-400 text-white overflow-hidden border-b-4 border-black"
       >
-        <div className="absolute inset-0"></div>
+        <div className="absolute inset-0 bg-[url('/img/cycling-bg.jpg')] bg-cover bg-center opacity-20"></div>
         <div className="relative z-10 max-w-4xl mx-auto">
           <h1 className="text-xl md:text-3xl lg:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
             {parseColoredText(title)}

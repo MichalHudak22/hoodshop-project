@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const AllOrders = () => {
-  const API = import.meta.env.VITE_API_BASE_URL;
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -11,42 +10,31 @@ const AllOrders = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get(`${API}/api/orders/admin`, {
+        const res = await axios.get('/api/orders/admin', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
-
-        if (Array.isArray(res.data)) {
-          setOrders(res.data);
-        } else if (Array.isArray(res.data.orders)) {
-          setOrders(res.data.orders);
-        } else {
-          console.warn('Neočakávaný formát dát z API:', res.data);
-          setOrders([]);
-        }
+        setOrders(res.data);
       } catch (err) {
         console.error('Chyba pri načítaní objednávok:', err);
         setError('Nepodarilo sa načítať objednávky.');
-        setOrders([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchOrders();
-  }, [API]);
+  }, []);
 
   const terms = searchTerm.toLowerCase().split(' ').filter(Boolean);
 
-  const filteredOrders = Array.isArray(orders) 
-  ? orders.filter(order => 
-      terms.every(term =>
-        (order.order_number || '').toLowerCase().includes(term) ||
-        (order.user_email || '').toLowerCase().includes(term)
-      )
+  const filteredOrders = orders.filter(order =>
+    terms.every(term =>
+      (order.order_number || '').toLowerCase().includes(term) ||
+      (order.user_email || '').toLowerCase().includes(term)
     )
-  : [];
+  );
 
   return (
     <div className="bg-black bg-opacity-70 md:rounded-xl p-5 border border-gray-700">
@@ -63,7 +51,7 @@ const AllOrders = () => {
       </div>
 
       <div className="rounded-lg shadow-lg max-h-[650px] xl:max-h-[900px] mb-10 overflow-y-scroll scrollbar scrollbar-thumb-gray-500 scrollbar-track-gray-800 max-w-5xl mx-auto mt-10">
-        {loading && <p className="text-green-400 text-center">Načítavam objednávky...</p>}
+        {loading && <p className="text-blue-400 text-center">Načítavam objednávky...</p>}
         {error && <p className="text-red-400 text-center">{error}</p>}
 
         {filteredOrders.length > 0 ? (

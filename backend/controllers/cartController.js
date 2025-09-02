@@ -4,11 +4,6 @@ const db = require('../database');
 // Pridanie produktu do košíka
 // ========================
 const addToCart = (req, res) => {
-  console.log('--- Backend addToCart ---');
-  console.log('Request body:', req.body);
-  console.log('Headers:', req.headers);
-  console.log('UserId:', req.userId);
-  console.log('SessionId:', req.headers['x-session-id']);
 
   const { productId, quantity } = req.body;
   const userId = req.userId || null;

@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
 
 const videoSources = [
-  `${import.meta.env.VITE_API_BASE_URL}/video/football.mp4`,
-  `${import.meta.env.VITE_API_BASE_URL}/video/hockey.mp4`,
-  `${import.meta.env.VITE_API_BASE_URL}/video/cycling.mp4`,
+  'http://localhost:3001/video/football.mp4',
+  'http://localhost:3001/video/hockey.mp4',
+  'http://localhost:3001/video/cycling.mp4',
 ];
 
 export default function HeroVideoCarousel() {
@@ -39,36 +38,37 @@ export default function HeroVideoCarousel() {
     }
   }, [currentIndex]);
 
-  return (
-    <div className="relative w-full h-[45vh] overflow-hidden">
-      <video
-        ref={videoRef}
-        src={videoSources[currentIndex]}
-        muted
-        playsInline
-        className={`w-full h-full object-cover transition-opacity duration-1000 ${fade ? 'opacity-100' : 'opacity-0'
-          }`}
-      />
+return (
+ <div className="relative w-full h-[45vh] overflow-hidden">
+  <video
+    ref={videoRef}
+    src={videoSources[currentIndex]}
+    muted
+    playsInline
+    className={`w-full h-full object-cover transition-opacity duration-1000 ${
+      fade ? 'opacity-100' : 'opacity-0'
+    }`}
+  />
 
-      <div className="absolute inset-0 flex items-end md:items-center justify-start md:px-4 md:pl-2 md:pt-32">
-        <div className="bg-black bg-opacity-60 p-4 md:p-6 md:rounded-lg max-w-3xl text-white transform md:translate-y-12">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-blue-200 drop-shadow-lg">
-            Discover top sports equipment for football, hockey, and cycling
-          </h1>
-          <p className="text-sm sm:text-base md:text-xl mb-4 md:mb-6 drop-shadow-md">
-            Shop with us and collect loyalty points you can use as a discount on your next purchase!
-          </p>
+  <div className="absolute inset-0 flex items-end md:items-center justify-start md:px-4 md:pl-2 md:pt-32">
+    <div className="bg-black bg-opacity-60 p-4 md:p-6 md:rounded-lg max-w-3xl text-white transform md:translate-y-12">
+      <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-blue-200 drop-shadow-lg">
+        Discover top sports equipment for football, hockey, and cycling
+      </h1>
+      <p className="text-sm sm:text-base md:text-xl mb-4 md:mb-6 drop-shadow-md">
+        Shop with us and collect loyalty points you can use as a discount on your next purchase!
+      </p>
 
-          <Link
-            to="/sports"
-            className="inline-block px-6 py-2 md:px-8 md:py-3 bg-blue-700 hover:bg-blue-600 rounded-md font-semibold text-base md:text-lg transition"
-          >
-            Shop Now
-          </Link>
-        </div>
-      </div>
+      <a
+        href="/sports"
+        className="inline-block px-6 py-2 md:px-8 md:py-3 bg-blue-700 hover:bg-blue-600 rounded-md font-semibold text-base md:text-lg transition"
+      >
+        Shop Now
+      </a>
     </div>
+  </div>
+</div>
 
-  );
+);
 
 }

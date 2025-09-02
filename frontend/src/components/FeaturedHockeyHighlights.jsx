@@ -11,11 +11,10 @@ const FeaturedHockeyHighlights = () => {
  const [errorMessage, setErrorMessage] = useState('');
 
 useEffect(() => {
-  setErrorMessage('');
+  setErrorMessage(''); // Vyčistí chybu pred novým načítaním
 
-  const baseUrl = import.meta.env.VITE_API_BASE_URL;
-
-  axios.get(`${baseUrl}/products/hockey/jersey`)
+  // Dresy (jerseys)
+  axios.get('http://localhost:3001/products/hockey/jersey')
     .then(response => {
       const highlightedJerseys = response.data.filter(item => item.highlight_title && item.description);
       setFeaturedJerseys(highlightedJerseys.slice(0, 2));
@@ -24,7 +23,8 @@ useEffect(() => {
       setErrorMessage('Nepodarilo sa načítať hockey jerseys.');
     });
 
-  axios.get(`${baseUrl}/products/hockey/skates`)
+  // Korčule (skates)
+  axios.get('http://localhost:3001/products/hockey/skates')
     .then(response => {
       const highlightedSkates = response.data.filter(item => item.highlight_title && item.description);
       setFeaturedSkates(highlightedSkates.slice(0, 2));
@@ -33,7 +33,8 @@ useEffect(() => {
       setErrorMessage('Nepodarilo sa načítať hockey skates.');
     });
 
-  axios.get(`${baseUrl}/products/hockey/helmets`)
+  // Prilby (helmets)
+  axios.get('http://localhost:3001/products/hockey/helmets')
     .then(response => {
       const highlightedHelmets = response.data.filter(item => item.highlight_title && item.description);
       setFeaturedHelmets(highlightedHelmets.slice(0, 2));
@@ -42,7 +43,6 @@ useEffect(() => {
       setErrorMessage('Nepodarilo sa načítať hockey helmets.');
     });
 }, []);
-
 
 
   // Spojenie všetkých produktov do jedného poľa
@@ -108,7 +108,7 @@ useEffect(() => {
             </h3>
             <div className="relative h-64 overflow-hidden shadow-lg group">
               <img
-                src={product ? `${import.meta.env.VITE_API_BASE_URL}${product.image}` : defaultBg}
+                src={product ? `http://localhost:3001${product.image}` : defaultBg}
                 alt={product?.highlight_title || `${name} default`}
                 className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-110"
               />

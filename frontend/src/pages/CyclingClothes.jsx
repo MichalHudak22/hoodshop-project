@@ -12,7 +12,7 @@ const CyclingClothesPage = () => {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/cycling/clothes`)
+    axios.get('http://localhost:3001/products/cycling/clothes')
       .then(response => {
         setClothes(response.data);
       })
@@ -21,20 +21,20 @@ const CyclingClothesPage = () => {
       });
   }, []);
 
-  const handleAddToCart = async (item) => {
+  const handleAddToCart = async (jersey) => {
     const sessionId = localStorage.getItem("sessionId");
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
+      const response = await fetch('http://localhost:3001/api/cart', {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          ...(!token && sessionId ? { "x-session-id": sessionId } : {}),
+          ...(token && { Authorization: `Bearer ${token}` }),
+          ...(!token && sessionId && { "x-session-id": sessionId }),
         },
         body: JSON.stringify({
-          productId: item.id,
+          productId: jersey.id,
           quantity: 1,
         }),
       });
@@ -44,9 +44,10 @@ const CyclingClothesPage = () => {
         setMessage("Product added to cart!");
         refreshCartCount();
 
+        // automaticky zmizne po 3 sekundách
         setTimeout(() => setMessage(''), 3000);
       } else {
-        setMessage("Failed to add to cart: " + (data.message || 'Unknown error'));
+        setMessage("Failed to add to cart: " + data.message);
         setTimeout(() => setMessage(''), 3000);
       }
     } catch (error) {
@@ -74,7 +75,7 @@ const CyclingClothesPage = () => {
       <section
         className="relative text-center py-10 px-4 bg-gradient-to-br from-orange-400 via-black to-orange-400 text-white overflow-hidden border-b-4 border-black"
       >
-        <div className="absolute inset-0"></div>
+        <div className="absolute inset-0 bg-[url('/img/cycling-bg.jpg')] bg-cover bg-center opacity-20"></div>
         <div className="relative z-10 max-w-4xl mx-auto">
           <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
             Premium <span className="text-blue-200">Cycling Clothes</span> for Every Ride

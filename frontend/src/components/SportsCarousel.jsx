@@ -14,7 +14,7 @@ const CustomCarousel = ({ slides }) => {
       slidesPerView={1}
       loop={true}
       autoplay={{
-        delay: 6000,
+        delay: 10000,
         disableOnInteraction: false,
       }}
       speed={1000}

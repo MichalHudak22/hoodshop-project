@@ -73,6 +73,8 @@ const Header = () => {
         </Link>
 
 
+
+
         {/* Mobilné ikony */}
         <div className="flex items-center space-x-4 lg:hidden">
           <Link to="/cart" className="relative hover:text-blue-200">
@@ -197,8 +199,7 @@ const Header = () => {
     {user.user_photo && (
       <div className="flex justify-center mb-3">
         <img
-          src={user.user_photo.startsWith('http') ? user.user_photo : `${import.meta.env.VITE_API_BASE_URL}
-${user.user_photo}`}
+          src={user.user_photo.startsWith('http') ? user.user_photo : `http://localhost:3001${user.user_photo}`}
           alt="Profile"
           className="w-16 h-16 rounded-full object-cover border-2 border-gray-500"
         />
