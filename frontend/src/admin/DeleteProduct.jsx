@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+const BACKEND_URL = 'https://hoodshop-project.onrender.com';
+
 const DeleteProduct = () => {
   const [allProducts, setAllProducts] = useState([]);
   const [filtered, setFiltered] = useState([]);
@@ -11,16 +13,20 @@ const DeleteProduct = () => {
   const [showModal, setShowModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
 
+  // Fetch products from backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get('/products/all');
-        setAllProducts(res.data);
-        setFiltered(res.data);
+        const res = await axios.get(`${BACKEND_URL}/products/all`);
+        const products = Array.isArray(res.data) ? res.data : [];
+        setAllProducts(products);
+        setFiltered(products);
       } catch (err) {
         setMessage('Chyba pri načítavaní produktov');
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     fetchProducts();
   }, []);
@@ -28,11 +34,8 @@ const DeleteProduct = () => {
   // Auto-clear message after 3 seconds
   useEffect(() => {
     if (message) {
-      const timer = setTimeout(() => {
-        setMessage('');
-      }, 3000);
-
-      return () => clearTimeout(timer); // cleanup on unmount or message change
+      const timer = setTimeout(() => setMessage(''), 3000);
+      return () => clearTimeout(timer);
     }
   }, [message]);
 
@@ -41,9 +44,10 @@ const DeleteProduct = () => {
     setQuery(q);
     setSelectedSlug(null);
 
-    const filteredResults = allProducts.filter((p) =>
-      p.name.toLowerCase().includes(q.toLowerCase()) ||
-      p.slug.toLowerCase().includes(q.toLowerCase())
+    const filteredResults = allProducts.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q.toLowerCase()) ||
+        p.slug.toLowerCase().includes(q.toLowerCase())
     );
     setFiltered(filteredResults);
   };
@@ -60,7 +64,7 @@ const DeleteProduct = () => {
   const confirmDelete = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`/products/${productToDelete}`, {
+      await axios.delete(`${BACKEND_URL}/products/${productToDelete}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -68,9 +72,10 @@ const DeleteProduct = () => {
       setAllProducts(updated);
       setFiltered(updated);
       setSelectedSlug(null);
-      setMessage('The product was successfully deleted.');
+      setMessage('Produkt bol úspešne vymazaný.');
     } catch (err) {
-      setMessage('Error deleting the product.');
+      console.error(err);
+      setMessage('Chyba pri vymazávaní produktu.');
     } finally {
       setShowModal(false);
       setProductToDelete(null);
@@ -93,44 +98,52 @@ const DeleteProduct = () => {
 
       <div className="h-[400px] max-w-3xl mx-auto overflow-y-auto scrollbar scrollbar-thumb-gray-500 scrollbar-track-gray-800 rounded-lg border-2 border-gray-300">
         <ul className="divide-y divide-gray-700">
-          {filtered.map((product) => (
-            <li
-              key={product.slug}
-              className={`p-4 transition cursor-pointer hover:bg-gray-800 ${
-                selectedSlug === product.slug ? 'bg-red-900 text-white' : ''
-              }`}
-              onClick={() => setSelectedSlug(product.slug)}
-            >
-              <p className="text-lg font-medium">{product.name}</p>
-              <p className="text-sm text-blue-200">
-                <span className='text-gray-200'>Brand:</span> {product.brand} <span className='text-gray-200'>| Category:</span> {product.category} <span className='text-gray-100'>| Type:</span> {product.type}
-              </p>
+          {Array.isArray(filtered) && filtered.length > 0 ? (
+            filtered.map((product) => (
+              <li
+                key={product.slug}
+                className={`p-4 transition cursor-pointer hover:bg-gray-800 ${
+                  selectedSlug === product.slug ? 'bg-red-900 text-white' : ''
+                }`}
+                onClick={() => setSelectedSlug(product.slug)}
+              >
+                <p className="text-lg font-medium">{product.name}</p>
+                <p className="text-sm text-blue-200">
+                  <span className="text-gray-200">Brand:</span> {product.brand}{' '}
+                  <span className="text-gray-200">| Category:</span> {product.category}{' '}
+                  <span className="text-gray-100">| Type:</span> {product.type}
+                </p>
+              </li>
+            ))
+          ) : (
+            <li className="p-4 text-red-400 text-center">
+              {loading ? 'Loading products...' : 'Nepodarilo sa načítať produkty.'}
             </li>
-          ))}
+          )}
         </ul>
       </div>
 
-    <div className="flex flex-col justify-center mt-6">
-  <button
-    onClick={handleDeleteClick}
-    className="w-[190px] bg-red-700 hover:bg-red-600 text-white py-2 px-4 text-sm md:text-lg rounded-lg transition mx-auto"
-    disabled={!selectedSlug}
-  >
-    Delete Product
-  </button>
+      <div className="flex flex-col justify-center mt-6">
+        <button
+          onClick={handleDeleteClick}
+          className="w-[190px] bg-red-700 hover:bg-red-600 text-white py-2 px-4 text-sm md:text-lg rounded-lg transition mx-auto"
+          disabled={!selectedSlug}
+        >
+          Delete Product
+        </button>
 
-  <div className="min-h-[24px] mt-2 flex items-center justify-center">
-    {message && <p className="text-green-400 text-center">{message}</p>}
-    {loading && <p className="text-blue-300 text-center">Loading products...</p>}
-  </div>
-</div>
-
+        <div className="min-h-[24px] mt-2 flex items-center justify-center">
+          {message && <p className="text-green-400 text-center">{message}</p>}
+        </div>
+      </div>
 
       {/* MODAL */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
           <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-500 max-w-md w-full">
-            <h3 className="text-xl text-white font-semibold mb-4 text-center">Do you really want to delete this product?</h3>
+            <h3 className="text-xl text-white font-semibold mb-4 text-center">
+              Do you really want to delete this product?
+            </h3>
             <div className="flex justify-center space-x-4">
               <button
                 onClick={confirmDelete}
