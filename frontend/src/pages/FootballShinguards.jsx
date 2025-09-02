@@ -11,22 +11,26 @@ const FootballShinguards = () => {
   const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
 
+  const baseURL = 'https://hoodshop-project.onrender.com'; // 🔹 produkčný backend
+
   useEffect(() => {
-    axios.get('http://localhost:3001/products/football/shinguards')
+    axios.get(`${baseURL}/products/football/shinguards`)
       .then(response => {
-        setShinguards(response.data);
+        console.log('Response from backend:', response.data);
+        setShinguards(Array.isArray(response.data) ? response.data : response.data.products || []);
       })
       .catch(error => {
         console.error('Chyba pri načítavaní chráničov:', error);
+        setShinguards([]);
       });
   }, []);
 
-  const handleAddToCart = async (jersey) => {
+  const handleAddToCart = async (shinguard) => {
     const sessionId = localStorage.getItem("sessionId");
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('http://localhost:3001/api/cart', {
+      const response = await fetch(`${baseURL}/api/cart`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -34,7 +38,7 @@ const FootballShinguards = () => {
           ...(!token && sessionId && { "x-session-id": sessionId }),
         },
         body: JSON.stringify({
-          productId: jersey.id,
+          productId: shinguard.id,
           quantity: 1,
         }),
       });
@@ -43,8 +47,6 @@ const FootballShinguards = () => {
       if (response.ok) {
         setMessage("Product added to cart!");
         refreshCartCount();
-
-        // automaticky zmizne po 3 sekundách
         setTimeout(() => setMessage(''), 3000);
       } else {
         setMessage("Failed to add to cart: " + data.message);
@@ -57,39 +59,35 @@ const FootballShinguards = () => {
     }
   };
 
-  // slides podľa rovnakého vzoru ako inde
-  const slides = shinguards.map(product => ({
+  const slides = Array.isArray(shinguards) ? shinguards.map(product => ({
     id: product.id,
     name: product.name,
     brand: product.brand,
     price: product.price,
-    image: product.image, // relatívna cesta
-  }));
+    image: `${baseURL}${product.image}`, // 🔹 obrázky z produkčného backendu
+  })) : [];
 
-  const highlightedShinguards = shinguards.filter(s => s.highlight_title && s.description);
+  const highlightedShinguards = Array.isArray(shinguards) ? shinguards.filter(s => s.highlight_title && s.description) : [];
   const featuredShinguard = highlightedShinguards[0];
   const featuredShinguard2 = highlightedShinguards[1];
 
   return (
     <div>
-    {/* HEAD TITLE */}
-<section
-  className="relative text-center py-10 px-4 bg-gradient-to-br  from-green-600 via-black to-green-700 text-white overflow-hidden border-b-4 border-black"
->
-  <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
-  <div className="relative z-10 max-w-4xl mx-auto">
-    <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
-      Discover Premium <span className="text-blue-200">Football Shinguards</span>
-    </h1>
-    <p className="text-md md:text-lg lg:text-xl text-gray-100 leading-relaxed">
-      Protect yourself on the field with our high-quality football shinguards. Our collection offers optimal{' '}
-      <span className="text-blue-200 font-medium">protection</span>,{' '}
-      <span className="text-blue-200 font-medium">comfort</span>, and{' '}
-      <span className="text-blue-200 font-medium">performance</span> for every player.
-    </p>
-  </div>
-</section>
-
+      {/* HEAD TITLE */}
+      <section className="relative text-center py-10 px-4 bg-gradient-to-br from-green-600 via-black to-green-700 text-white overflow-hidden border-b-4 border-black">
+        <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
+        <div className="relative z-10 max-w-4xl mx-auto">
+          <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
+            Discover Premium <span className="text-blue-200">Football Shinguards</span>
+          </h1>
+          <p className="text-md md:text-lg lg:text-xl text-gray-100 leading-relaxed">
+            Protect yourself on the field with our high-quality football shinguards. Our collection offers optimal{' '}
+            <span className="text-blue-200 font-medium">protection</span>,{' '}
+            <span className="text-blue-200 font-medium">comfort</span>, and{' '}
+            <span className="text-blue-200 font-medium">performance</span> for every player.
+          </p>
+        </div>
+      </section>
 
       {/* 1st FEATURED SHINGUARD */}
       {featuredShinguard && (
@@ -121,8 +119,8 @@ const FootballShinguards = () => {
         products={shinguards}
         onAddToCart={handleAddToCart}
       />
-      
-      {/* ✅ MESSAGE NA STRED OBRAZOVKY */}
+
+      {/* MESSAGE NA STRED OBRAZOVKY */}
       {message && (
         <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
           {message}

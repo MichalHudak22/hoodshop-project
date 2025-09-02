@@ -11,22 +11,26 @@ const FootballCleatsPage = () => {
   const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
 
+  const baseURL = 'https://hoodshop-project.onrender.com'; // 🔹 produkčný backend
+
   useEffect(() => {
-    axios.get('http://localhost:3001/products/football/cleats')
+    axios.get(`${baseURL}/products/football/cleats`)
       .then(response => {
-        setCleats(response.data);
+        console.log('Response from backend:', response.data); 
+        setCleats(Array.isArray(response.data) ? response.data : response.data.products || []);
       })
       .catch(error => {
         console.error('Chyba pri načítavaní futbalových kopačiek:', error);
+        setCleats([]);
       });
   }, []);
 
-  const handleAddToCart = async (jersey) => {
+  const handleAddToCart = async (cleat) => {
     const sessionId = localStorage.getItem("sessionId");
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('http://localhost:3001/api/cart', {
+      const response = await fetch(`${baseURL}/api/cart`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -34,7 +38,7 @@ const FootballCleatsPage = () => {
           ...(!token && sessionId && { "x-session-id": sessionId }),
         },
         body: JSON.stringify({
-          productId: jersey.id,
+          productId: cleat.id,
           quantity: 1,
         }),
       });
@@ -43,8 +47,6 @@ const FootballCleatsPage = () => {
       if (response.ok) {
         setMessage("Product added to cart!");
         refreshCartCount();
-
-        // automaticky zmizne po 3 sekundách
         setTimeout(() => setMessage(''), 3000);
       } else {
         setMessage("Failed to add to cart: " + data.message);
@@ -57,36 +59,32 @@ const FootballCleatsPage = () => {
     }
   };
 
-  // ✅ rovnaký štýl ako vo FootballJerseys.jsx
-  const slides = cleats.map(product => ({
+  const slides = Array.isArray(cleats) ? cleats.map(product => ({
     id: product.id,
     name: product.name,
     brand: product.brand,
     price: product.price,
-    image: product.image, // relatívna cesta
-  }));
+    image: `${baseURL}${product.image}`, // 🔹 obrázky z produkčného backendu
+  })) : [];
 
-  const highlightedCleats = cleats.filter(cleat => cleat.highlight_title && cleat.description);
+  const highlightedCleats = Array.isArray(cleats) ? cleats.filter(cleat => cleat.highlight_title && cleat.description) : [];
   const featuredCleat = highlightedCleats[0];
   const featuredCleat2 = highlightedCleats[1];
 
   return (
     <div>
       {/* HEAD TITLE */}
-      <section
-        className="relative text-center py-10 px-4 bg-gradient-to-br  from-green-600 via-black to-green-700 text-white overflow-hidden border-b-4 border-black"
-      >
+      <section className="relative text-center py-10 px-4 bg-gradient-to-br from-green-600 via-black to-green-700 text-white overflow-hidden border-b-4 border-black">
         <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
         <div className="relative z-10 max-w-4xl mx-auto">
           <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
             Discover Elite <span className="text-blue-200">Football Cleats</span>
           </h1>
           <p className="text-md md:text-lg lg:text-xl text-gray-100 leading-relaxed">
-            Step up your game with top-quality football cleats worn by pros. Our collection features advanced designs for <span className='text-blue-200'>speed, control</span> , and <span className='text-blue-200'>comforton</span> any pitch.
+            Step up your game with top-quality football cleats worn by pros. Our collection features advanced designs for <span className='text-blue-200'>speed, control</span> and <span className='text-blue-200'>comfort</span> on any pitch.
           </p>
         </div>
       </section>
-
 
       {/* 1st FEATURED CLEAT */}
       <FeaturedProduct
@@ -115,12 +113,11 @@ const FootballCleatsPage = () => {
         onAddToCart={handleAddToCart}
       />
 
-      {/* ✅ MESSAGE NA STRED OBRAZOVKY */}
+      {/* MESSAGE NA STRED OBRAZOVKY */}
       {message && (
         <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
           {message}
         </div>
-
       )}
     </div>
   );
