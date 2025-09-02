@@ -27,6 +27,7 @@ export default function UserListWithDelete() {
       })
       .then((data) => {
         console.log("API response:", data);
+        // vždy nastavíme pole
         setUsers(Array.isArray(data) ? data : data.users || []);
         setError(null);
       })
@@ -96,7 +97,8 @@ export default function UserListWithDelete() {
       body: JSON.stringify({ role: newRole }),
     })
       .then((res) => {
-        if (!res.ok) return res.json().then(data => { throw new Error(data.error || 'Chyba pri zmene roly'); });
+        if (!res.ok)
+          return res.json().then(data => { throw new Error(data.error || 'Chyba pri zmene roly'); });
         return res.json();
       })
       .then(() => {
@@ -109,14 +111,25 @@ export default function UserListWithDelete() {
       });
   };
 
-  const filteredUsers = users.filter(user =>
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // bezpečný filter
+  const filteredUsers = Array.isArray(users)
+    ? users.filter(user =>
+        user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
-  const adminCount = users.filter(u => u.role === 'admin').length;
-  const userCount = users.filter(u => u.role === 'user').length;
+  const adminCount = Array.isArray(users)
+    ? users.filter(u => u.role === 'admin').length
+    : 0;
 
-  const selectedUser = users.find(u => u.id === selectedUserId);
+  const userCount = Array.isArray(users)
+    ? users.filter(u => u.role === 'user').length
+    : 0;
+
+  const selectedUser = Array.isArray(users)
+    ? users.find(u => u.id === selectedUserId)
+    : null;
+
   return (
     <div className=''>
       {error && (
@@ -128,7 +141,7 @@ export default function UserListWithDelete() {
       <div className="max-w-3xl mx-auto mb-4 text-center">
         <p className="text-white font-semibold text-lg lg:text-xl">
           Registered users:{' '}
-          <span className="text-yellow-400">{users.length}</span>{' '}
+          <span className="text-yellow-400">{Array.isArray(users) ? users.length : 0}</span>{' '}
           <span className="hidden md:inline">
             (Admins:{' '}
             <span className="text-yellow-400">{adminCount}</span>, Users:{' '}
@@ -157,7 +170,6 @@ export default function UserListWithDelete() {
       </div>
 
       <div className="max-w-3xl min-h-[500px] mx-auto max-h-[500px] overflow-y-scroll scrollbar scrollbar-thumb-gray-500 scrollbar-track-gray-800 rounded-lg">
-
         <ul className="space-y-3 px-3">
           {filteredUsers.length === 0 ? (
             <p className="text-center text-lg text-red-500">No users found.</p>
@@ -166,8 +178,9 @@ export default function UserListWithDelete() {
               <li
                 key={user.id}
                 onClick={() => setSelectedUserId(user.id)}
-                className={`cursor-pointer bg-gray-800 hover:bg-gray-900 p-4 rounded-lg shadow border-2 ${selectedUserId === user.id ? 'border-blue-400 bg-gray-900' : 'border-blue-100'
-                  }`}
+                className={`cursor-pointer bg-gray-800 hover:bg-gray-900 p-4 rounded-lg shadow border-2 ${
+                  selectedUserId === user.id ? 'border-blue-400 bg-gray-900' : 'border-blue-100'
+                }`}
               >
                 <p className="text-lg font-semibold">{user.name}</p>
                 <p className="text-sm text-gray-300">{user.email}</p>
@@ -182,7 +195,6 @@ export default function UserListWithDelete() {
                   </span>
                 </p>
               </li>
-
             ))
           )}
         </ul>
@@ -200,7 +212,9 @@ export default function UserListWithDelete() {
         <button
           onClick={() => {
             if (!selectedUserId) return;
-            const selectedUser = users.find(u => u.id === selectedUserId);
+            const selectedUser = Array.isArray(users)
+              ? users.find(u => u.id === selectedUserId)
+              : null;
             if (selectedUser) {
               handleToggleRole(selectedUser.id, selectedUser.role);
             }
@@ -209,9 +223,11 @@ export default function UserListWithDelete() {
           className="w-[120px] md:w-[165px] text-center bg-blue-700 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2 px-4 text-sm md:text-lg rounded-lg transition"
         >
           {selectedUserId
-            ? users.find(u => u.id === selectedUserId)?.role === 'admin'
-              ? 'Set as User'
-              : 'Set as Admin'
+            ? (Array.isArray(users)
+                ? users.find(u => u.id === selectedUserId)?.role === 'admin'
+                  ? 'Set as User'
+                  : 'Set as Admin'
+                : 'Set as Admin')
             : 'Set as Admin'}
         </button>
 
@@ -224,12 +240,12 @@ export default function UserListWithDelete() {
         </button>
       </div>
 
-      {/* Modal na potvrdenie mazania */}
       {showConfirmModal && selectedUser && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
           <div className="bg-gray-900 p-6 rounded-lg max-w-md w-full text-center">
             <p className="mb-4 text-white text-lg">
-              Are you sure you want to delete the user <span className='font-bold'>{selectedUser.name}</span>?
+              Are you sure you want to delete the user{' '}
+              <span className='font-bold'>{selectedUser.name}</span>?
             </p>
             <div className="flex justify-center gap-6">
               <button
