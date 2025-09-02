@@ -13,62 +13,64 @@ const FootballPage = () => {
   const [message, setMessage] = useState('');
   
 
-  useEffect(() => {
-    // Načítanie carousel produktov
-    axios.get('http://localhost:3001/products/football/carousel')
-      .then(response => {
-        setCarouselProducts(response.data);
-      })
-      .catch(error => {
-        console.error('Chyba pri načítavaní carousel produktov:', error);
-      });
+useEffect(() => {
+  // Načítanie carousel produktov
+  axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/football/carousel`)
+    .then(response => {
+      setCarouselProducts(response.data);
+    })
+    .catch(error => {
+      console.error('Chyba pri načítaní carousel produktov:', error);
+    });
 
-    // Načítanie titulku a paragrafu z backendu
-    axios.get('http://localhost:3001/api/config/section/football-home-header')
-      .then(response => {
-        setTitleFromDB(response.data.title || '');
-        setParagraphFromDB(response.data.paragraph || '');
-      })
-      .catch(error => {
-        console.error('Chyba pri načítaní header textu:', error);
-      });
-  }, []);
+  // Načítanie titulku a paragrafu z backendu
+  axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/config/section/football-home-header`)
+    .then(response => {
+      setTitleFromDB(response.data.title || '');
+      setParagraphFromDB(response.data.paragraph || '');
+    })
+    .catch(error => {
+      console.error('Chyba pri načítaní header textu:', error);
+    });
+}, []);
 
-  const handleAddToCart = async (jersey) => {
-    const sessionId = localStorage.getItem("sessionId");
-    const token = localStorage.getItem("token");
 
-    try {
-      const response = await fetch('http://localhost:3001/api/cart', {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-          ...(!token && sessionId && { "x-session-id": sessionId }),
-        },
-        body: JSON.stringify({
-          productId: jersey.id,
-          quantity: 1,
-        }),
-      });
+const handleAddToCart = async (jersey) => {
+  const sessionId = localStorage.getItem("sessionId");
+  const token = localStorage.getItem("token");
 
-      const data = await response.json();
-      if (response.ok) {
-        setMessage("Product added to cart!");
-        refreshCartCount();
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+        ...(!token && sessionId && { "x-session-id": sessionId }),
+      },
+      body: JSON.stringify({
+        productId: jersey.id,
+        quantity: 1,
+      }),
+    });
 
-        // automaticky zmizne po 3 sekundách
-        setTimeout(() => setMessage(''), 3000);
-      } else {
-        setMessage("Failed to add to cart: " + data.message);
-        setTimeout(() => setMessage(''), 3000);
-      }
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      setMessage("Error adding to cart");
+    const data = await response.json();
+    if (response.ok) {
+      setMessage("Product added to cart!");
+      refreshCartCount();
+
+      // automaticky zmizne po 3 sekundách
+      setTimeout(() => setMessage(''), 3000);
+    } else {
+      setMessage("Failed to add to cart: " + data.message);
       setTimeout(() => setMessage(''), 3000);
     }
-  };
+  } catch (error) {
+    console.error("Error adding to cart:", error);
+    setMessage("Error adding to cart");
+    setTimeout(() => setMessage(''), 3000);
+  }
+};
+
 
   const slides = carouselProducts.map(product => ({
     id: product.id,
