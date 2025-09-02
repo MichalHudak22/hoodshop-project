@@ -21,7 +21,6 @@ function Profile() {
   const navigate = useNavigate();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const baseURL = 'https://hoodshop-project.onrender.com'; // <-- pridaj render URL
 
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
@@ -30,7 +29,7 @@ function Profile() {
   const handleAccountDeletion = () => {
     const token = localStorage.getItem('token');
 
-    fetch(`${baseURL}/user/profile`, {
+    fetch('http://localhost:3001/user/profile', {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -65,10 +64,11 @@ function Profile() {
     const formData = new FormData();
     formData.append('photo', selectedFile);
 
-    fetch(`${baseURL}/user/upload/photo`, {
+    fetch('http://localhost:3001/user/upload/photo', {
       method: 'POST',
       headers: {
         Authorization: 'Bearer ' + token,
+        // Content-Type sa NEPRIDÁVA pri FormData, nechaj to takto
       },
       body: formData,
     })
@@ -96,7 +96,7 @@ function Profile() {
   // Default Phodo funkcia pre nastavenie defaultnej fotky pre avatara 
   const setDefaultPhoto = async () => {
     try {
-      const response = await fetch(`${baseURL}/user/upload/default-photo`, {
+      const response = await fetch('http://localhost:3001/user/upload/default-photo', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -129,7 +129,7 @@ function Profile() {
       return;
     }
 
-    fetch(`${baseURL}/user/profile`, {
+    fetch('http://localhost:3001/user/profile', {
       method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -167,7 +167,7 @@ function Profile() {
       return acc;
     }, {});
 
-    fetch(`${baseURL}/user/profile`, {
+    fetch('http://localhost:3001/user/profile', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -254,7 +254,7 @@ function Profile() {
               {/* Miesto na zobrazenie fotky */}
               <div className="w-56 h-56 rounded-full overflow-hidden border-2 border-gray-400">
                 <img
-                  src={user.user_photo ? `${baseURL}${user.user_photo}` : "/img/default-avatar.jpg"}
+                  src={user.user_photo ? `http://localhost:3001${user.user_photo}` : "/img/default-avatar.jpg"}
                   alt="Profilová fotka"
                   className="w-full h-full object-cover"
                 />
@@ -376,18 +376,18 @@ function Profile() {
 
         </div>
 
-        {/* Delete Form */}
-        <div className="p-6 my-10 flex flex-col md:flex-row md:items-center md:justify-center w-full md:w-[90%] lg:w-[85%] xl:w-[1240px] text-white border-2 border-gray-600 bg-black bg-opacity-80 gap-4">
-          <p className="text-sm xl:text-[16px] text-gray-100 max-w-md mx-auto text-center md:text-left">
-            You can delete your account here, but be aware – all saved data associated with your account will be permanently lost.
-          </p>
-          <button
-            onClick={() => setShowDeleteModal(true)}
-            className="w-[90%] md:w-[220px] bg-red-700 hover:bg-red-600 text-white py-3 rounded-lg font-semibold transition- mx-auto"
-          >
-            Delete Account
-          </button>
-        </div>
+    {/* Delete Form */}
+<div className="p-6 my-10 flex flex-col md:flex-row md:items-center md:justify-center w-full md:w-[90%] lg:w-[85%] xl:w-[1240px] text-white border-2 border-gray-600 bg-black bg-opacity-80 gap-4">
+  <p className="text-sm xl:text-[16px] text-gray-100 max-w-md mx-auto text-center md:text-left">
+    You can delete your account here, but be aware – all saved data associated with your account will be permanently lost.
+  </p>
+  <button
+    onClick={() => setShowDeleteModal(true)}
+    className="w-[90%] md:w-[220px] bg-red-700 hover:bg-red-600 text-white py-3 rounded-lg font-semibold transition- mx-auto"
+  >
+    Delete Account
+  </button>
+</div>
 
 
 
