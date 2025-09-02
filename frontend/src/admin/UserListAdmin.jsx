@@ -26,7 +26,8 @@ export default function UserListWithDelete() {
         return res.json();
       })
       .then((data) => {
-        setUsers(data);
+        console.log("API response:", data);
+        setUsers(Array.isArray(data) ? data : data.users || []);
         setError(null);
       })
       .catch((e) => setError(e.message));
