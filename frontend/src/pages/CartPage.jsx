@@ -14,42 +14,43 @@ const CartPage = () => {
     const sum = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
     setTotal(sum);
   }, [cartItems]);
+  
+const handleRemove = async (cartItemId) => {
+  try {
+    const headers = {};
+    const sessionId = localStorage.getItem('sessionId');
+    if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
+    else headers['x-session-id'] = sessionId;
 
-  const handleRemove = async (productId) => {
-    try {
-      const headers = {};
-      const sessionId = localStorage.getItem('sessionId');
-      if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
-      else headers['x-session-id'] = sessionId;
+    await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${cartItemId}`, { headers });
+    await fetchCart();
+  } catch (err) {
+    console.error('Remove failed:', err);
+  }
+};
 
-      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/cart/${productId}`, { headers });
-      await fetchCart();
-    } catch (err) {
-      console.error('Remove failed:', err);
-    }
-  };
+const handleQuantityChange = async (item, delta) => {
+  const newQuantity = item.quantity + delta;
+  if (newQuantity < 1) return handleRemove(item.id); // <-- tu tiež item.id
 
-  const handleQuantityChange = async (item, delta) => {
-    const newQuantity = item.quantity + delta;
-    if (newQuantity < 1) return handleRemove(item.productId);
+  try {
+    const headers = {};
+    const sessionId = localStorage.getItem('sessionId');
+    if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
+    else headers['x-session-id'] = sessionId;
 
-    try {
-      const headers = {};
-      const sessionId = localStorage.getItem('sessionId');
-      if (user?.token) headers['Authorization'] = `Bearer ${user.token}`;
-      else headers['x-session-id'] = sessionId;
+    await axios.patch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/cart/${item.id}`, // <-- tu tiež item.id
+      { quantity: newQuantity },
+      { headers }
+    );
 
-      await axios.patch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/cart/${item.productId}`,
-        { quantity: newQuantity },
-        { headers }
-      );
+    await fetchCart();
+  } catch (err) {
+    console.error('Update failed:', err);
+  }
+};
 
-      await fetchCart();
-    } catch (err) {
-      console.error('Update failed:', err);
-    }
-  };
 
   if (cartLoading) return <p className="p-4">Loading cart...</p>;
   if (!cartItems.length) return <p className="p-4 pt-8 text-red-500 text-center text-xl">Your cart is empty.</p>;
