@@ -13,16 +13,14 @@ const handleAdd = (e) => {
   e.preventDefault();
   e.stopPropagation();
 
-  // vždy iba productId a quantity
   const payload = {
-    productId: product.id,       // použijeme id produktu
-    quantity: product.quantity ?? 1, // default 1
+    productId: product.id,
+    quantity: 1, // vždy 1 pri featured producte
   };
-
-  console.log('FeaturedProductReversed Add to Cart payload:', payload);
 
   handleAddToCart(payload);
 };
+
 
 
   return (

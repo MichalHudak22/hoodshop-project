@@ -102,9 +102,10 @@ const addToCart = async (product) => {
     setCartCount(items.length);
   };
 
-  useEffect(() => {
-    fetchCart();
-  }, [fetchCart]);
+useEffect(() => {
+  fetchCart();
+}, [user?.token]);
+
 
   return (
     <CartContext.Provider
