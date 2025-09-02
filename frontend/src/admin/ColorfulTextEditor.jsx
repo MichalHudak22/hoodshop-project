@@ -12,6 +12,7 @@ const ColorfulTextEditor = ({
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState(''); // 'success' alebo 'error'
 
+  const baseURL = 'https://hoodshop-project.onrender.com';
 
   const titleRef = useRef(null);
   const paragraphRef = useRef(null);
@@ -19,17 +20,17 @@ const ColorfulTextEditor = ({
   useEffect(() => {
     if (!sectionKey) return;
 
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3001/api/config/section/${sectionKey}`);
-        const data = response.data || {};
-        setTitle(data.title || '');
-        setParagraph(data.paragraph || '');
-        onChange && onChange({ title: data.title || '', paragraph: data.paragraph || '' });
-      } catch (error) {
-        console.error('Chyba pri načítaní dát z backendu:', error);
-      }
-    };
+const fetchData = async () => {
+  try {
+    const response = await axios.get(`${baseURL}/api/config/section/${sectionKey}`);
+    const data = response.data || {};
+    setTitle(data.title || '');
+    setParagraph(data.paragraph || '');
+    onChange && onChange({ title: data.title || '', paragraph: data.paragraph || '' });
+  } catch (error) {
+    console.error('Chyba pri načítaní dát z backendu:', error);
+  }
+};
 
     fetchData();
   }, [sectionKey, onChange]);
@@ -95,7 +96,7 @@ const saveToBackend = async () => {
   }
 
   try {
-    await axios.post('http://localhost:3001/api/config/section', {
+    await axios.post(`${baseURL}/api/config/section`, {
       section_key: sectionKey,
       title,
       paragraph,

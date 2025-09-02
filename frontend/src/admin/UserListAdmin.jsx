@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const baseURL = 'https://hoodshop-project.onrender.com'; // produkčná URL
+
 export default function UserListWithDelete() {
   const [users, setUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState(null);
@@ -16,10 +18,8 @@ export default function UserListWithDelete() {
       setError('Nie ste prihlásený');
       return;
     }
-    fetch('http://localhost:3001/user', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    fetch(`${baseURL}/user`, {
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {
         if (!res.ok) throw new Error('Nepodarilo sa načítať používateľov');
@@ -36,7 +36,6 @@ export default function UserListWithDelete() {
     fetchUsers();
   }, []);
 
-  // Upravený handler na kliknutie Delete - zobrazí modal
   const handleDeleteClick = () => {
     if (!selectedUserId) return;
     setShowConfirmModal(true);
@@ -50,17 +49,13 @@ export default function UserListWithDelete() {
     }
     setLoading(true);
     setError(null);
-    fetch(`http://localhost:3001/user/admin/user/${selectedUserId}`, {
+    fetch(`${baseURL}/user/admin/user/${selectedUserId}`, {
       method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then(async (res) => {
         if (!res.ok) {
-          // Pokusí sa načítať chybovú správu z JSON odpovede
           const errorData = await res.json().catch(() => null);
-          // Ak je v odpovedi error, použije ju, inak defaultnú správu
           throw new Error(errorData?.error || 'Error deleting user');
         }
         return res.json();
@@ -91,7 +86,7 @@ export default function UserListWithDelete() {
     }
     setLoading(true);
     setError(null);
-    fetch(`http://localhost:3001/user/admin/user/${userId}/role`, {
+    fetch(`${baseURL}/user/admin/user/${userId}/role`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -100,9 +95,7 @@ export default function UserListWithDelete() {
       body: JSON.stringify({ role: newRole }),
     })
       .then((res) => {
-        if (!res.ok) {
-          return res.json().then(data => { throw new Error(data.error || 'Chyba pri zmene roly'); });
-        }
+        if (!res.ok) return res.json().then(data => { throw new Error(data.error || 'Chyba pri zmene roly'); });
         return res.json();
       })
       .then(() => {
@@ -122,9 +115,7 @@ export default function UserListWithDelete() {
   const adminCount = users.filter(u => u.role === 'admin').length;
   const userCount = users.filter(u => u.role === 'user').length;
 
-  // Vyhľadáme meno vybraného používateľa na zobrazenie v modale
   const selectedUser = users.find(u => u.id === selectedUserId);
-
   return (
     <div className=''>
       {error && (

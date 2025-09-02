@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 
+const baseURL = 'https://hoodshop-project.onrender.com'; // produkčné URL
+
 function UserDetailPage() {
   const { id } = useParams();
   const token = localStorage.getItem('token');
@@ -15,7 +17,7 @@ function UserDetailPage() {
   // 1) Načítanie cien dopravy z DB
   useEffect(() => {
     axios
-      .get('http://localhost:3001/api/config/shipping-prices')
+      .get(`${baseURL}/api/config/shipping-prices`)
       .then(res => {
         const opts = (res.data || []).map(o => ({
           name: o.name,
@@ -32,7 +34,7 @@ function UserDetailPage() {
       setError('Missing token – you are not logged in');
       return;
     }
-    fetch(`http://localhost:3001/user/admin/user/${id}`, {
+    fetch(`${baseURL}/user/admin/user/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => {
@@ -46,7 +48,7 @@ function UserDetailPage() {
   // 3) Načítanie histórie objednávok
   useEffect(() => {
     if (!token) return;
-    fetch(`http://localhost:3001/api/order-history/history/${id}`, {
+    fetch(`${baseURL}/api/order-history/history/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => {

@@ -6,6 +6,7 @@ const VerifyEmailPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
+const baseURL = 'https://hoodshop-project.onrender.com';
   const token = searchParams.get('token');
 
   useEffect(() => {
@@ -16,7 +17,8 @@ const VerifyEmailPage = () => {
 
     console.log('Overujem email s tokenom:', token);
 
-    fetch(`http://localhost:3001/user/verify-email?token=${token}`)
+    fetch(`${baseURL}/user/verify-email?token=${token}`)
+
       .then((res) => res.json())
       .then((data) => {
         console.log('Odpoveď z overenia:', data);

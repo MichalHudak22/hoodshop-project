@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+const baseURL = 'https://hoodshop-project.onrender.com'; 
+
 const Registration = () => {
   const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '' });
   const [passwordMatchMessage, setPasswordMatchMessage] = useState('');
@@ -28,7 +30,8 @@ const Registration = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+
+const handleSubmit = (e) => {
   e.preventDefault();
 
   if (formData.password !== formData.confirmPassword) {
@@ -47,24 +50,22 @@ const Registration = () => {
     password: formData.password,
   };
 
-
-    fetch('http://localhost:3001/user', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(submitData),
+  fetch(`${baseURL}/user`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(submitData),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.error) {
+        alert('Error: ' + data.error);
+      } else if (data.message) {
+        alert(data.message);
+        navigate('/login');
+      }
     })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          alert('Error: ' + data.error);
-        } else if (data.message) {
-          alert(data.message);
-          navigate('/login');
-        }
-      })
-      .catch((error) => console.error('Registration error:', error));
-  };
-
+    .catch((error) => console.error('Registration error:', error));
+};
   return (
     <div
       className="relative mt-10 pb-10 flex justify-center bg-fixed bg-cover bg-no-repeat bg-center"

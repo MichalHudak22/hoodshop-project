@@ -18,6 +18,8 @@ const Header = () => {
   const [sportsOpen, setSportsOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
 
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://hoodshop-project.onrender.com';
+
   const modalRef = useRef(null);
 
   const toggleProfileModal = () => {
@@ -197,13 +199,13 @@ const Header = () => {
   >
     {/* Ak existuje profilová fotka */}
     {user.user_photo && (
-      <div className="flex justify-center mb-3">
-        <img
-          src={user.user_photo.startsWith('http') ? user.user_photo : `http://localhost:3001${user.user_photo}`}
-          alt="Profile"
-          className="w-16 h-16 rounded-full object-cover border-2 border-gray-500"
-        />
-      </div>
+       <div className="flex justify-center mb-3">
+              <img
+                src={user.user_photo.startsWith('http') ? user.user_photo : `${baseURL}${user.user_photo}`}
+                alt="Profile"
+                className="w-16 h-16 rounded-full object-cover border-2 border-gray-500"
+              />
+            </div>
     )}
 
     {/* Meno alebo email */}

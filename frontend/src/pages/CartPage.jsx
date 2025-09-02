@@ -14,6 +14,8 @@ const CartPage = () => {
   const [total, setTotal] = useState(0);
   const [sessionId, setSessionId] = useState(null);
 
+const baseURL = 'https://hoodshop-project.onrender.com';
+
   // Pri mountnutí vygeneruj alebo načítaj sessionId
   useEffect(() => {
     let sId = localStorage.getItem('sessionId') || localStorage.getItem('session_id');
@@ -24,32 +26,35 @@ const CartPage = () => {
     setSessionId(sId);
   }, []);
 
-  // Fetch košíka pri zmene user/token alebo sessionId
-  useEffect(() => {
-    if (!sessionId) return;
+// Fetch košíka pri zmene user/token alebo sessionId
+useEffect(() => {
+  if (!sessionId) return;
 
-    const fetchCart = async () => {
-      setLoading(true);
-      try {
-        const headers = {};
-        if (user && user.token) {
-          headers.Authorization = `Bearer ${user.token}`;
-        } else {
-          headers['x-session-id'] = sessionId;
-        }
-        const response = await axios.get('http://localhost:3001/api/cart', { headers });
-        setCartItems(response.data);
-        calculateTotal(response.data);
-        refreshCartCount();
-      } catch (err) {
-        console.error('Failed to load cart:', err);
-      } finally {
-        setLoading(false);
+  const fetchCart = async () => {
+    setLoading(true);
+    try {
+      const headers = {};
+      if (user && user.token) {
+        headers.Authorization = `Bearer ${user.token}`;
+      } else {
+        headers['x-session-id'] = sessionId;
       }
-    };
 
-    fetchCart();
-  }, [user, sessionId, refreshCartCount]);
+      const response = await axios.get(`${baseURL}/api/cart`, { headers });
+
+      setCartItems(response.data);
+      calculateTotal(response.data);
+      refreshCartCount();
+    } catch (err) {
+      console.error('Failed to load cart:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchCart();
+}, [user, sessionId, refreshCartCount]);
+
 
   const calculateTotal = (items) => {
     const sum = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
@@ -57,48 +62,52 @@ const CartPage = () => {
   };
 
   const handleRemove = async (itemId) => {
-    try {
-      const headers = {};
-      if (user && user.token) {
-        headers.Authorization = `Bearer ${user.token}`;
-      } else {
-        headers['x-session-id'] = sessionId;
-      }
-      await axios.delete(`http://localhost:3001/api/cart/${itemId}`, { headers });
-      const updated = cartItems.filter(item => item.id !== itemId);
-      setCartItems(updated);
-      calculateTotal(updated);
-      refreshCartCount();
-    } catch (err) {
-      console.error('Remove failed:', err);
+  try {
+    const headers = {};
+    if (user && user.token) {
+      headers.Authorization = `Bearer ${user.token}`;
+    } else {
+      headers['x-session-id'] = sessionId;
     }
-  };
+
+    await axios.delete(`${baseURL}/api/cart/${itemId}`, { headers });
+
+    const updated = cartItems.filter(item => item.id !== itemId);
+    setCartItems(updated);
+    calculateTotal(updated);
+    refreshCartCount();
+  } catch (err) {
+    console.error('Remove failed:', err);
+  }
+};
 
   const handleQuantityChange = async (itemId, newQuantity) => {
-    if (newQuantity < 1) return;
+  if (newQuantity < 1) return;
 
-    try {
-      const headers = {};
-      if (user && user.token) {
-        headers.Authorization = `Bearer ${user.token}`;
-      } else {
-        headers['x-session-id'] = sessionId;
-      }
-      await axios.patch(
-        `http://localhost:3001/api/cart/${itemId}`,
-        { quantity: newQuantity },
-        { headers }
-      );
-      const updated = cartItems.map(item =>
-        item.id === itemId ? { ...item, quantity: newQuantity } : item
-      );
-      setCartItems(updated);
-      calculateTotal(updated);
-      refreshCartCount();
-    } catch (err) {
-      console.error('Update failed:', err);
+  try {
+    const headers = {};
+    if (user && user.token) {
+      headers.Authorization = `Bearer ${user.token}`;
+    } else {
+      headers['x-session-id'] = sessionId;
     }
-  };
+
+    await axios.patch(
+      `${baseURL}/api/cart/${itemId}`,
+      { quantity: newQuantity },
+      { headers }
+    );
+
+    const updated = cartItems.map(item =>
+      item.id === itemId ? { ...item, quantity: newQuantity } : item
+    );
+    setCartItems(updated);
+    calculateTotal(updated);
+    refreshCartCount();
+  } catch (err) {
+    console.error('Update failed:', err);
+  }
+};
 
   if (loading) return <p className="p-4">Loading cart...</p>;
   if (cartItems.length === 0) return <p className="p-4 pt-8 text-red-500 text-center text-xl">Your cart is empty.</p>;

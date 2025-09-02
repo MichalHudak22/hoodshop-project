@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect } from 'react';
 
 export const AuthContext = createContext();
+const baseURL = 'https://hoodshop-project.onrender.com'; // <-- baseURL pre Render
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -14,8 +15,8 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       try {
-        const res = await fetch('http://localhost:3001/user/profile', {
-          headers: { 'Authorization': 'Bearer ' + storedToken },
+        const res = await fetch(`${baseURL}/user/profile`, {
+          headers: { Authorization: `Bearer ${storedToken}` },
         });
         if (!res.ok) throw new Error('Unauthorized');
         const userData = await res.json();

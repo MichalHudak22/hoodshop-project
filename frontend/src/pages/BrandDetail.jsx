@@ -1,8 +1,10 @@
-import { useParams } from "react-router-dom";
 import { useEffect, useState, useContext } from "react";
+import { useParams } from "react-router-dom";
 import ProductsCarousel from "../components/ProductsCarousel";
-import ProductSection from "../components/ProductSection"; // Dôležité
+import ProductSection from "../components/ProductSection";
 import { CartContext } from "../context/CartContext";
+
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://hoodshop-project.onrender.com';
 
 const BrandDetail = () => {
   const { slug } = useParams();
@@ -12,10 +14,11 @@ const BrandDetail = () => {
   const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
 
+  // Načítanie všetkých značiek
   useEffect(() => {
     const fetchAllBrands = async () => {
       try {
-        const res = await fetch(`http://localhost:3001/api/brands`);
+        const res = await fetch(`${baseURL}/api/brands`);
         const data = await res.json();
         setBrands(data);
       } catch (error) {
@@ -25,14 +28,15 @@ const BrandDetail = () => {
     fetchAllBrands();
   }, []);
 
+  // Načítanie konkrétnej značky a jej produktov
   useEffect(() => {
     const fetchBrand = async () => {
       try {
-        const res = await fetch(`http://localhost:3001/api/brands/${slug}`);
+        const res = await fetch(`${baseURL}/api/brands/${slug}`);
         const data = await res.json();
         setBrand(data);
 
-        const productRes = await fetch(`http://localhost:3001/products/brand/${data.name}`);
+        const productRes = await fetch(`${baseURL}/products/brand/${data.name}`);
         const productData = await productRes.json();
         setProducts(productData);
       } catch (error) {
@@ -42,30 +46,26 @@ const BrandDetail = () => {
     fetchBrand();
   }, [slug]);
 
-  const handleAddToCart = async (jersey) => {
+  // Pridanie produktu do košíka
+  const handleAddToCart = async (product) => {
     const sessionId = localStorage.getItem("sessionId");
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('http://localhost:3001/api/cart', {
+      const response = await fetch(`${baseURL}/api/cart`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
           ...(token && { Authorization: `Bearer ${token}` }),
           ...(!token && sessionId && { "x-session-id": sessionId }),
         },
-        body: JSON.stringify({
-          productId: jersey.id,
-          quantity: 1,
-        }),
+        body: JSON.stringify({ productId: product.id, quantity: 1 }),
       });
 
       const data = await response.json();
       if (response.ok) {
         setMessage("Product added to cart!");
         refreshCartCount();
-
-        // automaticky zmizne po 3 sekundách
         setTimeout(() => setMessage(''), 3000);
       } else {
         setMessage("Failed to add to cart: " + data.message);
@@ -88,19 +88,17 @@ const BrandDetail = () => {
       <section
         className="relative py-16 px-6 bg-black overflow-hidden"
         style={{
-          backgroundImage: `url(http://localhost:3001${brand.background_image || "/img/bg-default.jpg"})`,
+          backgroundImage: `url(${baseURL}${brand.background_image || "/img/bg-default.jpg"})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           backgroundAttachment: "fixed",
         }}
       >
-        {/* Čierne overlay pozadie */}
         <div className="absolute inset-0 bg-black opacity-40 z-0"></div>
-
         <div className="relative z-10 max-w-4xl mx-auto text-white text-center mb-16">
           <img
-            src={`http://localhost:3001${brand.brand_image}`}
+            src={`${baseURL}${brand.brand_image}`}
             alt={brand.name}
             className="mx-auto h-40 object-contain mb-6 rounded-xl"
           />
@@ -112,23 +110,22 @@ const BrandDetail = () => {
       {/* Carousel */}
       {products.length > 0 && (
         <div className="relative z-10 p-8 bg-black">
-          <h2 className="text-4xl font-semibold text-white mb-6 text-center bg-black">
+          <h2 className="text-4xl font-semibold text-white mb-6 text-center">
             Products by {brand.name}
           </h2>
           <ProductsCarousel slides={products} handleAddToCart={handleAddToCart} />
         </div>
       )}
 
-
-      {/* Lišta s logami značiek mimo overlay sekcie */}
+      {/* Lišta značiek */}
       <div className="bg-white py-2 px-4 shadow-inner my-8">
         <h1 className="text-4xl font-semibold text-center py-5">Our Brand Collection</h1>
         <div className="flex flex-wrap justify-center gap-2 sm:gap-4 xl:gap-8">
-          {brands.map((brand) => (
-            <a key={brand.id} href={`/brands/${brand.name.toLowerCase()}`}>
+          {brands.map((b) => (
+            <a key={b.id} href={`/brands/${b.name.toLowerCase()}`}>
               <img
-                src={`${import.meta.env.VITE_API_BASE_URL}${brand.brand_image}`}
-                alt={brand.name}
+                src={`${baseURL}${b.brand_image}`}
+                alt={b.name}
                 className="sm:h-10 w-[94px] lg:h-full object-contain transition-transform duration-300 hover:scale-110"
               />
             </a>
@@ -136,16 +133,15 @@ const BrandDetail = () => {
         </div>
       </div>
 
-      {/* Sekcia s ďalšími produktmi */}
+      {/* Sekcia produktov */}
       <ProductSection
         title={`Explore ${brand.name} Products`}
         products={products}
-        backgroundImage={`http://localhost:3001${brand.background_image || "/img/bg-default.jpg"}`}
-
+        backgroundImage={`${baseURL}${brand.background_image || "/img/bg-default.jpg"}`}
         onAddToCart={handleAddToCart}
       />
 
-       {/* ✅ MESSAGE NA STRED OBRAZOVKY */}
+      {/* Message */}
       {message && (
         <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
           {message}
