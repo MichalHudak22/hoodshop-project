@@ -15,8 +15,9 @@ const DeleteProduct = () => {
     const fetchProducts = async () => {
       try {
         const res = await axios.get('/products/all');
-        setAllProducts(res.data);
-        setFiltered(res.data);
+        const products = Array.isArray(res.data) ? res.data : [];
+        setAllProducts(products);
+        setFiltered(products);
       } catch (err) {
         setMessage('Chyba pri načítavaní produktov');
       }
@@ -24,6 +25,7 @@ const DeleteProduct = () => {
     };
     fetchProducts();
   }, []);
+
 
   // Auto-clear message after 3 seconds
   useEffect(() => {
@@ -93,12 +95,11 @@ const DeleteProduct = () => {
 
       <div className="h-[400px] max-w-3xl mx-auto overflow-y-auto scrollbar scrollbar-thumb-gray-500 scrollbar-track-gray-800 rounded-lg border-2 border-gray-300">
         <ul className="divide-y divide-gray-700">
-          {filtered.map((product) => (
+          {Array.isArray(filtered) && filtered.map((product) => (
             <li
               key={product.slug}
-              className={`p-4 transition cursor-pointer hover:bg-gray-800 ${
-                selectedSlug === product.slug ? 'bg-red-900 text-white' : ''
-              }`}
+              className={`p-4 transition cursor-pointer hover:bg-gray-800 ${selectedSlug === product.slug ? 'bg-red-900 text-white' : ''
+                }`}
               onClick={() => setSelectedSlug(product.slug)}
             >
               <p className="text-lg font-medium">{product.name}</p>
@@ -110,20 +111,20 @@ const DeleteProduct = () => {
         </ul>
       </div>
 
-    <div className="flex flex-col justify-center mt-6">
-  <button
-    onClick={handleDeleteClick}
-    className="w-[190px] bg-red-700 hover:bg-red-600 text-white py-2 px-4 text-sm md:text-lg rounded-lg transition mx-auto"
-    disabled={!selectedSlug}
-  >
-    Delete Product
-  </button>
+      <div className="flex flex-col justify-center mt-6">
+        <button
+          onClick={handleDeleteClick}
+          className="w-[190px] bg-red-700 hover:bg-red-600 text-white py-2 px-4 text-sm md:text-lg rounded-lg transition mx-auto"
+          disabled={!selectedSlug}
+        >
+          Delete Product
+        </button>
 
-  <div className="min-h-[24px] mt-2 flex items-center justify-center">
-    {message && <p className="text-green-400 text-center">{message}</p>}
-    {loading && <p className="text-blue-300 text-center">Loading products...</p>}
-  </div>
-</div>
+        <div className="min-h-[24px] mt-2 flex items-center justify-center">
+          {message && <p className="text-green-400 text-center">{message}</p>}
+          {loading && <p className="text-blue-300 text-center">Loading products...</p>}
+        </div>
+      </div>
 
 
       {/* MODAL */}
