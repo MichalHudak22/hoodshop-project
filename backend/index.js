@@ -22,12 +22,10 @@ app.use(express.json());
 const path = require('path');
 app.use('/img', express.static(path.join(process.cwd(), 'src/img')));
 
-
 // Pripojenie admin config routes
 app.use('/api/config', adminConfigRoutes);
 
-// Sprístupnenie obrázkov zo `src/img/`
-app.use('/img', express.static(path.join(__dirname, 'src/img')));
+
 
 // Sprístupnenie videí zo `src/video/`
 app.use('/video', express.static(path.join(__dirname, 'src/video')));
