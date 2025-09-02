@@ -48,41 +48,41 @@ const CyclingPage = () => {
   // Section key pre cycling header
   const sectionKey = 'cycling-home-header';
 
-  useEffect(() => {
-    axios.get('http://localhost:3001/products/cycling/carousel')
-      .then(response => setCarouselProducts(response.data))
-      .catch(error => console.error('Chyba pri načítavaní carousel produktov:', error));
-  }, []);
+useEffect(() => {
+  axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/cycling/carousel`)
+    .then(response => setCarouselProducts(response.data))
+    .catch(error => console.error('Chyba pri načítavaní carousel produktov:', error));
+}, []);
 
-  useEffect(() => {
-    axios.get(`http://localhost:3001/api/config/section/${sectionKey}`)
-      .then(response => {
-        const data = response.data || {};
-        setTitle(data.title || '');
-        setParagraph(data.paragraph || '');
-      })
-      .catch(error => {
-        console.error('Chyba pri načítaní textu sekcie:', error);
-      });
-  }, [sectionKey]);
+useEffect(() => {
+  axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/config/section/${sectionKey}`)
+    .then(response => {
+      const data = response.data || {};
+      setTitle(data.title || '');
+      setParagraph(data.paragraph || '');
+    })
+    .catch(error => {
+      console.error('Chyba pri načítaní textu sekcie:', error);
+    });
+}, [sectionKey]);
 
-  const handleAddToCart = async (jersey) => {
-    const sessionId = localStorage.getItem("sessionId");
-    const token = localStorage.getItem("token");
+const handleAddToCart = async (jersey) => {
+  const sessionId = localStorage.getItem("sessionId");
+  const token = localStorage.getItem("token");
 
-    try {
-      const response = await fetch('http://localhost:3001/api/cart', {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
-          ...(!token && sessionId && { "x-session-id": sessionId }),
-        },
-        body: JSON.stringify({
-          productId: jersey.id,
-          quantity: 1,
-        }),
-      });
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
+        ...(!token && sessionId && { "x-session-id": sessionId }),
+      },
+      body: JSON.stringify({
+        productId: jersey.id,
+        quantity: 1,
+      }),
+    });
 
       const data = await response.json();
       if (response.ok) {

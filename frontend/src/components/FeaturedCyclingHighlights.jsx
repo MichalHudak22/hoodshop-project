@@ -14,7 +14,7 @@ const FeaturedCyclingHighlights = () => {
 useEffect(() => {
   setErrorMessage(''); // vymažeme chybu pred novým fetchom
 
-  axios.get('http://localhost:3001/products/cycling/bike')
+  axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/cycling/bike`)
     .then(response => {
       const highlighted = response.data.filter(p => p.highlight_title && p.description);
       setFeaturedBikes(highlighted.slice(0, 2));
@@ -23,7 +23,7 @@ useEffect(() => {
       setErrorMessage('Nepodarilo sa načítať cycling bikes.');
     });
 
-  axios.get('http://localhost:3001/products/cycling/clothes')
+  axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/cycling/clothes`)
     .then(response => {
       const highlighted = response.data.filter(p => p.highlight_title && p.description);
       setFeaturedClothes(highlighted.slice(0, 2));
@@ -32,7 +32,7 @@ useEffect(() => {
       setErrorMessage('Nepodarilo sa načítať cycling clothes.');
     });
 
-  axios.get('http://localhost:3001/products/cycling/helmets')
+  axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/cycling/helmets`)
     .then(response => {
       const highlighted = response.data.filter(p => p.highlight_title && p.description);
       setFeaturedHelmets(highlighted.slice(0, 2));
@@ -41,6 +41,7 @@ useEffect(() => {
       setErrorMessage('Nepodarilo sa načítať cycling helmets.');
     });
 }, []);
+
 
 
   const featuredItems = [];

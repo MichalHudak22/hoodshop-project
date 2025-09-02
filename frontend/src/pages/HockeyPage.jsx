@@ -49,7 +49,7 @@ const HockeyPage = () => {
   const sectionKey = 'hockey-home-header';
 
   useEffect(() => {
-    axios.get('http://localhost:3001/products/hockey/carousel')
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/hockey/carousel`)
       .then(response => {
         setCarouselProducts(response.data);
       })
@@ -60,7 +60,7 @@ const HockeyPage = () => {
 
   useEffect(() => {
     // Načítanie textov pre header podľa sectionKey
-    axios.get(`http://localhost:3001/api/config/section/${sectionKey}`)
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/config/section/${sectionKey}`)
       .then(response => {
         const data = response.data || {};
         setTitle(data.title || '');
@@ -76,7 +76,7 @@ const HockeyPage = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('http://localhost:3001/api/cart', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -122,7 +122,7 @@ const HockeyPage = () => {
         className="relative text-center py-10 px-4 bg-gradient-to-br from-blue-600 via-black to-blue-900 text-white overflow-hidden border-b-4 border-black"
       >
         <div className="absolute inset-0 bg-[url('/img/hockey-bg.jpg')] bg-cover bg-center opacity-20"></div>
-        
+
         <div className="relative z-10 max-w-4xl mx-auto">
           <h1 className="text-xl md:text-3xl lg:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
             {parseColoredText(title)}
@@ -144,7 +144,7 @@ const HockeyPage = () => {
       {/* FEATURED HIGHLIGHTS */}
       <FeaturedHockeyHighlights />
 
-       {/* ✅ MESSAGE NA STRED OBRAZOVKY */}
+      {/* ✅ MESSAGE NA STRED OBRAZOVKY */}
       {message && (
         <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
           {message}

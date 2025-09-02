@@ -14,7 +14,7 @@ useEffect(() => {
   setErrorMessage(''); // Vyčistí chybu pred novým načítaním
 
   // Dresy (jerseys)
-  axios.get('http://localhost:3001/products/hockey/jersey')
+  axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/hockey/jersey`)
     .then(response => {
       const highlightedJerseys = response.data.filter(item => item.highlight_title && item.description);
       setFeaturedJerseys(highlightedJerseys.slice(0, 2));
@@ -24,7 +24,7 @@ useEffect(() => {
     });
 
   // Korčule (skates)
-  axios.get('http://localhost:3001/products/hockey/skates')
+  axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/hockey/skates`)
     .then(response => {
       const highlightedSkates = response.data.filter(item => item.highlight_title && item.description);
       setFeaturedSkates(highlightedSkates.slice(0, 2));
@@ -34,7 +34,7 @@ useEffect(() => {
     });
 
   // Prilby (helmets)
-  axios.get('http://localhost:3001/products/hockey/helmets')
+  axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/hockey/helmets`)
     .then(response => {
       const highlightedHelmets = response.data.filter(item => item.highlight_title && item.description);
       setFeaturedHelmets(highlightedHelmets.slice(0, 2));
@@ -43,6 +43,7 @@ useEffect(() => {
       setErrorMessage('Nepodarilo sa načítať hockey helmets.');
     });
 }, []);
+
 
 
   // Spojenie všetkých produktov do jedného poľa
