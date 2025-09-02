@@ -19,6 +19,10 @@ const PORT = 3001;
 app.use(cors());
 app.use(express.json());
 
+const path = require('path');
+app.use('/img', express.static(path.join(process.cwd(), 'src/img')));
+
+
 // Pripojenie admin config routes
 app.use('/api/config', adminConfigRoutes);
 
