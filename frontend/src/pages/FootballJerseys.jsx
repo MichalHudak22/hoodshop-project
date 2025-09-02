@@ -11,8 +11,9 @@ const FootballJerseys = () => {
   const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
 
-  const baseURL = 'https://hoodshop-project-1.onrender.com'; // produkčná URL Render
-  
+  const baseURL = 'https://hoodshop-project.onrender.com';
+
+
 useEffect(() => {
   axios.get(`${baseURL}/products/football/jersey`)
     .then(response => {
