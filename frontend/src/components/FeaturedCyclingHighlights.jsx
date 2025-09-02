@@ -7,40 +7,42 @@ const FeaturedCyclingHighlights = () => {
   const [featuredClothes, setFeaturedClothes] = useState([]);
   const [featuredHelmets, setFeaturedHelmets] = useState([]);
 
- const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
-// ...
+  const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ dynamická URL
 
-useEffect(() => {
-  setErrorMessage(''); // vymažeme chybu pred novým fetchom
+  // ...
 
-  axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/cycling/bike`)
-    .then(response => {
-      const highlighted = response.data.filter(p => p.highlight_title && p.description);
-      setFeaturedBikes(highlighted.slice(0, 2));
-    })
-    .catch(() => {
-      setErrorMessage('Nepodarilo sa načítať cycling bikes.');
-    });
+  useEffect(() => {
+    setErrorMessage(''); // vymažeme chybu pred novým fetchom
 
-  axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/cycling/clothes`)
-    .then(response => {
-      const highlighted = response.data.filter(p => p.highlight_title && p.description);
-      setFeaturedClothes(highlighted.slice(0, 2));
-    })
-    .catch(() => {
-      setErrorMessage('Nepodarilo sa načítať cycling clothes.');
-    });
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/cycling/bike`)
+      .then(response => {
+        const highlighted = response.data.filter(p => p.highlight_title && p.description);
+        setFeaturedBikes(highlighted.slice(0, 2));
+      })
+      .catch(() => {
+        setErrorMessage('Nepodarilo sa načítať cycling bikes.');
+      });
 
-  axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/cycling/helmets`)
-    .then(response => {
-      const highlighted = response.data.filter(p => p.highlight_title && p.description);
-      setFeaturedHelmets(highlighted.slice(0, 2));
-    })
-    .catch(() => {
-      setErrorMessage('Nepodarilo sa načítať cycling helmets.');
-    });
-}, []);
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/cycling/clothes`)
+      .then(response => {
+        const highlighted = response.data.filter(p => p.highlight_title && p.description);
+        setFeaturedClothes(highlighted.slice(0, 2));
+      })
+      .catch(() => {
+        setErrorMessage('Nepodarilo sa načítať cycling clothes.');
+      });
+
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/cycling/helmets`)
+      .then(response => {
+        const highlighted = response.data.filter(p => p.highlight_title && p.description);
+        setFeaturedHelmets(highlighted.slice(0, 2));
+      })
+      .catch(() => {
+        setErrorMessage('Nepodarilo sa načítať cycling helmets.');
+      });
+  }, []);
 
 
 
@@ -87,28 +89,28 @@ useEffect(() => {
         </h2>
 
         <div className="w-full xl:w-[90%] 2xl:max-w-[90%] mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-         {featuredItems.map(({ name, product, defaultBg }, index) => (
-        <Link
-          key={`${name}-${index}`}
-          to={`/product/${product?.slug || ''}`}
-          className="flex flex-col h-full bg-white rounded-lg overflow-hidden shadow-lg hover:brightness-125 transition"
-        >
-          <h3 className="py-4 px-3 text-md md:min-h-[80px] font-bold bg-black text-white text-center">
-            {product?.highlight_title || `${name} Featured Product`}
-          </h3>
-          <div className="relative h-64 overflow-hidden shadow-lg group">
-            <img
-              src={product ? `http://localhost:3001${product.image}` : defaultBg}
-              alt={product?.highlight_title || `${name} default`}
-              className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-110"
-            />
-            <div className="absolute inset-0 bg-black bg-opacity-10"></div>
-          </div>
-          <div className="bg-black bg-opacity-90 text-white text-sm p-4 flex-1">
-            {product?.description || `Explore top products from ${name}.`}
-          </div>
-        </Link>
-      ))}
+          {featuredItems.map(({ name, product, defaultBg }, index) => (
+            <Link
+              key={`${name}-${index}`}
+              to={`/product/${product?.slug || ''}`}
+              className="flex flex-col h-full bg-white rounded-lg overflow-hidden shadow-lg hover:brightness-125 transition"
+            >
+              <h3 className="py-4 px-3 text-md md:min-h-[80px] font-bold bg-black text-white text-center">
+                {product?.highlight_title || `${name} Featured Product`}
+              </h3>
+              <div className="relative h-64 overflow-hidden shadow-lg group">
+                <img
+                  src={product ? `${baseURL}${product.image}` : defaultBg} // ✅ dynamická URL
+                  alt={product?.highlight_title || `${name} default`}
+                  className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-10"></div>
+              </div>
+              <div className="bg-black bg-opacity-90 text-white text-sm p-4 flex-1">
+                {product?.description || `Explore top products from ${name}.`}
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
     </section>
