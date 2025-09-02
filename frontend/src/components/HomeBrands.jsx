@@ -20,6 +20,12 @@ const HomeBrands = () => {
     Trek: 'Leaders in cycling'
   };
 
+  // Pomocná funkcia, ktorá zabezpečí správnu URL obrázku
+  const getBrandImageURL = (path) => {
+    if (!path) return ''; // prázdny string, ak cesta nie je definovaná
+    return `${baseURL}${path.startsWith('/') ? path : '/' + path}`;
+  };
+
   return (
     <section
       className="relative py-12 px-6 bg-black overflow-hidden"
@@ -42,13 +48,13 @@ const HomeBrands = () => {
             return (
               <a
                 key={brand.id}
-                href={`/brands/${slug}`} // relatívna cesta
+                href={`/brands/${slug}`} // relatívna cesta vo frontende
                 className="group block rounded-xl overflow-hidden shadow-lg transform transition duration-300 hover:scale-105 border-2 border-black hover:border-white"
               >
                 <div
                   className="h-40 w-full bg-center bg-no-repeat bg-contain bg-white transition duration-300 group-hover:brightness-110"
                   style={{
-                    backgroundImage: `url(${baseURL}${brand.brand_image})`,
+                    backgroundImage: `url(${getBrandImageURL(brand.brand_image)})`,
                   }}
                 ></div>
                 <div className="bg-black text-white text-center py-2">
