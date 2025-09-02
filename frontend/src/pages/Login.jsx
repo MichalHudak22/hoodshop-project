@@ -13,45 +13,45 @@ function Login() {
   const { login } = useContext(AuthContext);
   const { refreshCartCount } = useContext(CartContext);
 
+  const baseURL = 'https://hoodshop-project.onrender.com'; // <-- Render URL
+
   const handleSubmit = (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  fetch('http://localhost:3001/user/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.error) {
-        setError(data.error);
-        setMessage('');
-      } else if (data.message === 'Email is not verified. Please verify your account before logging in.') {
-        // Speciálna správa pre neoverený email
-        setError('Email is not verified. Please verify your account before logging in.');
-        setMessage('');
-      } else {
-        setMessage(data.message);
-        setError('');
-
-        login({
-          email: data.email,
-          name: data.name,
-          role: data.role,
-          token: data.token,
-        });
-
-        refreshCartCount();
-        navigate('/profile');
-      }
+    fetch(`${baseURL}/user/login`, {   // <-- použitie baseURL
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
     })
-    .catch((err) => {
-      console.error('Error during login:', err);
-      setError('An error occurred while logging in.');
-      setMessage('');
-    });
-};
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          setError(data.error);
+          setMessage('');
+        } else if (data.message === 'Email is not verified. Please verify your account before logging in.') {
+          setError('Email is not verified. Please verify your account before logging in.');
+          setMessage('');
+        } else {
+          setMessage(data.message);
+          setError('');
 
+          login({
+            email: data.email,
+            name: data.name,
+            role: data.role,
+            token: data.token,
+          });
+
+          refreshCartCount();
+          navigate('/profile');
+        }
+      })
+      .catch((err) => {
+        console.error('Error during login:', err);
+        setError('An error occurred while logging in.');
+        setMessage('');
+      });
+  };
 
   return (
     <div
@@ -110,7 +110,7 @@ function Login() {
           </div>
         </form>
 
-          <div className="mt-4 text-center h-8">
+        <div className="mt-4 text-center h-8">
           {error ? (
             <p className="text-red-400">{error}</p>
           ) : message ? (
@@ -131,8 +131,6 @@ function Login() {
             Create Account
           </Link>
         </div>
-
-      
       </div>
     </div>
   );
