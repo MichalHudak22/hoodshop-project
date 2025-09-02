@@ -57,15 +57,18 @@ const FootballJerseys = () => {
     }
   };
 
-  const slides = jerseys.map(product => ({
-    id: product.id,
-    name: product.name,
-    brand: product.brand,
-    price: product.price,
-    image: `${baseURL}${product.image}`, // obrázky z backendu Render
-  }));
+const slides = Array.isArray(jerseys) ? jerseys.map(product => ({
+  id: product.id,
+  name: product.name,
+  brand: product.brand,
+  price: product.price,
+  image: `${baseURL}${product.image}`,
+})) : [];
 
-  const highlightedJerseys = jerseys.filter(jersey => jersey.highlight_title && jersey.description);
+const highlightedJerseys = Array.isArray(jerseys)
+  ? jerseys.filter(jersey => jersey.highlight_title && jersey.description)
+  : [];
+
   const featuredJersey = highlightedJerseys[0];
   const featuredJersey2 = highlightedJerseys[1];
 
