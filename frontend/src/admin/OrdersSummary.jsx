@@ -11,22 +11,27 @@ function OrdersSummary() {
 
   useEffect(() => {
     const fetchSummary = async () => {
-  try {
-  const [summaryRes, topProductsRes] = await Promise.all([
-    axios.get('/api/orders/summary', { headers: { Authorization: `Bearer ${token}` } }),
-    axios.get('/api/orders/top-products', { headers: { Authorization: `Bearer ${token}` } }),
-  ]);
+      try {
+        const [summaryRes, topProductsRes] = await Promise.all([
+          axios.get('/api/orders/summary', { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get('/api/orders/top-products', { headers: { Authorization: `Bearer ${token}` } }),
+        ]);
 
-  setSummary(summaryRes.data || { totalOrders: 0, totalRevenue: 0, totalUsedPoints: 0 });
-  setTopProducts(Array.isArray(topProductsRes.data) ? topProductsRes.data : []);
+        console.log('summaryRes.data:', summaryRes.data);
+        console.log('topProductsRes.data:', topProductsRes.data);
 
-} catch (err) {
-  setError('Nepodarilo sa načítať sumár objednávok alebo rebríček produktov.');
-  console.error(err);
-} finally {
-  setLoading(false);
-}
+        // Bezpečne nastavíme summary
+        setSummary(summaryRes.data || { totalOrders: 0, totalRevenue: 0, totalUsedPoints: 0 });
 
+        // Bezpečne nastavíme topProducts
+        setTopProducts(Array.isArray(topProductsRes.data) ? topProductsRes.data : []);
+
+      } catch (err) {
+        setError('Nepodarilo sa načítať sumár objednávok alebo rebríček produktov.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchSummary();
@@ -69,24 +74,21 @@ function OrdersSummary() {
           </span>
         </div>
 
-        {/* 🏆 Top 10 najpredávanejších produktov */}
         <div className="bg-gray-800 bg-opacity-70 p-4 rounded-md mt-4">
           <h4 className="text-lg font-semibold mb-2 text-center text-blue-200">Top 10 Best-Selling Products</h4>
-          {topProducts.length === 0 ? (
+          {!Array.isArray(topProducts) || topProducts.length === 0 ? (
             <p className="text-sm text-gray-400">Žiadne dáta o predajoch.</p>
           ) : (
             <ul className="space-y-1 text-base text-yellow-300">
               {topProducts.map((product, index) => (
                 <li key={index} className="flex justify-between">
-                  <span className="font-medium text-white">{index + 1}. {product.name}</span>
-                  <span>{product.quantity} ks</span>
+                  <span className="font-medium text-white">{index + 1}. {product.name || 'Unknown'}</span>
+                  <span>{product.quantity ?? 0} ks</span>
                 </li>
               ))}
             </ul>
           )}
         </div>
-
-
       </div>
     </div>
   );
