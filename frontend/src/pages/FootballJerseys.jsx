@@ -11,8 +11,10 @@ const FootballJerseys = () => {
   const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
 
+  const baseURL = 'https://hoodshop-project-1.onrender.com'; // produkčná URL Render
+
   useEffect(() => {
-    axios.get('http://localhost:3001/products/football/jersey')
+    axios.get(`${baseURL}/products/football/jersey`)
       .then(response => {
         setJerseys(response.data);
       })
@@ -26,7 +28,7 @@ const FootballJerseys = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('http://localhost:3001/api/cart', {
+      const response = await fetch(`${baseURL}/api/cart`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -43,8 +45,6 @@ const FootballJerseys = () => {
       if (response.ok) {
         setMessage("Product added to cart!");
         refreshCartCount();
-
-        // automaticky zmizne po 3 sekundách
         setTimeout(() => setMessage(''), 3000);
       } else {
         setMessage("Failed to add to cart: " + data.message);
@@ -57,14 +57,12 @@ const FootballJerseys = () => {
     }
   };
 
-
-  // ✅ Carousel 
   const slides = jerseys.map(product => ({
     id: product.id,
     name: product.name,
     brand: product.brand,
     price: product.price,
-    image: product.image,
+    image: `${baseURL}${product.image}`, // obrázky z backendu Render
   }));
 
   const highlightedJerseys = jerseys.filter(jersey => jersey.highlight_title && jersey.description);
@@ -73,10 +71,7 @@ const FootballJerseys = () => {
 
   return (
     <div>
-      {/* HEAD TITLE */}
-      <section
-        className="relative text-center py-10 px-4 bg-gradient-to-br  from-green-600 via-black to-green-700 text-white overflow-hidden border-b-4 border-black"
-      >
+      <section className="relative text-center py-10 px-4 bg-gradient-to-br from-green-600 via-black to-green-700 text-white overflow-hidden border-b-4 border-black">
         <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
         <div className="relative z-10 max-w-4xl mx-auto">
           <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
@@ -91,27 +86,22 @@ const FootballJerseys = () => {
         </div>
       </section>
 
-
-      {/* 1st FEATURED JERSEY */}
       <FeaturedProduct
         product={featuredJersey}
         handleAddToCart={handleAddToCart}
         backgroundImage="/img/bg-football3.jpg"
       />
 
-      {/* CAROUSEL */}
       <div className="py-10 bg-black">
         <ProductsCarousel slides={slides} handleAddToCart={handleAddToCart} />
       </div>
 
-      {/* 2nd FEATURED JERSEY */}
       <FeaturedProductReversed
         product={featuredJersey2}
         handleAddToCart={handleAddToCart}
         backgroundImage="/img/bg-football3.jpg"
       />
 
-      {/* ALL JERSEYS */}
       <ProductSection
         title="All Football Jerseys"
         backgroundImage="/img/bg-football5.jpg"
@@ -119,7 +109,6 @@ const FootballJerseys = () => {
         onAddToCart={handleAddToCart}
       />
 
-      {/* ✅ MESSAGE NA STRED OBRAZOVKY */}
       {message && (
         <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
           {message}
