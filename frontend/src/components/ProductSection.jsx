@@ -3,6 +3,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const ProductSection = ({ title, products, backgroundImage, onAddToCart }) => {
+  const baseURL = 'https://hoodshop-project.onrender.com'; // produkčný backend
+
   return (
     <section className="relative py-12 px-6 bg-black overflow-hidden">
       {/* Overlay pozadie */}
@@ -10,10 +12,10 @@ const ProductSection = ({ title, products, backgroundImage, onAddToCart }) => {
         className="absolute inset-0 z-0"
         style={{
           backgroundImage: `url("${backgroundImage}")`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        backgroundAttachment: "fixed",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          backgroundAttachment: "fixed",
           opacity: 0.6,
         }}
       ></div>
@@ -36,7 +38,7 @@ const ProductSection = ({ title, products, backgroundImage, onAddToCart }) => {
                 className="block"
               >
                 <img
-                  src={`http://localhost:3001${product.image}`}
+                  src={`${baseURL}${product.image}`} // <-- tu je zmena
                   alt={product.name}
                   className="w-full h-64 object-contain p-4 bg-gray-50"
                 />

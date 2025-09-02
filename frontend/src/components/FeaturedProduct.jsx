@@ -4,6 +4,7 @@ const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
   if (!product) return null;
 
   const productSlug = product.name.toLowerCase().replace(/\s+/g, '-');
+  const baseURL = 'https://hoodshop-project.onrender.com'; // produkčný backend
 
   return (
     <section className="relative py-16 px-6 bg-black overflow-hidden border-b-4 border-black">
@@ -27,7 +28,7 @@ const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
           {/* OBÁLENIE obrázku do Link komponentu */}
           <Link to={`/product/${productSlug}`}>
             <img
-              src={`http://localhost:3001${product.image}`}
+              src={`${baseURL}${product.image}`} // <-- tu je zmena
               alt={product.name}
               className="max-w-sm rounded-lg shadow-xl object-contain hover:brightness-110"
             />
@@ -56,6 +57,5 @@ const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
     </section>
   );
 };
-
 
 export default FeaturedProduct;
