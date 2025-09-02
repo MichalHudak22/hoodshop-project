@@ -11,25 +11,22 @@ function OrdersSummary() {
 
   useEffect(() => {
     const fetchSummary = async () => {
-      try {
-        const [summaryRes, topProductsRes] = await Promise.all([
-          axios.get('/api/orders/summary', {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get('/api/orders/top-products', {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
+  try {
+  const [summaryRes, topProductsRes] = await Promise.all([
+    axios.get('/api/orders/summary', { headers: { Authorization: `Bearer ${token}` } }),
+    axios.get('/api/orders/top-products', { headers: { Authorization: `Bearer ${token}` } }),
+  ]);
 
-        setSummary(summaryRes.data);
-        setTopProducts(topProductsRes.data);
+  setSummary(summaryRes.data || { totalOrders: 0, totalRevenue: 0, totalUsedPoints: 0 });
+  setTopProducts(Array.isArray(topProductsRes.data) ? topProductsRes.data : []);
 
-      } catch (err) {
-        setError('Nepodarilo sa načítať sumár objednávok alebo rebríček produktov.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
+} catch (err) {
+  setError('Nepodarilo sa načítať sumár objednávok alebo rebríček produktov.');
+  console.error(err);
+} finally {
+  setLoading(false);
+}
+
     };
 
     fetchSummary();
