@@ -1,24 +1,22 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
-import { CartContext } from '../context/CartContext';  // pridaj import kontextu
+import { CartContext } from '../context/CartContext';
 import ProductsCarousel from '../components/ProductsCarousel';
 import FeaturedProduct from '../components/FeaturedProduct';
 import FeaturedProductReversed from '../components/FeaturedProductReversed';
 import ProductSection from '../components/ProductSection';
 
+const baseURL = "https://hoodshop-project.onrender.com"; // produkčné URL
+
 const HockeyJerseys = () => {
   const [jerseys, setJerseys] = useState([]);
-  const { refreshCartCount } = useContext(CartContext);  // použijeme kontext
+  const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    axios.get('http://localhost:3001/products/hockey/jersey')
-      .then(response => {
-        setJerseys(response.data);
-      })
-      .catch(error => {
-        console.error('Chyba pri načítavaní hokejových dresov:', error);
-      });
+    axios.get(`${baseURL}/products/hockey/jersey`)
+      .then(response => setJerseys(response.data))
+      .catch(error => console.error('Chyba pri načítavaní hokejových dresov:', error));
   }, []);
 
   const handleAddToCart = async (jersey) => {
@@ -26,7 +24,7 @@ const HockeyJerseys = () => {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('http://localhost:3001/api/cart', {
+      const response = await fetch(`${baseURL}/api/cart`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -43,8 +41,6 @@ const HockeyJerseys = () => {
       if (response.ok) {
         setMessage("Product added to cart!");
         refreshCartCount();
-
-        // automaticky zmizne po 3 sekundách
         setTimeout(() => setMessage(''), 3000);
       } else {
         setMessage("Failed to add to cart: " + data.message);
@@ -57,40 +53,37 @@ const HockeyJerseys = () => {
     }
   };
 
-  // UPRAVA: upravujem slides pre carousel podľa vzoru HockeyPage
   const slides = jerseys.map(product => ({
     id: product.id,
-    name: product.name,         // <-- Namiesto title je name (UPRAVA)
+    name: product.name,
     brand: product.brand,
     price: product.price,
-    image: product.image,       // <-- NEposielam full URL, ale relatívnu cestu (UPRAVA)
-    // buttonText a link som odstránil, lebo ich Carousel nevyužíva (UPRAVA)
+    image: `${baseURL}${product.image}`, // absolútna URL pre carousel
   }));
 
-  // Výber zvýraznených dresov
   const highlightedJerseys = jerseys.filter(j => j.highlight_title && j.description);
   const featuredJersey = highlightedJerseys[0];
   const featuredJersey2 = highlightedJerseys[1];
 
   return (
     <div>
-     {/* HEAD TITLE */}
-        <section
-          className="relative text-center py-10 px-4 bg-gradient-to-br from-blue-600 via-black to-blue-900 text-white overflow-hidden border-b-4 border-black"
-        >
-          <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
-          <div className="relative z-10 max-w-4xl mx-auto">
-            <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
-              Premium <span className="text-blue-200">Hockey Jerseys</span>
-            </h1>
-            <p className="text-md md:text-lg lg:text-xl text-gray-100 leading-relaxed">
-              Discover our exclusive collection of hockey jerseys combining{' '}
-              <span className="text-blue-200 font-medium">style</span>,{' '}
-              <span className="text-blue-200 font-medium">comfort</span>, and{' '}
-              <span className="text-blue-200 font-medium">durability</span>.
-            </p>
-          </div>
-        </section>
+      {/* HEAD TITLE */}
+      <section
+        className="relative text-center py-10 px-4 bg-gradient-to-br from-blue-600 via-black to-blue-900 text-white overflow-hidden border-b-4 border-black"
+      >
+        <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
+        <div className="relative z-10 max-w-4xl mx-auto">
+          <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
+            Premium <span className="text-blue-200">Hockey Jerseys</span>
+          </h1>
+          <p className="text-md md:text-lg lg:text-xl text-gray-100 leading-relaxed">
+            Discover our exclusive collection of hockey jerseys combining{' '}
+            <span className="text-blue-200 font-medium">style</span>,{' '}
+            <span className="text-blue-200 font-medium">comfort</span>, and{' '}
+            <span className="text-blue-200 font-medium">durability</span>.
+          </p>
+        </div>
+      </section>
 
       {/* 1st FEATURED JERSEY */}
       {featuredJersey && (

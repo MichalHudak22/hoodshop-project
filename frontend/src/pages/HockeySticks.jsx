@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
-import { CartContext } from '../context/CartContext';  // pridáme import kontextu
+import { CartContext } from '../context/CartContext';
 import ProductsCarousel from '../components/ProductsCarousel';
 import ProductSection from '../components/ProductSection';
 import FeaturedProduct from '../components/FeaturedProduct';
@@ -8,21 +8,23 @@ import FeaturedProductReversed from '../components/FeaturedProductReversed';
 
 const HockeySticks = () => {
   const [sticks, setSticks] = useState([]);
-  const { refreshCartCount } = useContext(CartContext);  // použijeme kontext
+  const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
 
+  const baseURL = "https://hoodshop-project.onrender.com"; // produkčné URL
+
   useEffect(() => {
-    axios.get('http://localhost:3001/products/hockey/sticks')
+    axios.get(`${baseURL}/products/hockey/sticks`)
       .then(response => setSticks(response.data))
       .catch(error => console.error('Chyba pri načítavaní hokejok:', error));
   }, []);
 
-  const handleAddToCart = async (jersey) => {
+  const handleAddToCart = async (product) => {
     const sessionId = localStorage.getItem("sessionId");
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('http://localhost:3001/api/cart', {
+      const response = await fetch(`${baseURL}/api/cart`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -30,7 +32,7 @@ const HockeySticks = () => {
           ...(!token && sessionId && { "x-session-id": sessionId }),
         },
         body: JSON.stringify({
-          productId: jersey.id,
+          productId: product.id,
           quantity: 1,
         }),
       });
@@ -39,8 +41,6 @@ const HockeySticks = () => {
       if (response.ok) {
         setMessage("Product added to cart!");
         refreshCartCount();
-
-        // automaticky zmizne po 3 sekundách
         setTimeout(() => setMessage(''), 3000);
       } else {
         setMessage("Failed to add to cart: " + data.message);
@@ -53,13 +53,12 @@ const HockeySticks = () => {
     }
   };
 
-  // UPRAVA slides podľa vzoru iných stránok - žiadny full URL v image, používame name, bez buttonText a link
-  const slides = sticks.map(product => ({
-    id: product.id,
-    name: product.name,
-    brand: product.brand,
-    price: product.price,
-    image: product.image,  // relatívna cesta bez localhost
+  const slides = sticks.map(p => ({
+    id: p.id,
+    name: p.name,
+    brand: p.brand,
+    price: p.price,
+    image: `${baseURL}${p.image}`, // absolútna URL pre carousel
   }));
 
   const highlighted = sticks.filter(s => s.highlight_title && s.description);
@@ -68,26 +67,22 @@ const HockeySticks = () => {
 
   return (
     <div>
-     {/* HEAD TITLE */}
-<section
-  className="relative text-center py-10 px-4 bg-gradient-to-br from-blue-600 via-black to-blue-900 text-white overflow-hidden border-b-4 border-black"
->
-  <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
-  <div className="relative z-10 max-w-4xl mx-auto">
-    <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
-      Discover Elite <span className="text-blue-200">Hockey Sticks</span>
-    </h1>
-    <p className="text-md md:text-lg lg:text-xl text-gray-100 leading-relaxed">
-      Dominate the rink with precision-engineered hockey sticks designed for{' '}
-      <span className="text-blue-200 font-medium">power</span>,{' '}
-      <span className="text-blue-200 font-medium">accuracy</span>, and{' '}
-      <span className="text-blue-200 font-medium">performance</span>.
-    </p>
-  </div>
-</section>
+      {/* HEAD TITLE */}
+      <section className="relative text-center py-10 px-4 bg-gradient-to-br from-blue-600 via-black to-blue-900 text-white overflow-hidden border-b-4 border-black">
+        <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
+        <div className="relative z-10 max-w-4xl mx-auto">
+          <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
+            Discover Elite <span className="text-blue-200">Hockey Sticks</span>
+          </h1>
+          <p className="text-md md:text-lg lg:text-xl text-gray-100 leading-relaxed">
+            Dominate the rink with precision-engineered hockey sticks designed for{' '}
+            <span className="text-blue-200 font-medium">power</span>,{' '}
+            <span className="text-blue-200 font-medium">accuracy</span>, and{' '}
+            <span className="text-blue-200 font-medium">performance</span>.
+          </p>
+        </div>
+      </section>
 
-
-      {/* 1st FEATURED PRODUCT */}
       {featured1 && (
         <FeaturedProduct
           product={featured1}
@@ -96,12 +91,10 @@ const HockeySticks = () => {
         />
       )}
 
-      {/* CAROUSEL */}
       <div className="py-10 bg-black">
-       <ProductsCarousel slides={slides} handleAddToCart={handleAddToCart} />
+        <ProductsCarousel slides={slides} handleAddToCart={handleAddToCart} />
       </div>
 
-      {/* 2nd FEATURED PRODUCT */}
       {featured2 && (
         <FeaturedProductReversed
           product={featured2}
@@ -110,7 +103,6 @@ const HockeySticks = () => {
         />
       )}
 
-      {/* ALL PRODUCTS GRID */}
       <ProductSection
         title="Discover All Sticks"
         backgroundImage="/img/bg-hockey2.jpg"
@@ -118,7 +110,6 @@ const HockeySticks = () => {
         onAddToCart={handleAddToCart}
       />
 
-      {/* ✅ MESSAGE NA STRED OBRAZOVKY */}
       {message && (
         <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
           {message}

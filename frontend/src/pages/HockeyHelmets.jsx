@@ -4,25 +4,28 @@ import ProductsCarousel from '../components/ProductsCarousel';
 import ProductSection from '../components/ProductSection';
 import FeaturedProduct from '../components/FeaturedProduct';
 import FeaturedProductReversed from '../components/FeaturedProductReversed';
-import { CartContext } from '../context/CartContext';  // pridaj tento import
+import { CartContext } from '../context/CartContext';
 
 const HockeyHelmets = () => {
   const [helmets, setHelmets] = useState([]);
-  const { refreshCartCount } = useContext(CartContext);  // použijeme kontext
+  const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
 
+  // Base URL pre Render
+  const baseURL = "https://hoodshop-project.onrender.com";
+
   useEffect(() => {
-    axios.get('http://localhost:3001/products/hockey/helmets')
+    axios.get(`${baseURL}/products/hockey/helmets`)
       .then(response => setHelmets(response.data))
       .catch(error => console.error('Chyba pri načítavaní hokejových prilieb:', error));
   }, []);
 
-  const handleAddToCart = async (jersey) => {
+  const handleAddToCart = async (product) => {
     const sessionId = localStorage.getItem("sessionId");
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('http://localhost:3001/api/cart', {
+      const response = await fetch(`${baseURL}/api/cart`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -30,7 +33,7 @@ const HockeyHelmets = () => {
           ...(!token && sessionId && { "x-session-id": sessionId }),
         },
         body: JSON.stringify({
-          productId: jersey.id,
+          productId: product.id,
           quantity: 1,
         }),
       });
@@ -39,8 +42,6 @@ const HockeyHelmets = () => {
       if (response.ok) {
         setMessage("Product added to cart!");
         refreshCartCount();
-
-        // automaticky zmizne po 3 sekundách
         setTimeout(() => setMessage(''), 3000);
       } else {
         setMessage("Failed to add to cart: " + data.message);
@@ -53,16 +54,16 @@ const HockeyHelmets = () => {
     }
   };
 
-  // UPRAVA: upravil som slides podľa vzoru HockeyJerseys / HockeyPage
-  const slides = helmets.map(product => ({
-    id: product.id,
-    name: product.name,          // namiesto title použiť name (UPRAVA)
-    brand: product.brand,
-    price: product.price,
-    image: product.image,        // NEposielať full URL, len relatívnu cestu (UPRAVA)
-    // buttonText a link som odstránil, nie sú potrebné (UPRAVA)
+  // Slides pre carousel s absolútnymi URL
+  const slides = helmets.map(p => ({
+    id: p.id,
+    name: p.name,
+    brand: p.brand,
+    price: p.price,
+    image: `${baseURL}${p.image}`,
   }));
 
+  // Zvýraznené produkty
   const highlighted = helmets.filter(h => h.highlight_title && h.description);
   const featured1 = highlighted[0];
   const featured2 = highlighted[1];
@@ -70,9 +71,7 @@ const HockeyHelmets = () => {
   return (
     <div>
       {/* HEAD TITLE */}
-      <section
-        className="relative text-center py-10 px-4 bg-gradient-to-br from-blue-600 via-black to-blue-900 text-white overflow-hidden border-b-4 border-black"
-      >
+      <section className="relative text-center py-10 px-4 bg-gradient-to-br from-blue-600 via-black to-blue-900 text-white overflow-hidden border-b-4 border-black">
         <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
         <div className="relative z-10 max-w-4xl mx-auto">
           <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
@@ -86,7 +85,7 @@ const HockeyHelmets = () => {
         </div>
       </section>
 
-
+      {/* 1st FEATURED */}
       {featured1 && (
         <FeaturedProduct
           product={featured1}
@@ -95,10 +94,12 @@ const HockeyHelmets = () => {
         />
       )}
 
+      {/* CAROUSEL */}
       <div className="py-10 bg-black border-y-4 border-black">
         <ProductsCarousel slides={slides} handleAddToCart={handleAddToCart} />
       </div>
 
+      {/* 2nd FEATURED */}
       {featured2 && (
         <FeaturedProductReversed
           product={featured2}
@@ -107,6 +108,7 @@ const HockeyHelmets = () => {
         />
       )}
 
+      {/* ALL PRODUCTS */}
       <ProductSection
         title="Discover All Helmets"
         backgroundImage="/img/bg-hockey2.jpg"
@@ -114,7 +116,7 @@ const HockeyHelmets = () => {
         onAddToCart={handleAddToCart}
       />
 
-      {/* ✅ MESSAGE NA STRED OBRAZOVKY */}
+      {/* MESSAGE */}
       {message && (
         <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
           {message}

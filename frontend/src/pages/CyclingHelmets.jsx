@@ -11,22 +11,25 @@ const CyclingHelmets = () => {
   const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
 
+  const baseURL = 'https://hoodshop-project.onrender.com'; // 🔹 produkčný backend
+
   useEffect(() => {
-    axios.get('http://localhost:3001/products/cycling/helmets')
+    axios.get(`${baseURL}/products/cycling/helmets`)
       .then(response => {
-        setHelmets(response.data);
+        console.log('Response from backend:', response.data);
+        setHelmets(Array.isArray(response.data) ? response.data : response.data.products || []);
       })
       .catch(error => {
         console.error('Chyba pri načítavaní prilieb:', error);
       });
   }, []);
 
-  const handleAddToCart = async (jersey) => {
+  const handleAddToCart = async (helmet) => {
     const sessionId = localStorage.getItem("sessionId");
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('http://localhost:3001/api/cart', {
+      const response = await fetch(`${baseURL}/api/cart`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -34,7 +37,7 @@ const CyclingHelmets = () => {
           ...(!token && sessionId && { "x-session-id": sessionId }),
         },
         body: JSON.stringify({
-          productId: jersey.id,
+          productId: helmet.id,
           quantity: 1,
         }),
       });
@@ -43,8 +46,6 @@ const CyclingHelmets = () => {
       if (response.ok) {
         setMessage("Product added to cart!");
         refreshCartCount();
-
-        // automaticky zmizne po 3 sekundách
         setTimeout(() => setMessage(''), 3000);
       } else {
         setMessage("Failed to add to cart: " + data.message);
@@ -57,12 +58,13 @@ const CyclingHelmets = () => {
     }
   };
 
+  // Carousel slides
   const slides = helmets.map(product => ({
     id: product.id,
     name: product.name,
     brand: product.brand,
     price: product.price,
-    image: product.image, // relatívna cesta bez prefixu
+    image: `${baseURL}${product.image}`, // 🔹 obrázky z produkčného backendu
   }));
 
   // Výber 2 zvýraznených produktov
@@ -72,25 +74,21 @@ const CyclingHelmets = () => {
 
   return (
     <div>
-     {/* HEAD TITLE */}
-<section
-  className="relative text-center py-10 px-4 bg-gradient-to-br from-orange-400 via-black to-orange-400 text-white overflow-hidden border-b-4 border-black"
->
-  <div className="absolute inset-0 bg-[url('/img/cycling-bg.jpg')] bg-cover bg-center opacity-20"></div>
-  <div className="relative z-10 max-w-4xl mx-auto">
-   <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
-  Top-Quality <span className="text-blue-200">Cycling Helmets</span> for Every Ride
-</h1>
-
-  <p className="text-md md:text-lg lg:text-xl text-gray-100 leading-relaxed">
-    Discover our selection of premium helmets for{' '}
-    <span className="text-blue-200 font-medium">safety</span>,{' '}
-    <span className="text-blue-200 font-medium">comfort</span>, and{' '}
-    <span className="text-blue-200 font-medium">style</span> — ideal for every cyclist, from daily commuters to pro riders.
-  </p>
-  </div>
-</section>
-
+      {/* HEAD TITLE */}
+      <section className="relative text-center py-10 px-4 bg-gradient-to-br from-orange-400 via-black to-orange-400 text-white overflow-hidden border-b-4 border-black">
+        <div className="absolute inset-0 bg-[url('/img/cycling-bg.jpg')] bg-cover bg-center opacity-20"></div>
+        <div className="relative z-10 max-w-4xl mx-auto">
+          <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
+            Top-Quality <span className="text-blue-200">Cycling Helmets</span> for Every Ride
+          </h1>
+          <p className="text-md md:text-lg lg:text-xl text-gray-100 leading-relaxed">
+            Discover our selection of premium helmets for{' '}
+            <span className="text-blue-200 font-medium">safety</span>,{' '}
+            <span className="text-blue-200 font-medium">comfort</span>, and{' '}
+            <span className="text-blue-200 font-medium">style</span> — ideal for every cyclist, from daily commuters to pro riders.
+          </p>
+        </div>
+      </section>
 
       {/* 1st FEATURED HELMET */}
       {featured1 && (
@@ -122,8 +120,8 @@ const CyclingHelmets = () => {
         products={helmets}
         onAddToCart={handleAddToCart}
       />
-      
-        {/* ✅ MESSAGE NA STRED OBRAZOVKY */}
+
+      {/* MESSAGE NA STRED OBRAZOVKY */}
       {message && (
         <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
           {message}

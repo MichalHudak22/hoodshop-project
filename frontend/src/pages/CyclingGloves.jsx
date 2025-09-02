@@ -11,22 +11,25 @@ const CyclingGloves = () => {
   const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
 
+  const baseURL = 'https://hoodshop-project.onrender.com'; // 🔹 produkčný backend
+
   useEffect(() => {
-    axios.get('http://localhost:3001/products/cycling/gloves')
+    axios.get(`${baseURL}/products/cycling/gloves`)
       .then(response => {
-        setGloves(response.data);
+        console.log('Response from backend:', response.data);
+        setGloves(Array.isArray(response.data) ? response.data : response.data.products || []);
       })
       .catch(error => {
         console.error('Chyba pri načítavaní cycling rukavíc:', error);
       });
   }, []);
 
-  const handleAddToCart = async (jersey) => {
+  const handleAddToCart = async (glove) => {
     const sessionId = localStorage.getItem("sessionId");
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('http://localhost:3001/api/cart', {
+      const response = await fetch(`${baseURL}/api/cart`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
@@ -34,7 +37,7 @@ const CyclingGloves = () => {
           ...(!token && sessionId && { "x-session-id": sessionId }),
         },
         body: JSON.stringify({
-          productId: jersey.id,
+          productId: glove.id,
           quantity: 1,
         }),
       });
@@ -43,8 +46,6 @@ const CyclingGloves = () => {
       if (response.ok) {
         setMessage("Product added to cart!");
         refreshCartCount();
-
-        // automaticky zmizne po 3 sekundách
         setTimeout(() => setMessage(''), 3000);
       } else {
         setMessage("Failed to add to cart: " + data.message);
@@ -57,12 +58,13 @@ const CyclingGloves = () => {
     }
   };
 
+  // Carousel slides
   const slides = gloves.map(product => ({
     id: product.id,
     name: product.name,
     brand: product.brand,
     price: product.price,
-    image: product.image, // relatívna cesta bez prefixu
+    image: `${baseURL}${product.image}`, // 🔹 obrázky z produkčného backendu
   }));
 
   // Výber 2 zvýraznených produktov
@@ -81,15 +83,13 @@ const CyclingGloves = () => {
           <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
             Discover Premium <span className="text-blue-200">Cycling Gloves</span>
           </h1>
-         <p className="text-md md:text-lg lg:text-xl text-gray-100 leading-relaxed">
+          <p className="text-md md:text-lg lg:text-xl text-gray-100 leading-relaxed">
             Ride longer and more{' '}
             <span className="text-blue-200 font-medium">comfortably</span> with our selection of{' '}
             <span className="text-blue-200 font-medium">high-performance</span> cycling gloves, designed for grip, breathability, and endurance.
           </p>
-
         </div>
       </section>
-
 
       {/* 1st FEATURED GLOVE */}
       {featured1 && (
@@ -122,7 +122,7 @@ const CyclingGloves = () => {
         onAddToCart={handleAddToCart}
       />
 
-        {/* ✅ MESSAGE NA STRED OBRAZOVKY */}
+      {/* MESSAGE NA STRED OBRAZOVKY */}
       {message && (
         <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
           {message}
