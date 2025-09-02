@@ -12,16 +12,19 @@ const FootballJerseys = () => {
   const [message, setMessage] = useState('');
 
   const baseURL = 'https://hoodshop-project-1.onrender.com'; // produkčná URL Render
+  
+useEffect(() => {
+  axios.get(`${baseURL}/products/football/jersey`)
+    .then(response => {
+      console.log('Response from backend:', response.data); // <-- tu vidíš, čo je
+      setJerseys(Array.isArray(response.data) ? response.data : response.data.products || []);
+    })
+    .catch(error => {
+      console.error('Chyba pri načítavaní football dresov:', error);
+      setJerseys([]);
+    });
+}, []);
 
-  useEffect(() => {
-    axios.get(`${baseURL}/products/football/jersey`)
-      .then(response => {
-        setJerseys(response.data);
-      })
-      .catch(error => {
-        console.error('Chyba pri načítavaní football dresov:', error);
-      });
-  }, []);
 
   const handleAddToCart = async (jersey) => {
     const sessionId = localStorage.getItem("sessionId");
