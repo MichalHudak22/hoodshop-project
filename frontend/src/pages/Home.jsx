@@ -11,7 +11,8 @@ function Home() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    fetch('http://localhost:3001/products/carousel-top')
+    fetch(`${import.meta.env.VITE_API_BASE_URL}/products/carousel-top`)
+
       .then((res) => res.json())
       .then((data) => setCarouselSlides(data))
       .catch((e) => console.error('Chyba pri načítaní carousel produktov:', e));
@@ -22,7 +23,7 @@ function Home() {
     const token = localStorage.getItem("token");
 
     try {
-      const response = await fetch('http://localhost:3001/api/cart', {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/cart`, {
         method: 'POST',
         headers: {
           "Content-Type": "application/json",
