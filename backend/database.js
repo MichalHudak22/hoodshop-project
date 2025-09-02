@@ -1,9 +1,8 @@
 const mysql = require('mysql2');
-const util = require('util');
 const fs = require('fs');
 require('dotenv').config();
 
-const db = mysql.createConnection({
+const pool = mysql.createPool({
   host: process.env.DB_HOST,
   port: process.env.DB_PORT,
   user: process.env.DB_USER,
@@ -11,18 +10,13 @@ const db = mysql.createConnection({
   database: process.env.DB_NAME,
   ssl: {
     ca: fs.readFileSync('./ssl/isrgrootx1.pem')
-  }
+  },
+  waitForConnections: true,
+  connectionLimit: 10,  // počet súčasných spojení
+  queueLimit: 0          // neobmedzená čakacia fronta
 });
 
-db.connect(err => {
-  if (err) {
-    console.error('Chyba pripojenia:', err);
-  } else {
-    console.log('Pripojený k databáze cez SSL');
-  }
-});
-
-// Promisify db.query, aby sme mohli použiť await
-db.query = util.promisify(db.query);
+// Promisify pre použitie s async/await
+const db = pool.promise();
 
 module.exports = db;
