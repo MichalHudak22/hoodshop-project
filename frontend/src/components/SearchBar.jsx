@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const SearchBar = ({ onResultClick }) => {
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://hoodshop-project.onrender.com";
+  // Vezme URL z .env (Render alebo lokál)
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const wrapperRef = useRef(null);
 
@@ -18,10 +19,7 @@ const SearchBar = ({ onResultClick }) => {
           .then((res) => {
             setResults(Array.isArray(res.data) ? res.data : []);
           })
-          .catch((err) => {
-            console.error("Search error:", err);
-            setResults([]);
-          });
+          .catch(() => setResults([]));
       } else {
         setResults([]);
       }
@@ -38,9 +36,9 @@ const SearchBar = ({ onResultClick }) => {
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
