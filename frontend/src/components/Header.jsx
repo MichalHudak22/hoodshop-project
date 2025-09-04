@@ -9,7 +9,7 @@ import SearchBar from './SearchBar';
 
 const Header = () => {
   const { user, logout } = useContext(AuthContext);
-  const { cartCount, refreshCartCount } = useContext(CartContext);
+  const { cartCount } = useContext(CartContext);
   const navigate = useNavigate();
 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -18,9 +18,13 @@ const Header = () => {
   const [sportsOpen, setSportsOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
 
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://hoodshop-project.onrender.com';
+
   const modalRef = useRef(null);
 
-  const toggleProfileModal = () => setProfileModalOpen(!profileModalOpen);
+  const toggleProfileModal = () => {
+    setProfileModalOpen(!profileModalOpen);
+  };
 
   const handleLogout = () => {
     logout();
@@ -29,7 +33,9 @@ const Header = () => {
     setProfileModalOpen(false);
   };
 
-  const toggleMenu = () => setMenuOpen(!menuOpen);
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
 
   // Zatvorenie modalu klikom mimo
   useEffect(() => {
@@ -39,8 +45,13 @@ const Header = () => {
       }
     };
 
-    if (profileModalOpen) document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    if (profileModalOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, [profileModalOpen]);
 
   // Skryť/zobraziť header pri scrollovaní
@@ -54,11 +65,6 @@ const Header = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [prevScrollPos]);
-
-  // Refresh cartCount pri zmene používateľa alebo otvorení headeru
-  useEffect(() => {
-    refreshCartCount();
-  }, [user, refreshCartCount]);
 
   return (
     <header className={`fixed w-full flex flex-col bg-black bg-opacity-90 text-white border-b border-white border-opacity-70 z-50 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
