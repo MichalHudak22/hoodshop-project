@@ -14,8 +14,8 @@ const SearchBar = ({ onResultClick }) => {
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       if (query.trim().length > 0) {
-        axios
-          .get(`${API_BASE_URL}/api/products/search?q=${encodeURIComponent(query)}`)
+        axios.get(`${API_BASE_URL}/products/search?q=${encodeURIComponent(query)}`)
+
           .then((res) => {
             setResults(Array.isArray(res.data) ? res.data : []);
           })
