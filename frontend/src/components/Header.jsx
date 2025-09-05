@@ -66,6 +66,8 @@ const Header = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [prevScrollPos]);
 
+  console.log('Header cartCount:', cartCount);
+
   return (
     <header className={`fixed w-full flex flex-col bg-black bg-opacity-90 text-white border-b border-white border-opacity-70 z-50 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
       {/* Top bar */}

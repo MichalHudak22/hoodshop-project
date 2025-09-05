@@ -52,12 +52,16 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 
 
 function App() {
-  useEffect(() => {
-    if (!localStorage.getItem("session_id")) {
-      const newSessionId = uuidv4();
-      localStorage.setItem("session_id", newSessionId);
-    }
-  }, []);
+useEffect(() => {
+  if (!localStorage.getItem("session_id")) {
+    const newSessionId = uuidv4();
+    localStorage.setItem("session_id", newSessionId);
+    console.log('App.jsx new session_id:', newSessionId); // <-- kontrola
+  } else {
+    console.log('App.jsx existing session_id:', localStorage.getItem("session_id")); // <-- kontrola
+  }
+}, []);
+
 
 
   return (
