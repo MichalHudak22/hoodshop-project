@@ -146,7 +146,8 @@ const getCartCount = async (req, res) => {
   const userId = req.userId || null;
   const sessionId = req.headers['x-session-id'] || null;
 
-  if (!userId && !sessionId) return res.status(400).json({ error: 'Chýba identifikácia používateľa' });
+  if (!userId && !sessionId)
+    return res.status(400).json({ error: 'Chýba identifikácia používateľa' });
 
   try {
     let query, params;
@@ -161,7 +162,7 @@ const getCartCount = async (req, res) => {
       params = [sessionId];
     }
 
-    const results = await db.query(query, params);
+    const [results] = await db.query(query, params); // 👈 db musí byť mysql2/promise pool
     const count = results[0].count || 0;
     res.status(200).json({ count });
   } catch (err) {
@@ -169,6 +170,7 @@ const getCartCount = async (req, res) => {
     res.status(500).json({ error: 'Chyba pri načítaní počtu položiek' });
   }
 };
+
 
 // ========================
 // Vymazanie celého košíka
