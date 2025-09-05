@@ -18,6 +18,18 @@ const Header = () => {
   const [sportsOpen, setSportsOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
 
+  // Sleduje zmenu cartCount a loguje ju
+useEffect(() => {
+  console.log('🛒 Header - cartCount aktualizovaný:', cartCount);
+}, [cartCount]);
+
+// Logni aj usera a session_id pre istotu
+useEffect(() => {
+  console.log('Header - user:', user);
+  console.log('Header - session_id:', localStorage.getItem('session_id'));
+}, [user]);
+
+
   const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://hoodshop-project.onrender.com';
 
   const modalRef = useRef(null);
