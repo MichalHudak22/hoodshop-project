@@ -15,6 +15,7 @@ export const CartProvider = ({ children }) => {
     }
   };
 
+  // Funkcia na získanie počtu položiek v košíku
   const fetchCartCount = useCallback(async () => {
     try {
       const headers = {};
@@ -35,15 +36,16 @@ export const CartProvider = ({ children }) => {
     }
   }, []);
 
-  // refreshCartCount bude stabilná referencia
+  // Stabilná referencia pre aktualizáciu počtu
   const refreshCartCount = useCallback(() => {
     fetchCartCount();
   }, [fetchCartCount]);
 
   useEffect(() => {
-    initSession();           // session_id pre neprihlásených
-    fetchCartCount();        // načítanie počtu pri štarte
-  }, [user, fetchCartCount]); // aktualizuje sa aj pri zmene user (login/logout)
+    // Inicializácia session_id pred načítaním počtu
+    initSession();
+    fetchCartCount();
+  }, [user]); // spustí sa pri štarte a pri zmene user (login/logout)
 
   return (
     <CartContext.Provider value={{ cartCount, refreshCartCount }}>
