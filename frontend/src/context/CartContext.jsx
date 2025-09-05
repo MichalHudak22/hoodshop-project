@@ -29,30 +29,23 @@ const fetchCartCount = useCallback(async () => {
 
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
+      // nepridávame session_id
     } else if (sessionId) {
       headers['x-session-id'] = sessionId;
     }
 
-    console.log('Fetching cart count. URL:', `${baseURL}/api/cart/count`);
-    console.log('Headers:', headers);
+    console.log('Fetching cart count. Token:', token, 'SessionID:', sessionId);
 
     const res = await axios.get(`${baseURL}/api/cart/count`, { headers });
+    console.log('Cart count response:', res.data);
 
-    console.log('Cart count raw response:', res); // <-- pridaj log celého response
-    console.log('Cart count response data:', res.data);
-
-    if (res.data && typeof res.data.count !== 'undefined') {
-      setCartCount(res.data.count);
-    } else {
-      console.warn('Unexpected response format, setting cartCount to 0');
-      setCartCount(0);
-    }
-
+    setCartCount(res.data.count || 0);
   } catch (err) {
     console.error('Chyba pri načítaní počtu položiek v košíku:', err);
     setCartCount(0);
   }
 }, [baseURL]);
+
 
 
   const refreshCartCount = useCallback(() => {
