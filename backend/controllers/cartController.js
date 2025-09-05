@@ -162,8 +162,8 @@ const getCartCount = async (req, res) => {
       params = [sessionId];
     }
 
-    const [results] = await db.query(query, params); // 👈 db musí byť mysql2/promise pool
-    const count = results[0].count || 0;
+    const [results] = await pool.query(query, params); // db musí byť mysql2/promise pool
+    const count = results[0]?.count || 0; // ✅ bezpečný prístup
     res.status(200).json({ count });
   } catch (err) {
     console.error('Chyba pri načítaní počtu položiek:', err);

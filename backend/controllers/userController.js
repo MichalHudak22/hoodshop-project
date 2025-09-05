@@ -107,15 +107,26 @@ const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
     const [users] = await pool.query('SELECT * FROM user WHERE email = ?', [email]);
-    if (users.length === 0) return res.status(404).json({ error: 'Používateľ s týmto emailom neexistuje.' });
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({ error: 'Používateľ s týmto emailom neexistuje.' });
+    }
 
     const user = users[0];
-    if (user.is_verified === 0) return res.status(403).json({ error: 'Email nie je overený. Skontroluj svoj email.' });
+    if (!user) return res.status(404).json({ error: 'Používateľ s týmto emailom neexistuje.' });
+
+    if (user.is_verified === 0 || user.is_verified === false) {
+      return res.status(403).json({ error: 'Email nie je overený. Skontroluj svoj email.' });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ error: 'Nesprávne heslo.' });
 
-    const token = jwt.sign({ userId: user.id, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '6h' });
+    const token = jwt.sign(
+      { userId: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '6h' }
+    );
 
     res.status(200).json({
       message: 'Prihlásenie úspešné',
@@ -125,7 +136,7 @@ const loginUser = async (req, res) => {
       role: user.role,
     });
   } catch (err) {
-    console.error(err);
+    console.error('Chyba pri prihlasovaní:', err);
     res.status(500).json({ error: 'Chyba pri prihlasovaní.' });
   }
 };
