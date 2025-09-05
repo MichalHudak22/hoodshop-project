@@ -115,40 +115,41 @@ const Header = () => {
           <Link to="/about" className="hover:text-blue-200">Project Info</Link>
         </nav>
 
+{/* Desktop ikony */}
+<div className="hidden lg:flex items-center space-x-3">
+  <SearchBar />
+  <Link to="/cart" className="relative hover:text-blue-200">
+    <ShoppingCart size={26} />
+    {/* Badge pre počet položiek */}
+    {cartCount > 0 ? (
+      <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+        {cartCount}
+      </span>
+    ) : null}
+  </Link>
+  
+  {user ? (
+    <>
+      <button onClick={toggleProfileModal} className="hover:text-blue-200">
+        <User size={26} />
+      </button>
 
-        {/* Desktop ikony */}
-        <div className="hidden lg:flex items-center space-x-3">
-          <SearchBar />
-          <Link to="/cart" className="relative hover:text-blue-200">
-            <ShoppingCart size={26} />
-            {cartCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                {cartCount}
-              </span>
-            )}
-          </Link>
-          {user ? (
-            <>
+      {/* Admin link – len pre admina */}
+      {user.role === 'admin' && (
+        <Link to="/admin" className="hover:text-blue-200 font-semibold text-xl">
+          Admin
+        </Link>
+      )}
 
-              <button onClick={toggleProfileModal} className="hover:text-blue-200">
-                <User size={26} />
-              </button>
+      <button onClick={handleLogout} className="hover:text-blue-200 font-semibold text-xl">
+        Logout
+      </button>
+    </>
+  ) : (
+    <Link to="/login" className="hover:text-blue-200 text-xl">Login</Link>
+  )}
+</div>
 
-              {/* 🔒 Admin Link – len pre admina */}
-              {user.role === 'admin' && (
-                <Link to="/admin" className="hover:text-blue-200 font-semibold text-xl">
-                  Admin
-                </Link>
-              )}
-
-              <button onClick={handleLogout} className="hover:text-blue-200 font-semibold text-xl">Logout</button>
-            </>
-          ) : (
-            <>
-              <Link to="/login" className="hover:text-blue-200 text-xl">Login</Link>
-            </>
-          )}
-        </div>
 
       </div>
 

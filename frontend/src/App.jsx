@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { CartProvider } from './context/CartContext'; // <- pridaj import
+import { AuthProvider } from './context/AuthContext'; // <- pridaj import
 
 // Lazy load stránok
 const Home = lazy(() => import('./pages/Home'));
@@ -60,6 +61,7 @@ function App() {
 
   return (
     <Router>
+      <AuthProvider>
       <CartProvider> {/* OBALÍME TÝMTO VŠETKO, ČO POTREBUJE PRÍSTUP KU KART CONTEXT */}
         <Header />
         <div className="pt-[89px]">
@@ -103,6 +105,7 @@ function App() {
         </div>
         <Footer />
       </CartProvider>
+      </AuthProvider>
     </Router>
   );
 }

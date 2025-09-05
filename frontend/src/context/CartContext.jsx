@@ -8,11 +8,18 @@ export const CartProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
   const [cartCount, setCartCount] = useState(0);
 
+  // Vytvorenie session_id pre neprihlásených
+  const initSession = () => {
+    if (!localStorage.getItem('session_id')) {
+      localStorage.setItem('session_id', crypto.randomUUID());
+    }
+  };
+
   const fetchCartCount = useCallback(async () => {
     try {
       const headers = {};
       const token = localStorage.getItem('token');
-      const sessionId = localStorage.getItem('session_id') || localStorage.getItem('sessionId');
+      const sessionId = localStorage.getItem('session_id');
 
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
@@ -26,7 +33,7 @@ export const CartProvider = ({ children }) => {
       console.error('Chyba pri načítaní počtu položiek v košíku:', err);
       setCartCount(0);
     }
-  }, []); // žiadne závislosti alebo iba tie, ktoré sú potrebné
+  }, []);
 
   // refreshCartCount bude stabilná referencia
   const refreshCartCount = useCallback(() => {
@@ -34,8 +41,9 @@ export const CartProvider = ({ children }) => {
   }, [fetchCartCount]);
 
   useEffect(() => {
-    fetchCartCount();
-  }, [user, fetchCartCount]);
+    initSession();           // session_id pre neprihlásených
+    fetchCartCount();        // načítanie počtu pri štarte
+  }, [user, fetchCartCount]); // aktualizuje sa aj pri zmene user (login/logout)
 
   return (
     <CartContext.Provider value={{ cartCount, refreshCartCount }}>
