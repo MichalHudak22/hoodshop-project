@@ -72,7 +72,7 @@ const getProductsByCategoryAndType = (req, res) => {
 // GET search products by name (q= query param)
 const searchProductsByName = (req, res) => {
   const { q } = req.query;
-  if (!q) {
+  if (!q || q.trim() === '') {
     return res.status(400).json({ error: 'Chýba parameter vyhľadávania' });
   }
 
@@ -82,9 +82,10 @@ const searchProductsByName = (req, res) => {
       console.error('DB error searchProductsByName:', err);
       return res.status(500).json({ error: 'Chyba servera' });
     }
-    res.json(results);
+    res.json(results || []);
   });
 };
+
 
 // GET products for carousel by category (using carousel_group pattern)
 const getCarouselByCategory = (req, res) => {
