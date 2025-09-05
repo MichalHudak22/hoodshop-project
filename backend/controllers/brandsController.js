@@ -14,7 +14,7 @@ const getAllBrands = (req, res) => {
 
 
 // Získaj len vybrané značky pre home-brands
-const getSelectedBrands = async (req, res) => {
+const getSelectedBrands = (req, res) => {
   const sql = `
     SELECT id, name, brand_image 
     FROM brands 
@@ -22,14 +22,13 @@ const getSelectedBrands = async (req, res) => {
   `;
   const values = ['Adidas', 'Nike', 'Bauer', 'Trek'];
 
-  try {
-    const results = await db.query(sql, values);
+  db.query(sql, values, (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: 'Database error', details: err });
+    }
     res.json(results);
-  } catch (err) {
-    console.error('DB error getSelectedBrands:', err);
-    res.status(500).json({ error: 'Database error', details: err });
-  }
-};
+  });
+  };
 
   // Získaj značku podľa názvu (slug)
 const getBrandBySlug = (req, res) => {
