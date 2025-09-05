@@ -21,32 +21,29 @@ export const CartProvider = ({ children }) => {
     }
   };
 
-const fetchCartCount = useCallback(async () => {
-  try {
-    const headers = {};
-    const token = localStorage.getItem('token');
-    const sessionId = localStorage.getItem('session_id');
+  const fetchCartCount = useCallback(async () => {
+    try {
+      const headers = {};
+      const token = localStorage.getItem('token');
+      const sessionId = localStorage.getItem('session_id');
 
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-      // nepridávame session_id
-    } else if (sessionId) {
-      headers['x-session-id'] = sessionId;
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      } else if (sessionId) {
+        headers['x-session-id'] = sessionId;
+      }
+
+      console.log('Fetching cart count. Token:', token, 'SessionID:', sessionId);
+
+      const res = await axios.get(`${baseURL}/api/cart/count`, { headers });
+      console.log('Cart count response:', res.data);
+
+      setCartCount(res.data.count || 0);
+    } catch (err) {
+      console.error('Chyba pri načítaní počtu položiek v košíku:', err);
+      setCartCount(0);
     }
-
-    console.log('Fetching cart count. Token:', token, 'SessionID:', sessionId);
-
-    const res = await axios.get(`${baseURL}/api/cart/count`, { headers });
-    console.log('Cart count response:', res.data);
-
-    setCartCount(res.data.count || 0);
-  } catch (err) {
-    console.error('Chyba pri načítaní počtu položiek v košíku:', err);
-    setCartCount(0);
-  }
-}, [baseURL]);
-
-
+  }, [baseURL]);
 
   const refreshCartCount = useCallback(() => {
     fetchCartCount();
@@ -56,6 +53,11 @@ const fetchCartCount = useCallback(async () => {
     initSession();
     fetchCartCount();
   }, [user, fetchCartCount]);
+
+  // Logovanie zmeny cartCount
+  useEffect(() => {
+    console.log('Cart count changed:', cartCount);
+  }, [cartCount]);
 
   return (
     <CartContext.Provider value={{ cartCount, refreshCartCount }}>
