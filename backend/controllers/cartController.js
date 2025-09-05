@@ -3,241 +3,203 @@ const db = require('../database');
 // ========================
 // Pridanie produktu do košíka
 // ========================
-const addToCart = (req, res) => {
-
+const addToCart = async (req, res) => {
   const { productId, quantity } = req.body;
   const userId = req.userId || null;
   const sessionId = req.headers['x-session-id'] || null;
 
-  if (!userId && !sessionId) {
-    return res.status(400).json({ error: 'Chýba identifikácia používateľa' });
-  }
+  if (!userId && !sessionId) return res.status(400).json({ error: 'Chýba identifikácia používateľa' });
+  if (!productId || !quantity || quantity <= 0) return res.status(400).json({ error: 'Neplatné údaje produktu alebo množstva' });
 
-  if (!productId || !quantity || quantity <= 0) {
-    return res.status(400).json({ error: 'Neplatné údaje produktu alebo množstva' });
-  }
+  try {
+    let checkQuery, checkParams;
+    if (userId) {
+      checkQuery = 'SELECT id, quantity FROM cart_items WHERE user_id = ? AND product_id = ?';
+      checkParams = [userId, productId];
+    } else {
+      checkQuery = 'SELECT id, quantity FROM cart_items WHERE session_id = ? AND product_id = ?';
+      checkParams = [sessionId, productId];
+    }
 
-  // Najprv zisti, či už produkt v košíku je
-  let checkQuery = '';
-  let checkParams = [];
-
-  if (userId) {
-    checkQuery = 'SELECT id, quantity FROM cart_items WHERE user_id = ? AND product_id = ?';
-    checkParams = [userId, productId];
-  } else {
-    checkQuery = 'SELECT id, quantity FROM cart_items WHERE session_id = ? AND product_id = ?';
-    checkParams = [sessionId, productId];
-  }
-
-  db.query(checkQuery, checkParams, (err, results) => {
-    if (err) return res.status(500).json({ error: 'Chyba pri kontrole košíka' });
+    const results = await db.query(checkQuery, checkParams);
 
     if (results.length > 0) {
-      // Produkt už existuje, zvýš množstvo
-      const cartItemId = results[0].id;
+      // zvýš množstvo
       const newQuantity = results[0].quantity + quantity;
-
-      const updateQuery = 'UPDATE cart_items SET quantity = ? WHERE id = ?';
-      db.query(updateQuery, [newQuantity, cartItemId], (err2) => {
-        if (err2) return res.status(500).json({ error: 'Chyba pri aktualizácii množstva v košíku' });
-        res.status(200).json({ message: 'Množstvo produktu aktualizované v košíku' });
-      });
+      await db.query('UPDATE cart_items SET quantity = ? WHERE id = ?', [newQuantity, results[0].id]);
+      return res.status(200).json({ message: 'Množstvo produktu aktualizované v košíku' });
     } else {
-      // Produkt nie je v košíku, vlož nový záznam
-      const insertQuery = 'INSERT INTO cart_items (user_id, session_id, product_id, quantity) VALUES (?, ?, ?, ?)';
-      db.query(insertQuery, [userId, sessionId, productId, quantity], (err3) => {
-        if (err3) return res.status(500).json({ error: 'Chyba pri pridávaní do košíka' });
-        res.status(201).json({ message: 'Produkt pridaný do košíka' });
-      });
+      await db.query(
+        'INSERT INTO cart_items (user_id, session_id, product_id, quantity) VALUES (?, ?, ?, ?)',
+        [userId, sessionId, productId, quantity]
+      );
+      return res.status(201).json({ message: 'Produkt pridaný do košíka' });
     }
-  });
+  } catch (err) {
+    console.error('Chyba pri pridávaní do košíka:', err);
+    res.status(500).json({ error: 'Chyba pri manipulácii s košíkom' });
+  }
 };
-
 
 // ========================
 // Získanie obsahu košíka
 // ========================
-const getCart = (req, res) => {
+const getCart = async (req, res) => {
   const userId = req.userId || null;
   const sessionId = req.headers['x-session-id'] || null;
 
-  if (!userId && !sessionId) {
-    return res.status(400).json({ error: 'Chýba identifikácia používateľa' });
-  }
+  if (!userId && !sessionId) return res.status(400).json({ error: 'Chýba identifikácia používateľa' });
 
-  let query;
-  let params;
+  try {
+    let query, params;
 
-  // Ak sú k dispozícii obe identifikácie (zvyčajne počas prechodu z neprihláseného stavu na prihlásený)
-  if (userId && sessionId) {
-    query = `
-     SELECT cart_items.id AS cart_item_id, cart_items.quantity, products.id AS product_id, products.name, products.price, products.image
-     FROM cart_items
-     JOIN products ON cart_items.product_id = products.id
-     WHERE cart_items.user_id = ? OR cart_items.session_id = ?
+    if (userId && sessionId) {
+      query = `
+        SELECT cart_items.id AS cart_item_id, cart_items.quantity, products.id AS product_id, products.name, products.price, products.image
+        FROM cart_items
+        JOIN products ON cart_items.product_id = products.id
+        WHERE cart_items.user_id = ? OR cart_items.session_id = ?
+      `;
+      params = [userId, sessionId];
+    } else if (userId) {
+      query = `
+        SELECT cart_items.id AS cart_item_id, cart_items.quantity, products.id AS product_id, products.name, products.price, products.image
+        FROM cart_items
+        JOIN products ON cart_items.product_id = products.id
+        WHERE cart_items.user_id = ?
+      `;
+      params = [userId];
+    } else {
+      query = `
+        SELECT cart_items.id AS cart_item_id, cart_items.quantity, products.id AS product_id, products.name, products.price, products.image
+        FROM cart_items
+        JOIN products ON cart_items.product_id = products.id
+        WHERE cart_items.session_id = ?
+      `;
+      params = [sessionId];
+    }
 
-    `;
-    params = [userId, sessionId];
-  } else if (userId) {
-    query = `
-      SELECT cart_items.id AS cart_item_id, cart_items.quantity, products.id AS product_id, products.name, products.price, products.image
-      FROM cart_items
-      JOIN products ON cart_items.product_id = products.id
-      WHERE cart_items.user_id = ?
+    const results = await db.query(query, params);
 
-    `;
-    params = [userId];
-  } else {
-    query = `
-      SELECT cart_items.id AS cart_item_id, cart_items.quantity, products.id AS product_id, products.name, products.price, products.image
-      FROM cart_items
-      JOIN products ON cart_items.product_id = products.id
-      WHERE cart_items.session_id = ?
-    `;
-    params = [sessionId];
-  }
-
-  db.query(query, params, (err, results) => {
-    if (err) return res.status(500).json({ error: 'Chyba pri načítaní košíka' });
-
-    // Výsledky sa formátujú pre frontend (zmena `cart_item_id` na `id`)
     const formattedResults = results.map(item => ({
-      id: item.cart_item_id, // ID položky v košíku
-      quantity: item.quantity, // Množstvo
-      product_id: item.product_id, // ID produktu
-      name: item.name, // Názov produktu
-      price: item.price, // Cena
-      image: item.image, // Obrázok
+      id: item.cart_item_id,
+      quantity: item.quantity,
+      product_id: item.product_id,
+      name: item.name,
+      price: item.price,
+      image: item.image
     }));
 
     res.status(200).json(formattedResults);
-  });
+  } catch (err) {
+    console.error('Chyba pri načítaní košíka:', err);
+    res.status(500).json({ error: 'Chyba pri načítaní košíka' });
+  }
 };
 
 // ========================
 // Odstránenie položky z košíka
 // ========================
-const removeFromCart = (req, res) => {
-  const { id } = req.params; // ID položky v košíku (cart_item_id)
+const removeFromCart = async (req, res) => {
+  const { id } = req.params;
   const userId = req.userId || null;
   const sessionId = req.headers['x-session-id'] || null;
 
-  if (!userId && !sessionId) {
-    return res.status(400).json({ error: 'Chýba identifikácia používateľa' });
-  }
+  if (!userId && !sessionId) return res.status(400).json({ error: 'Chýba identifikácia používateľa' });
 
-  const query = 'DELETE FROM cart_items WHERE id = ? AND (user_id = ? OR session_id = ?)';
-  db.query(query, [id, userId, sessionId], (err, result) => {
-    if (err) return res.status(500).json({ error: 'Chyba pri odstraňovaní položky' });
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Položka nebola nájdená alebo nemáte oprávnenie ju odstrániť' });
-    }
-
+  try {
+    const result = await db.query('DELETE FROM cart_items WHERE id = ? AND (user_id = ? OR session_id = ?)', [id, userId, sessionId]);
+    if (result.affectedRows === 0) return res.status(404).json({ error: 'Položka nebola nájdená alebo nemáte oprávnenie ju odstrániť' });
     res.status(200).json({ message: 'Položka odstránená' });
-  });
+  } catch (err) {
+    console.error('Chyba pri odstraňovaní položky:', err);
+    res.status(500).json({ error: 'Chyba pri odstraňovaní položky' });
+  }
 };
 
 // ========================
-// Aktualizácia množstva položky v košíku
+// Aktualizácia množstva položky
 // ========================
-const updateCartItem = (req, res) => {
-  const cartItemId = req.params.id; // ID položky v košíku
+const updateCartItem = async (req, res) => {
+  const cartItemId = req.params.id;
   const { quantity } = req.body;
-
   const userId = req.userId || null;
   const sessionId = req.headers['x-session-id'] || null;
 
-  if (!userId && !sessionId) {
-    return res.status(400).json({ error: 'Chýba identifikácia používateľa' });
+  if (!userId && !sessionId) return res.status(400).json({ error: 'Chýba identifikácia používateľa' });
+  if (!quantity || quantity < 1) return res.status(400).json({ error: 'Neplatné množstvo' });
+
+  try {
+    const result = await db.query('UPDATE cart_items SET quantity = ? WHERE id = ? AND (user_id = ? OR session_id = ?)', [quantity, cartItemId, userId, sessionId]);
+    if (result.affectedRows === 0) return res.status(404).json({ error: 'Položka nebola nájdená alebo nemáte oprávnenie ju upraviť' });
+    res.status(200).json({ message: 'Množstvo úspešne aktualizované' });
+  } catch (err) {
+    console.error('Chyba pri aktualizácii položky:', err);
+    res.status(500).json({ error: 'Chyba pri aktualizácii položky' });
   }
+};
 
-  if (!quantity || quantity < 1) {
-    return res.status(400).json({ error: 'Neplatné množstvo' });
-  }
+// ========================
+// Počet položiek v košíku
+// ========================
+const getCartCount = async (req, res) => {
+  const userId = req.userId || null;
+  const sessionId = req.headers['x-session-id'] || null;
 
-  const query = 'UPDATE cart_items SET quantity = ? WHERE id = ? AND (user_id = ? OR session_id = ?)';
-  db.query(query, [quantity, cartItemId, userId, sessionId], (err, result) => {
-    if (err) return res.status(500).json({ error: 'Chyba pri aktualizácii položky' });
+  if (!userId && !sessionId) return res.status(400).json({ error: 'Chýba identifikácia používateľa' });
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Položka nebola nájdená alebo nemáte oprávnenie ju upraviť' });
+  try {
+    let query, params;
+    if (userId && sessionId) {
+      query = 'SELECT SUM(quantity) AS count FROM cart_items WHERE user_id = ? OR session_id = ?';
+      params = [userId, sessionId];
+    } else if (userId) {
+      query = 'SELECT SUM(quantity) AS count FROM cart_items WHERE user_id = ?';
+      params = [userId];
+    } else {
+      query = 'SELECT SUM(quantity) AS count FROM cart_items WHERE session_id = ?';
+      params = [sessionId];
     }
 
-    res.status(200).json({ message: 'Množstvo úspešne aktualizované' });
-  });
-};
-
-// ========================
-// Získanie počtu položiek v košíku (pre badge)
-// ========================
-const getCartCount = (req, res) => {
-  const userId = req.userId || null;
-  const sessionId = req.headers['x-session-id'] || null;
-
-  if (!userId && !sessionId) {
-    return res.status(400).json({ error: 'Chýba identifikácia používateľa' });
-  }
-
-  let query = '';
-  let params = [];
-
-  if (userId && sessionId) {
-    // Počíta počet všetkých položiek pre používateľa alebo session
-    query = 'SELECT SUM(quantity) AS count FROM cart_items WHERE user_id = ? OR session_id = ?';
-    params = [userId, sessionId];
-  } else if (userId) {
-    query = 'SELECT SUM(quantity) AS count FROM cart_items WHERE user_id = ?';
-    params = [userId];
-  } else {
-    query = 'SELECT SUM(quantity) AS count FROM cart_items WHERE session_id = ?';
-    params = [sessionId];
-  }
-
-  db.query(query, params, (err, results) => {
-    if (err) return res.status(500).json({ error: 'Chyba pri načítaní počtu položiek' });
-
+    const results = await db.query(query, params);
     const count = results[0].count || 0;
     res.status(200).json({ count });
-  });
+  } catch (err) {
+    console.error('Chyba pri načítaní počtu položiek:', err);
+    res.status(500).json({ error: 'Chyba pri načítaní počtu položiek' });
+  }
 };
 
-
 // ========================
-// Vymazanie celého košíka (po dokončení objednávky)
+// Vymazanie celého košíka
 // ========================
-const clearCart = (req, res) => {
+const clearCart = async (req, res) => {
   const userId = req.userId || null;
   const sessionId = req.headers['x-session-id'] || null;
 
-  if (!userId && !sessionId) {
-    return res.status(400).json({ error: 'Chýba identifikácia používateľa' });
-  }
+  if (!userId && !sessionId) return res.status(400).json({ error: 'Chýba identifikácia používateľa' });
 
-  let query = '';
-  let params = [];
+  try {
+    let query, params;
+    if (userId && sessionId) {
+      query = 'DELETE FROM cart_items WHERE user_id = ? OR session_id = ?';
+      params = [userId, sessionId];
+    } else if (userId) {
+      query = 'DELETE FROM cart_items WHERE user_id = ?';
+      params = [userId];
+    } else {
+      query = 'DELETE FROM cart_items WHERE session_id = ?';
+      params = [sessionId];
+    }
 
-  if (userId && sessionId) {
-    query = 'DELETE FROM cart_items WHERE user_id = ? OR session_id = ?';
-    params = [userId, sessionId];
-  } else if (userId) {
-    query = 'DELETE FROM cart_items WHERE user_id = ?';
-    params = [userId];
-  } else {
-    query = 'DELETE FROM cart_items WHERE session_id = ?';
-    params = [sessionId];
-  }
-
-  db.query(query, params, (err, result) => {
-    if (err) return res.status(500).json({ error: 'Chyba pri mazaní košíka' });
-
+    await db.query(query, params);
     res.status(200).json({ message: 'Košík úspešne vymazaný' });
-  });
+  } catch (err) {
+    console.error('Chyba pri mazaní košíka:', err);
+    res.status(500).json({ error: 'Chyba pri mazaní košíka' });
+  }
 };
 
-
-
-// Export funkcií pre použitie v route súbore
 module.exports = {
   addToCart,
   getCart,
