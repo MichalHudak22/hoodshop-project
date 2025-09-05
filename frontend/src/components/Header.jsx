@@ -18,18 +18,6 @@ const Header = () => {
   const [sportsOpen, setSportsOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
 
-  // Sleduje zmenu cartCount a loguje ju
-useEffect(() => {
-  console.log('🛒 Header - cartCount aktualizovaný:', cartCount);
-}, [cartCount]);
-
-// Logni aj usera a session_id pre istotu
-useEffect(() => {
-  console.log('Header - user:', user);
-  console.log('Header - session_id:', localStorage.getItem('session_id'));
-}, [user]);
-
-
   const baseURL = import.meta.env.VITE_API_BASE_URL || 'https://hoodshop-project.onrender.com';
 
   const modalRef = useRef(null);
@@ -77,8 +65,6 @@ useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [prevScrollPos]);
-
-  console.log('Header cartCount:', cartCount);
 
   return (
     <header className={`fixed w-full flex flex-col bg-black bg-opacity-90 text-white border-b border-white border-opacity-70 z-50 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
@@ -129,41 +115,40 @@ useEffect(() => {
           <Link to="/about" className="hover:text-blue-200">Project Info</Link>
         </nav>
 
-{/* Desktop ikony */}
-<div className="hidden lg:flex items-center space-x-3">
-  <SearchBar />
-  <Link to="/cart" className="relative hover:text-blue-200">
-    <ShoppingCart size={26} />
-    {/* Badge pre počet položiek */}
-    {cartCount > 0 ? (
-      <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-        {cartCount}
-      </span>
-    ) : null}
-  </Link>
-  
-  {user ? (
-    <>
-      <button onClick={toggleProfileModal} className="hover:text-blue-200">
-        <User size={26} />
-      </button>
 
-      {/* Admin link – len pre admina */}
-      {user.role === 'admin' && (
-        <Link to="/admin" className="hover:text-blue-200 font-semibold text-xl">
-          Admin
-        </Link>
-      )}
+        {/* Desktop ikony */}
+        <div className="hidden lg:flex items-center space-x-3">
+          <SearchBar />
+          <Link to="/cart" className="relative hover:text-blue-200">
+            <ShoppingCart size={26} />
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                {cartCount}
+              </span>
+            )}
+          </Link>
+          {user ? (
+            <>
 
-      <button onClick={handleLogout} className="hover:text-blue-200 font-semibold text-xl">
-        Logout
-      </button>
-    </>
-  ) : (
-    <Link to="/login" className="hover:text-blue-200 text-xl">Login</Link>
-  )}
-</div>
+              <button onClick={toggleProfileModal} className="hover:text-blue-200">
+                <User size={26} />
+              </button>
 
+              {/* 🔒 Admin Link – len pre admina */}
+              {user.role === 'admin' && (
+                <Link to="/admin" className="hover:text-blue-200 font-semibold text-xl">
+                  Admin
+                </Link>
+              )}
+
+              <button onClick={handleLogout} className="hover:text-blue-200 font-semibold text-xl">Logout</button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="hover:text-blue-200 text-xl">Login</Link>
+            </>
+          )}
+        </div>
 
       </div>
 
