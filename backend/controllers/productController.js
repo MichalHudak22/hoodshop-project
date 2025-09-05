@@ -16,8 +16,9 @@ const getProductsByBrand = (req, res) => {
   });
 };
 
+
 // GET top carousel products (one product per category/type pair)
-const getTopCarouselProducts = (req, res) => {
+const getTopCarouselProducts = async (req, res) => {
   const productTypes = [
     { category: 'football', type: 'jersey' },
     { category: 'football', type: 'ball' },
@@ -33,21 +34,26 @@ const getTopCarouselProducts = (req, res) => {
     { category: 'cycling', type: 'clothes' },
   ];
 
-  // Safety: používame mysql.escape na hodnoty, aby sme sa vyhli SQL injekcii
-  let queries = productTypes.map(({ category, type }) => {
-    return `(SELECT * FROM products WHERE category = ${db.escape(category)} AND type = ${db.escape(type)} ORDER BY id DESC LIMIT 1)`;
-  });
+  try {
+    // Vytvoríme UNION ALL query
+    const queries = productTypes.map(({ category, type }) => {
+      return `(SELECT * FROM products WHERE category = ${db.escape(category)} AND type = ${db.escape(type)} ORDER BY id DESC LIMIT 1)`;
+    });
 
-  const finalQuery = queries.join(' UNION ALL ');
+    const finalQuery = queries.join(' UNION ALL ');
 
-  db.query(finalQuery, (err, results) => {
-    if (err) {
-      console.error('DB error getTopCarouselProducts:', err);
-      return res.status(500).json({ error: 'Chyba servera' });
-    }
+    // Použijeme pool.query s await
+    const results = await db.query(finalQuery);
+
     res.json(results);
-  });
+  } catch (err) {
+    console.error('DB error getTopCarouselProducts:', err);
+    res.status(500).json({ error: 'Chyba servera' });
+  }
 };
+
+module.exports = { getTopCarouselProducts };
+
 
 // GET products by category and type
 const getProductsByCategoryAndType = (req, res) => {
