@@ -16,38 +16,45 @@ const getProductsByBrand = (req, res) => {
   });
 };
 
+
 // GET top carousel products (one product per category/type pair)
-const getTopCarouselProducts = (req, res) => {
+const getTopCarouselProducts = async (req, res) => {
   const productTypes = [
-    { category: 'football', type: 'jersey' },
-    { category: 'football', type: 'ball' },
-    { category: 'football', type: 'cleats' },
-    { category: 'football', type: 'shinguards' },
-    { category: 'hockey', type: 'jersey' },
-    { category: 'hockey', type: 'helmets' },
-    { category: 'hockey', type: 'skates' },
-    { category: 'hockey', type: 'sticks' },
-    { category: 'cycling', type: 'bike' },
-    { category: 'cycling', type: 'gloves' },
-    { category: 'cycling', type: 'helmets' },
-    { category: 'cycling', type: 'clothes' },
+    { category: "football", type: "jersey" },
+    { category: "football", type: "ball" },
+    { category: "football", type: "cleats" },
+    { category: "football", type: "shinguards" },
+    { category: "hockey", type: "jersey" },
+    { category: "hockey", type: "helmets" },
+    { category: "hockey", type: "skates" },
+    { category: "hockey", type: "sticks" },
+    { category: "cycling", type: "bike" },
+    { category: "cycling", type: "gloves" },
+    { category: "cycling", type: "helmets" },
+    { category: "cycling", type: "clothes" },
   ];
 
-  // Safety: používame mysql.escape na hodnoty, aby sme sa vyhli SQL injekcii
-  let queries = productTypes.map(({ category, type }) => {
-    return `(SELECT * FROM products WHERE category = ${db.escape(category)} AND type = ${db.escape(type)} ORDER BY id DESC LIMIT 1)`;
-  });
+  try {
+    // Každý SELECT obalíme do UNION ALL
+    let queries = productTypes.map(({ category, type }) => {
+      return `(SELECT * FROM products 
+               WHERE category = ${db.escape(category)} 
+                 AND type = ${db.escape(type)} 
+               ORDER BY id DESC LIMIT 1)`;
+    });
 
-  const finalQuery = queries.join(' UNION ALL ');
+    const finalQuery = queries.join(" UNION ALL ");
 
-  db.query(finalQuery, (err, results) => {
-    if (err) {
-      console.error('DB error getTopCarouselProducts:', err);
-      return res.status(500).json({ error: 'Chyba servera' });
-    }
-    res.json(results);
-  });
+    // await + destructuring
+    const [rows] = await db.query(finalQuery);
+
+    res.json(rows);
+  } catch (err) {
+    console.error("DB error getTopCarouselProducts:", err);
+    res.status(500).json({ error: "Chyba servera" });
+  }
 };
+
 
 // GET products by category and type
 const getProductsByCategoryAndType = (req, res) => {

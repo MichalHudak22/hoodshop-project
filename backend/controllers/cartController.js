@@ -171,35 +171,38 @@ const updateCartItem = (req, res) => {
 // ========================
 // Získanie počtu položiek v košíku (pre badge)
 // ========================
-const getCartCount = (req, res) => {
+const getCartCount = async (req, res) => {
   const userId = req.userId || null;
-  const sessionId = req.headers['x-session-id'] || null;
+  const sessionId = req.headers["x-session-id"] || null;
 
   if (!userId && !sessionId) {
-    return res.status(400).json({ error: 'Chýba identifikácia používateľa' });
+    return res.status(400).json({ error: "Chýba identifikácia používateľa" });
   }
 
-  let query = '';
+  let query = "";
   let params = [];
 
   if (userId && sessionId) {
     // Počíta počet všetkých položiek pre používateľa alebo session
-    query = 'SELECT SUM(quantity) AS count FROM cart_items WHERE user_id = ? OR session_id = ?';
+    query =
+      "SELECT SUM(quantity) AS count FROM cart_items WHERE user_id = ? OR session_id = ?";
     params = [userId, sessionId];
   } else if (userId) {
-    query = 'SELECT SUM(quantity) AS count FROM cart_items WHERE user_id = ?';
+    query = "SELECT SUM(quantity) AS count FROM cart_items WHERE user_id = ?";
     params = [userId];
   } else {
-    query = 'SELECT SUM(quantity) AS count FROM cart_items WHERE session_id = ?';
+    query = "SELECT SUM(quantity) AS count FROM cart_items WHERE session_id = ?";
     params = [sessionId];
   }
 
-  db.query(query, params, (err, results) => {
-    if (err) return res.status(500).json({ error: 'Chyba pri načítaní počtu položiek' });
-
-    const count = results[0].count || 0;
+  try {
+    const [rows] = await db.query(query, params);
+    const count = rows[0]?.count || 0;
     res.status(200).json({ count });
-  });
+  } catch (err) {
+    console.error("DB error getCartCount:", err);
+    res.status(500).json({ error: "Chyba pri načítaní počtu položiek" });
+  }
 };
 
 
