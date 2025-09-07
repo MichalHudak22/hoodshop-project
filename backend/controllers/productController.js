@@ -122,18 +122,14 @@ const getProductBySlug = async (req, res) => {
 };
 
 
-// GET all products (for admin delete page)
-// GET all products (for admin delete page)
-const getAllProducts = (req, res) => {
-  const sql = 'SELECT * FROM products ORDER BY id DESC';
-
-  db.query(sql, (err, results) => {
-    if (err) {
-      console.error('DB error getAllProducts:', err);
-      return res.status(500).json({ error: 'Chyba servera' });
-    }
+const getAllProducts = async (req, res) => {
+  try {
+    const [results] = await db.query('SELECT * FROM products ORDER BY id DESC');
     res.json(results);
-  });
+  } catch (err) {
+    console.error('DB error getAllProducts:', err);
+    res.status(500).json({ error: 'Chyba servera' });
+  }
 };
 
 
@@ -179,16 +175,12 @@ const addProduct = async (req, res) => {
 
 
 // ADMIN - Delete product by slug (and delete image file)
-const deleteProductBySlug = (req, res) => {
+const deleteProductBySlug = async (req, res) => {
   const { slug } = req.params;
 
-  const sqlSelect = 'SELECT image FROM products WHERE slug = ?';
-
-  db.query(sqlSelect, [slug], (err, results) => {
-    if (err) {
-      console.error('DB error select product for delete:', err);
-      return res.status(500).json({ error: 'Chyba servera' });
-    }
+  try {
+    // 1️⃣ Získať cestu k obrázku
+    const [results] = await db.query('SELECT image FROM products WHERE slug = ?', [slug]);
 
     if (results.length === 0) {
       return res.status(404).json({ error: 'Produkt nebol nájdený' });
@@ -196,30 +188,27 @@ const deleteProductBySlug = (req, res) => {
 
     const imagePath = results[0].image;
 
+    // 2️⃣ Vymazať obrázok (ak existuje)
     if (imagePath) {
-      // Absolútna cesta na serveri, uprav podľa svojej štruktúry
       const fullPath = path.join(__dirname, '..', 'src', imagePath);
-
-      fs.unlink(fullPath, (err) => {
-        if (err) {
-          console.warn('Chyba pri mazaní obrázka:', err);
-          // nemusíme vracať chybu, môžeme pokračovať
-        }
-      });
+      try {
+        await fs.promises.unlink(fullPath);
+      } catch (err) {
+        console.warn('Chyba pri mazaní obrázka:', err);
+        // pokračujeme aj keď sa nepodarí vymazať obrázok
+      }
     }
 
-    const sqlDelete = 'DELETE FROM products WHERE slug = ?';
+    // 3️⃣ Vymazať produkt z DB
+    await db.query('DELETE FROM products WHERE slug = ?', [slug]);
 
-    db.query(sqlDelete, [slug], (err) => {
-      if (err) {
-        console.error('DB error delete product:', err);
-        return res.status(500).json({ error: 'Chyba servera pri mazaní produktu' });
-      }
-
-      res.json({ message: 'Produkt bol vymazaný' });
-    });
-  });
+    res.json({ message: 'Produkt bol vymazaný' });
+  } catch (err) {
+    console.error('DB error deleteProductBySlug:', err);
+    res.status(500).json({ error: 'Chyba servera pri mazaní produktu' });
+  }
 };
+
 
 
 module.exports = {
