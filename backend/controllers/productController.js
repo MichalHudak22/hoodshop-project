@@ -57,68 +57,72 @@ const getTopCarouselProducts = async (req, res) => {
 
 
 // GET products by category and type
-const getProductsByCategoryAndType = (req, res) => {
+const getProductsByCategoryAndType = async (req, res) => {
   const { category, type } = req.params;
-  const sql = 'SELECT * FROM products WHERE category = ? AND type = ?';
+  const sql = "SELECT * FROM products WHERE category = ? AND type = ?";
 
-  db.query(sql, [category, type], (err, results) => {
-    if (err) {
-      console.error('DB error getProductsByCategoryAndType:', err);
-      return res.status(500).json({ error: 'Chyba servera' });
-    }
-    res.json(results);
-  });
+  try {
+    const [rows] = await db.query(sql, [category, type]);
+    res.json(rows);
+  } catch (err) {
+    console.error("DB error getProductsByCategoryAndType:", err);
+    res.status(500).json({ error: "Chyba servera" });
+  }
 };
 
+
 // GET search products by name (q= query param)
-const searchProductsByName = (req, res) => {
+const searchProductsByName = async (req, res) => {
   const { q } = req.query;
   if (!q) {
     return res.status(400).json({ error: 'Chýba parameter vyhľadávania' });
   }
 
   const sql = 'SELECT * FROM products WHERE LOWER(name) LIKE ? LIMIT 20';
-  db.query(sql, [`%${q.toLowerCase()}%`], (err, results) => {
-    if (err) {
-      console.error('DB error searchProductsByName:', err);
-      return res.status(500).json({ error: 'Chyba servera' });
-    }
-    res.json(results);
-  });
+
+  try {
+    const [rows] = await db.query(sql, [`%${q.toLowerCase()}%`]);
+    res.json(rows);
+  } catch (err) {
+    console.error('DB error searchProductsByName:', err);
+    res.status(500).json({ error: 'Chyba servera' });
+  }
 };
 
+
 // GET products for carousel by category (using carousel_group pattern)
-const getCarouselByCategory = (req, res) => {
+const getCarouselByCategory = async (req, res) => {
   const { category } = req.params;
   const sql = "SELECT * FROM products WHERE carousel_group LIKE ?";
 
-  db.query(sql, [`${category}_%`], (err, results) => {
-    if (err) {
-      console.error('DB error getCarouselByCategory:', err);
-      return res.status(500).json({ error: 'Chyba servera' });
-    }
-    res.json(results);
-  });
+  try {
+    const [rows] = await db.query(sql, [`${category}_%`]);
+    res.json(rows);
+  } catch (err) {
+    console.error('DB error getCarouselByCategory:', err);
+    res.status(500).json({ error: 'Chyba servera' });
+  }
 };
 
 // GET product detail by slug
-const getProductBySlug = (req, res) => {
+const getProductBySlug = async (req, res) => {
   const { slug } = req.params;
   const sql = 'SELECT * FROM products WHERE slug = ?';
 
-  db.query(sql, [slug], (err, results) => {
-    if (err) {
-      console.error('DB error getProductBySlug:', err);
-      return res.status(500).json({ error: 'Chyba servera' });
-    }
-    if (results.length === 0) {
+  try {
+    const [rows] = await db.query(sql, [slug]);
+    if (rows.length === 0) {
       return res.status(404).json({ error: 'Produkt nebol nájdený' });
     }
-    res.json(results[0]);
-  });
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('DB error getProductBySlug:', err);
+    res.status(500).json({ error: 'Chyba servera' });
+  }
 };
 
 
+// GET all products (for admin delete page)
 // GET all products (for admin delete page)
 const getAllProducts = (req, res) => {
   const sql = 'SELECT * FROM products ORDER BY id DESC';
@@ -134,7 +138,7 @@ const getAllProducts = (req, res) => {
 
 
 // ADMIN - Add product
-const addProduct = (req, res) => {
+const addProduct = async (req, res) => {
   const {
     name, category, brand, price,
     type, description, slug,
@@ -154,22 +158,24 @@ const addProduct = (req, res) => {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  db.query(sql, [
-    name, category, brand, price, imagePath, type, description, slug,
-    highlight_title || null,
-    carousel_group || null
-  ], (err, result) => {
-    if (err) {
-      console.error('DB error addProduct:', err);
-      return res.status(500).json({ error: 'Chyba servera pri vkladaní produktu' });
-    }
+  try {
+    const [result] = await db.query(sql, [
+      name, category, brand, price, imagePath, type, description, slug,
+      highlight_title || null,
+      carousel_group || null
+    ]);
+
     res.status(201).json({
       message: 'Product was successfully added.',
       productId: result.insertId,
       imagePath,
     });
-  });
+  } catch (err) {
+    console.error('DB error addProduct:', err);
+    res.status(500).json({ error: 'Chyba servera pri vkladaní produktu' });
+  }
 };
+
 
 
 // ADMIN - Delete product by slug (and delete image file)
