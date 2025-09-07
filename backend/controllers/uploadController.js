@@ -8,9 +8,7 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const userId = req.userId;
     const userFolder = path.join(__dirname, '..', 'uploads', 'profile_photos', userId.toString());
-    if (!fs.existsSync(userFolder)) {
-      fs.mkdirSync(userFolder, { recursive: true });
-    }
+    if (!fs.existsSync(userFolder)) fs.mkdirSync(userFolder, { recursive: true });
     cb(null, userFolder);
   },
   filename: (req, file, cb) => {
@@ -30,42 +28,29 @@ const upload = multer({
   },
 }).single('photo');
 
-// Hlavná funkcia
+// Hlavná funkcia pre upload
 exports.uploadProfilePhoto = (req, res) => {
-  console.log('User ID:', req.userId);
-
-  upload(req, res, async function (err) {
-    if (err) {
-      console.error('Multer error:', err);
-      return res.status(400).json({ success: false, message: err.message });
-    }
+  upload(req, res, async (err) => {
+    if (err) return res.status(400).json({ success: false, message: err.message });
 
     const userId = req.userId;
     if (!userId) return res.status(401).json({ success: false, message: 'Neautorizovaný prístup.' });
-
-    if (!req.file) {
-      return res.status(400).json({ success: false, message: 'Súbor nebol odoslaný.' });
-    }
+    if (!req.file) return res.status(400).json({ success: false, message: 'Súbor nebol odoslaný.' });
 
     const fileName = req.file.filename;
     const relativePath = `/uploads/profile_photos/${userId}/${fileName}`;
     const userFolder = path.join(__dirname, '..', 'uploads', 'profile_photos', userId.toString());
 
     try {
-      // ⚠️ Vymažeme všetky súbory v priečinku používateľa okrem aktuálne nahraného
+      // Vymazať staré fotky okrem aktuálnej
       const allFiles = fs.readdirSync(userFolder);
-      allFiles.forEach(file => {
-        if (file !== fileName) {
-          const filePath = path.join(userFolder, file);
-          fs.unlinkSync(filePath);
-          console.log('Vymazaný starý súbor:', filePath);
-        }
-      });
+      for (const file of allFiles) {
+        if (file !== fileName) fs.unlinkSync(path.join(userFolder, file));
+      }
 
-      // 💾 Ulož cestu do databázy
+      // Uložiť cestu do DB cez pool
       await db.query('UPDATE user SET user_photo = ? WHERE id = ?', [relativePath, userId]);
 
-      console.log('Fotka nahraná, cesta:', relativePath);
       return res.json({ success: true, photo: relativePath });
     } catch (error) {
       console.error('Chyba pri mazaní alebo ukladaní obrázka:', error);
@@ -74,25 +59,22 @@ exports.uploadProfilePhoto = (req, res) => {
   });
 };
 
-
+// Nastavenie defaultnej fotky
 exports.setDefaultProfilePhoto = async (req, res) => {
   const userId = req.userId;
   if (!userId) return res.status(401).json({ success: false, message: 'Neautorizovaný prístup.' });
 
   const defaultPath = '/uploads/profile_photos/default-avatar.jpg';
+  const userFolder = path.join(__dirname, '..', 'uploads', 'profile_photos', userId.toString());
 
   try {
-    // Uprav cestu v databáze
+    // Aktualizovať DB
     await db.query('UPDATE user SET user_photo = ? WHERE id = ?', [defaultPath, userId]);
 
-    // Môžeme tiež vymazať všetky fotky v osobnom priečinku používateľa
-    const userFolder = path.join(__dirname, '..', 'uploads', 'profile_photos', userId.toString());
+    // Vymazať všetky vlastné fotky používateľa
     if (fs.existsSync(userFolder)) {
-      fs.readdirSync(userFolder).forEach(file => {
-        const filePath = path.join(userFolder, file);
-        fs.unlinkSync(filePath);
-      });
-      console.log('Vymazané všetky vlastné profilové fotky pre používateľa:', userId);
+      const files = fs.readdirSync(userFolder);
+      for (const file of files) fs.unlinkSync(path.join(userFolder, file));
     }
 
     return res.json({ success: true, photo: defaultPath });
@@ -101,5 +83,3 @@ exports.setDefaultProfilePhoto = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Chyba pri nastavovaní defaultnej fotky.' });
   }
 };
-
-

@@ -1,15 +1,16 @@
 const db = require('../database');
 
 // Získaj všetky značky
-const getAllBrands = (req, res) => {
+const getAllBrands = async (req, res) => {
   const sql = 'SELECT id, name, brand_image, brand_info, background_image, brand_Text FROM brands';
 
-  db.query(sql, (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: 'Database error', details: err });
-    }
+  try {
+    const [results] = await db.query(sql);
     res.json(results);
-  });
+  } catch (err) {
+    console.error('DB error getAllBrands:', err);
+    res.status(500).json({ error: 'Database error', details: err });
+  }
 };
 
 
@@ -31,8 +32,8 @@ const getSelectedBrands = async (req, res) => {
   }
 };
 
-  // Získaj značku podľa názvu (slug)
-const getBrandBySlug = (req, res) => {
+// GET značku podľa slug
+const getBrandBySlug = async (req, res) => {
   const slug = req.params.slug.toLowerCase();
 
   const sql = `
@@ -41,17 +42,17 @@ const getBrandBySlug = (req, res) => {
     WHERE slug = ?
   `;
 
-  db.query(sql, [slug], (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: 'Database error', details: err });
+  try {
+    const [rows] = await db.query(sql, [slug]);
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Brand not found" });
     }
-    if (results.length === 0) {
-      return res.status(404).json({ error: 'Brand not found' });
-    }
-    res.json(results[0]);
-  });
+    res.json(rows[0]);
+  } catch (err) {
+    console.error("DB error getBrandBySlug:", err);
+    res.status(500).json({ error: "Database error" });
+  }
 };
-
 
 module.exports = {
   getAllBrands,

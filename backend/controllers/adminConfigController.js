@@ -1,10 +1,9 @@
 const db = require('../database');
 
-// ------------------ Ziskat ceny DPD GLS a SLovak Post ------------------
+// ------------------ Získať ceny DPD, GLS a Slovak Post ------------------
 exports.getShippingPrices = async (req, res) => {
   try {
-    const rows = await db.query('SELECT name, price FROM admin_config');
-
+    const [rows] = await db.query('SELECT name, price FROM admin_config');
     res.json(rows);
   } catch (err) {
     console.error('Chyba pri načítaní cien dopravy:', err);
@@ -12,7 +11,7 @@ exports.getShippingPrices = async (req, res) => {
   }
 };
 
-// ------------------ Upravit ceny DPD GLS a SLovak Post ------------------
+// ------------------ Upraviť ceny DPD, GLS a Slovak Post ------------------
 exports.updateShippingPrice = async (req, res) => {
   const { name, price } = req.body;
 
@@ -29,23 +28,25 @@ exports.updateShippingPrice = async (req, res) => {
   }
 };
 
-
-    // ------------------ Admin_Change_Title ------------------
+// ------------------ Admin_Change_Title ------------------
 
 // GET: Načítanie textu podľa sekcie
 exports.getSectionContent = async (req, res) => {
   const { key } = req.params;
+
   try {
-    const rows = await db.query(
+    const [rows] = await db.query(
       'SELECT title, paragraph FROM admin_change_title WHERE section_key = ?',
       [key]
     );
+
     if (rows.length === 0) {
       return res.status(404).json({ error: 'Sekcia neexistuje' });
     }
+
     res.json(rows[0]);
-  } catch (error) {
-    console.error('Chyba pri načítaní textu:', error);
+  } catch (err) {
+    console.error('Chyba pri načítaní textu:', err);
     res.status(500).json({ error: 'Interná chyba servera' });
   }
 };
@@ -59,7 +60,7 @@ exports.updateSectionContent = async (req, res) => {
   }
 
   try {
-    const rows = await db.query(
+    const [rows] = await db.query(
       'SELECT id FROM admin_change_title WHERE section_key = ?',
       [section_key]
     );
@@ -79,8 +80,8 @@ exports.updateSectionContent = async (req, res) => {
     }
 
     res.json({ success: true });
-  } catch (error) {
-    console.error('Chyba pri ukladaní textu:', error);
+  } catch (err) {
+    console.error('Chyba pri ukladaní textu:', err);
     res.status(500).json({ error: 'Interná chyba servera' });
   }
 };

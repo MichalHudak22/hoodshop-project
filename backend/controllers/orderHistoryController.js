@@ -4,21 +4,21 @@ const db = require('../database');
 const getUserOrders = async (req, res) => {
   const userId = req.userId;
 
-  if (!userId) {
-    return res.status(401).json({ error: 'Neautorizovaný prístup' });
-  }
+  if (!userId) return res.status(401).json({ error: 'Neautorizovaný prístup' });
 
   try {
-    // Bez destructuringu, výsledok je priamo pole riadkov
-    const orders = await db.query(
-  `SELECT id, order_number, created_at, full_name, profile_email, address, city, postal_code, mobile_number, payment_method, delivery_method, delivery_price, total_price, used_points FROM orders WHERE user_id = ? ORDER BY created_at DESC`,
-  [userId]
-);
-
+    // db.query vracia [rows, fields], takže destructuring
+    const [orders] = await db.query(
+      `SELECT id, order_number, created_at, full_name, profile_email, address, city, postal_code, mobile_number, payment_method, delivery_method, delivery_price, total_price, used_points
+       FROM orders
+       WHERE user_id = ?
+       ORDER BY created_at DESC`,
+      [userId]
+    );
 
     for (const order of orders) {
-      const items = await db.query(
-        `SELECT oi.*, p.name as product_name
+      const [items] = await db.query(
+        `SELECT oi.*, p.name AS product_name
          FROM order_items oi
          LEFT JOIN products p ON oi.product_id = p.id
          WHERE oi.order_id = ?`,
@@ -34,6 +34,7 @@ const getUserOrders = async (req, res) => {
   }
 };
 
+
 const getOrdersByUserIdForAdmin = async (req, res) => {
   const user = req.user;
   const targetUserId = req.params.userId;
@@ -43,7 +44,8 @@ const getOrdersByUserIdForAdmin = async (req, res) => {
   }
 
   try {
-    const rows = await db.query(`
+    // destructuring: rows obsahuje výsledky
+    const [rows] = await db.query(`
       SELECT 
         o.id AS order_id,
         o.order_number,
@@ -78,27 +80,27 @@ const getOrdersByUserIdForAdmin = async (req, res) => {
       const orderId = row.order_id;
 
       if (!ordersMap.has(orderId)) {
-       ordersMap.set(orderId, {
-        id: orderId,
-        order_number: row.order_number,
-        user_id: row.user_id,
-        full_name: row.full_name,
-        profile_email: row.profile_email,
-        address: row.address,
-        city: row.city,
-        postal_code: row.postal_code,
-        mobile_number: row.mobile_number,
-        payment_method: row.payment_method,
-        delivery_method: row.delivery_method,  
-        delivery_price: row.delivery_price, 
-        total_price: row.total_price,
-        created_at: row.created_at,
-        used_points: row.used_points,
-        items: [],
-      });
+        ordersMap.set(orderId, {
+          id: orderId,
+          order_number: row.order_number,
+          user_id: row.user_id,
+          full_name: row.full_name,
+          profile_email: row.profile_email,
+          address: row.address,
+          city: row.city,
+          postal_code: row.postal_code,
+          mobile_number: row.mobile_number,
+          payment_method: row.payment_method,
+          delivery_method: row.delivery_method,  
+          delivery_price: row.delivery_price, 
+          total_price: row.total_price,
+          created_at: row.created_at,
+          used_points: row.used_points,
+          items: [],
+        });
       }
 
-      // Pridaj produkt do "items" zoznamu
+      // Pridaj produkt do items
       ordersMap.get(orderId).items.push({
         product_id: row.product_id,
         product_name: row.product_name,
@@ -108,8 +110,8 @@ const getOrdersByUserIdForAdmin = async (req, res) => {
     }
 
     const groupedOrders = Array.from(ordersMap.values());
-
     res.json(groupedOrders);
+
   } catch (err) {
     console.error('Chyba pri načítaní objednávok adminom:', err);
     res.status(500).json({ error: 'Chyba servera' });

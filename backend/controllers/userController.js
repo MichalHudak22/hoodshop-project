@@ -6,17 +6,14 @@ const db = require('../database');
 
 
 // Funkcia pre získanie všetkých používateľov
-const getUsers = (req, res) => {
-  const query = 'SELECT id, name, email, role FROM user';
-
-  db.query(query, (err, results) => {
-    if (err) {
-      console.error(err);  // loguj chybu na server
-      res.status(500).json({ error: 'Interná chyba servera' });  // neposielaj DB chyby von
-    } else {
-      res.json(results);
-    }
-  });
+const getUsers = async (req, res) => {
+  try {
+    const [results] = await db.query('SELECT id, name, email, role FROM user');
+    res.json(results);
+  } catch (err) {
+    console.error('Chyba pri načítaní používateľov:', err);
+    res.status(500).json({ error: 'Interná chyba servera' });
+  }
 };
 
 
@@ -36,437 +33,413 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const createUser = (req, res) => {
+const createUser = async (req, res) => {
   const { name, email, password } = req.body;
 
-  const checkEmailQuery = 'SELECT * FROM user WHERE email = ?';
-  db.query(checkEmailQuery, [email], (err, results) => {
-    if (err) return res.status(500).json({ error: 'Chyba pri overovaní emailu.' });
-    if (results.length > 0) return res.status(400).json({ error: 'Email je už zaregistrovaný.' });
+  try {
+    // 1️⃣ Overenie, či už email existuje
+    const [existingUsers] = await db.query('SELECT * FROM user WHERE email = ?', [email]);
+    if (existingUsers.length > 0) {
+      return res.status(400).json({ error: 'Email je už zaregistrovaný.' });
+    }
 
-    bcrypt.hash(password, 10, (err, hashedPassword) => {
-      if (err) return res.status(500).json({ error: 'Chyba pri hashovaní hesla.' });
+    // 2️⃣ Hashovanie hesla
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-      const insertUserQuery = 'INSERT INTO user (name, email, password, is_verified) VALUES (?, ?, ?, false)';
-      db.query(insertUserQuery, [name, email, hashedPassword], (err, result) => {
-        if (err) return res.status(500).json({ error: 'Chyba pri ukladaní používateľa.' });
+    // 3️⃣ Vloženie používateľa
+    const [insertResult] = await db.query(
+      'INSERT INTO user (name, email, password, is_verified) VALUES (?, ?, ?, false)',
+      [name, email, hashedPassword]
+    );
 
-        const userId = result.insertId;
-        const token = uuidv4();
-        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-        const expiresAtFormatted = expiresAt.toISOString().slice(0, 19).replace('T', ' ');
+    const userId = insertResult.insertId;
 
-        // VLOŽENIE IBA RAZ
-        db.query(
-          'INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
-          [userId, token, expiresAtFormatted],
-          (err) => {
-           if (err) {
-  console.error('Chyba pri ukladaní tokenu:', err);
-  return res.status(500).json({ error: 'Chyba pri ukladaní tokenu.' });
-}
+    // 4️⃣ Vytvorenie tokenu na overenie emailu
+    const token = uuidv4();
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const expiresAtFormatted = expiresAt.toISOString().slice(0, 19).replace('T', ' ');
 
+    await db.query(
+      'INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
+      [userId, token, expiresAtFormatted]
+    );
 
-            const verificationLink = `http://localhost:5173/verify-email?token=${token}`;
+    // 5️⃣ Odoslanie overovacieho emailu s BASE_URL z env
+    const frontendURL = process.env.BASE_URL || 'http://localhost:5173';
+    const verificationLink = `${frontendURL}/verify-email?token=${token}`;
 
-            transporter.sendMail({
-              to: email,
-              subject: 'Overenie emailu',
-              html: `
-                <p>Ahoj ${name},</p>
-                <p>Prosím, over svoj účet kliknutím na odkaz nižšie:</p>
-                <a href="${verificationLink}">${verificationLink}</a>
-                <p>Ak si sa neregistroval, ignoruj tento email.</p>
-              `,
-            }, (err, info) => {
-              if (err) {
-                console.error('Chyba pri odosielaní emailu:', err);
-                return res.status(500).json({ error: 'Nepodarilo sa odoslať overovací email.' });
-              }
-              res.status(201).json({ message: 'Registrácia úspešná. Skontroluj email pre overenie účtu.' });
-            });
-          }
-        );
-      });
+    await transporter.sendMail({
+      to: email,
+      subject: 'Overenie emailu',
+      html: `
+        <p>Ahoj ${name},</p>
+        <p>Prosím, over svoj účet kliknutím na odkaz nižšie:</p>
+        <a href="${verificationLink}">${verificationLink}</a>
+        <p>Ak si sa neregistroval, ignoruj tento email.</p>
+      `,
     });
-  });
+
+    // 6️⃣ Úspešná odpoveď
+    res.status(201).json({ message: 'Registrácia úspešná. Skontroluj email pre overenie účtu.' });
+
+  } catch (err) {
+    console.error('Chyba pri registrácii používateľa:', err);
+    res.status(500).json({ error: 'Interná chyba servera' });
+  }
 };
 
 
 // Funkcia pre overenie registracie pomocou emailu
-const verifyEmail = (req, res) => {
+const verifyEmail = async (req, res) => {
   const token = req.query.token;
   if (!token) {
     return res.status(400).json({ error: 'Token chýba' });
   }
 
-  // Skontrolujeme, či token je v DB (teda ešte nebol použitý)
-  const query = 'SELECT * FROM email_verification_tokens WHERE token = ?';
-  db.query(query, [token], (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: 'Chyba databázy' });
-    }
-
-    if (results.length === 0) {
-      // Token neexistuje => už bol použitý alebo je neplatný
+  try {
+    // 1️⃣ Skontrolujeme, či token existuje
+    const [rows] = await db.query('SELECT * FROM email_verification_tokens WHERE token = ?', [token]);
+    if (rows.length === 0) {
       return res.status(400).json({ error: 'Token neplatný alebo už použitý' });
     }
 
-    const tokenData = results[0];
+    const tokenData = rows[0];
     const now = new Date();
     const expiresAt = new Date(tokenData.expires_at);
 
     if (now > expiresAt) {
-      // Token expiroval => tiež ho považujeme za neplatný/už použitý
       return res.status(400).json({ error: 'Token expiroval' });
     }
 
-    // Token platný => označíme používateľa ako overeného
     const userId = tokenData.user_id;
-    const updateQuery = 'UPDATE user SET is_verified = true WHERE id = ?';
 
-    db.query(updateQuery, [userId], (err2) => {
-      if (err2) {
-        return res.status(500).json({ error: 'Chyba pri overení používateľa' });
-      }
+    // 2️⃣ Označíme používateľa ako overeného
+    await db.query('UPDATE user SET is_verified = true WHERE id = ?', [userId]);
 
-      // Vymažeme token z DB, aby už nebolo možné ho použiť znovu
-      db.query('DELETE FROM email_verification_tokens WHERE user_id = ?', [userId], (err3) => {
-        if (err3) {
-          // Chyba pri mazaní tokenu, ale overenie považujeme za úspešné
-          console.error('Chyba pri mazaní tokenu:', err3);
-        }
-        return res.status(200).json({ message: 'Email úspešne overený' });
-      });
-    });
-  });
+    // 3️⃣ Vymažeme token, aby sa už nedal použiť
+    await db.query('DELETE FROM email_verification_tokens WHERE user_id = ?', [userId]);
+
+    res.status(200).json({ message: 'Email úspešne overený' });
+
+  } catch (err) {
+    console.error('Chyba pri overovaní emailu:', err);
+    res.status(500).json({ error: 'Interná chyba servera' });
+  }
 };
 
 
-// Funkcia na prihlasenie uzivatela
-const loginUser = (req, res) => {
+
+const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
-  const query = 'SELECT * FROM user WHERE email = ?';
-  db.query(query, [email], (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: 'Chyba pri pripojení k databáze' });
+  try {
+    // 1️⃣ Načítame používateľa podľa emailu
+    const [users] = await db.query('SELECT * FROM user WHERE email = ?', [email]);
+    if (users.length === 0) {
+      return res.status(404).json({ error: 'Používateľ s týmto emailom neexistuje.' });
     }
 
-    if (results.length === 0) {
-      return res.status(404).json({ error: 'No user exists with this email.' });
-    }
+    const user = users[0];
 
-    const user = results[0];
-
-    // TU PRIDÁME KONTROLU IS_VERIFIED
+    // 2️⃣ Skontrolujeme, či je email overený
     if (user.is_verified === 0) {
       return res.status(403).json({ error: 'Email nie je overený. Skontroluj svoj email.' });
     }
 
-    // Porovnanie zadaného hesla s hashovaným heslom v databáze
-    bcrypt.compare(password, user.password, (err, isMatch) => {
-      if (err) {
-        return res.status(500).json({ error: 'Chyba pri porovnávaní hesla' });
-      }
+    // 3️⃣ Porovnanie hesla
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Nesprávne heslo.' });
+    }
 
-      if (!isMatch) {
-        return res.status(400).json({ error: 'Incorrect password.' });
-      }
+    // 4️⃣ Vytvorenie JWT tokenu
+    const token = jwt.sign(
+      { userId: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '6h' }
+    );
 
-      // Ak je heslo správne, vytvoríme JWT token (v ňom už je aj role)
-      const token = jwt.sign(
-        { userId: user.id, email: user.email, role: user.role },
-        process.env.JWT_SECRET,
-        { expiresIn: '6h' }
-      );
-
-      // Posielame token, email, name a role klientovi
-      res.status(200).json({
-        message: 'Prihlásenie úspešné',
-        token,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-      });
+    // 5️⃣ Odpoveď klientovi
+    res.status(200).json({
+      message: 'Prihlásenie úspešné',
+      token,
+      email: user.email,
+      name: user.name,
+      role: user.role,
     });
-  });
+
+  } catch (err) {
+    console.error('Chyba pri prihlasovaní používateľa:', err);
+    res.status(500).json({ error: 'Interná chyba servera' });
+  }
 };
 
 
-
 // Funkcia pre získanie informácií o prihlásenom používateľovi (vrátane roly)
-const getUserProfile = (req, res) => {
-  const userId = req.user.userId; // oprava: req.user.userId (nie req.userId)
+const getUserProfile = async (req, res) => {
+  try {
+    const userId = req.user.userId; // req.user.userId z JWT
 
-  const query = `
-    SELECT name, email, profile_email, birth_date, mobile_number, address, city, postal_code, loyalty_points, user_photo, role 
-    FROM user
-    WHERE id = ?
-  `;
-
-  db.query(query, [userId], (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: 'Chyba pri načítavaní údajov' });
-    }
+    const [results] = await db.query(`
+      SELECT name, email, profile_email, birth_date, mobile_number, address, city, postal_code, loyalty_points, user_photo, role 
+      FROM user
+      WHERE id = ?
+    `, [userId]);
 
     if (results.length === 0) {
       return res.status(404).json({ error: 'Používateľ neexistuje' });
     }
 
     res.status(200).json(results[0]);
-  });
+  } catch (err) {
+    console.error('Chyba pri načítavaní údajov používateľa:', err);
+    res.status(500).json({ error: 'Interná chyba servera' });
+  }
 };
 
 
-const updateUserProfile = (req, res) => {
-  const userId = req.user?.userId;
-  const fieldsToUpdate = req.body;
 
-  if (!fieldsToUpdate || Object.keys(fieldsToUpdate).length === 0) {
-    return res.status(400).json({ error: 'Nič na aktualizáciu' });
-  }
+const updateUserProfile = async (req, res) => {
+  try {
+    const userId = req.user?.userId;
+    const fieldsToUpdate = req.body;
 
-  const allowedFields = ['name', 'email', 'profile_email', 'birth_date', 'mobile_number', 'address', 'city', 'postal_code'];
-  const filteredFields = {};
-
-  for (const key in fieldsToUpdate) {
-    if (allowedFields.includes(key)) {
-      filteredFields[key] = fieldsToUpdate[key];
-    }
-  }
-
-  if (Object.keys(filteredFields).length === 0) {
-    return res.status(400).json({ error: 'Žiadne platné polia na aktualizáciu' });
-  }
-
-  // **Úprava birth_date na formát YYYY-MM-DD**
-  if (filteredFields.birth_date) {
-    const date = new Date(filteredFields.birth_date);
-    if (isNaN(date.getTime())) {
-      return res.status(400).json({ error: 'Neplatný formát dátumu narodenia' });
-    }
-    filteredFields.birth_date = date.toISOString().split('T')[0]; // napr. '1990-11-09'
-  }
-
-  const setClause = [];
-  const values = [];
-
-  Object.entries(filteredFields).forEach(([key, value]) => {
-    setClause.push(`${key} = ?`);
-    values.push(value);
-  });
-
-  values.push(userId); // pre WHERE
-
-  const sql = `UPDATE user SET ${setClause.join(', ')} WHERE id = ?`;
-
-  db.query(sql, values, (err, result) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ error: 'Chyba pri aktualizácii profilu' });
+    if (!fieldsToUpdate || Object.keys(fieldsToUpdate).length === 0) {
+      return res.status(400).json({ error: 'Nič na aktualizáciu' });
     }
 
-    if (result.affectedRows === 0) {
+    const allowedFields = ['name', 'email', 'profile_email', 'birth_date', 'mobile_number', 'address', 'city', 'postal_code'];
+    const filteredFields = {};
+
+    for (const key in fieldsToUpdate) {
+      if (allowedFields.includes(key)) {
+        filteredFields[key] = fieldsToUpdate[key];
+      }
+    }
+
+    if (Object.keys(filteredFields).length === 0) {
+      return res.status(400).json({ error: 'Žiadne platné polia na aktualizáciu' });
+    }
+
+    // Úprava birth_date na formát YYYY-MM-DD
+    if (filteredFields.birth_date) {
+      const date = new Date(filteredFields.birth_date);
+      if (isNaN(date.getTime())) {
+        return res.status(400).json({ error: 'Neplatný formát dátumu narodenia' });
+      }
+      filteredFields.birth_date = date.toISOString().split('T')[0]; // napr. '1990-11-09'
+    }
+
+    const setClause = [];
+    const values = [];
+
+    Object.entries(filteredFields).forEach(([key, value]) => {
+      setClause.push(`${key} = ?`);
+      values.push(value);
+    });
+
+    values.push(userId); // pre WHERE
+
+    const sql = `UPDATE user SET ${setClause.join(', ')} WHERE id = ?`;
+    const [updateResult] = await db.query(sql, values);
+
+    if (updateResult.affectedRows === 0) {
       return res.status(404).json({ error: 'Používateľ nebol nájdený' });
     }
 
-    db.query(
+    const [rows] = await db.query(
       'SELECT id, name, email, profile_email, birth_date, mobile_number, address, city, postal_code FROM user WHERE id = ?',
-      [userId],
-      (err2, rows) => {
-        if (err2) {
-          console.error(err2);
-          return res.status(500).json({ error: 'Chyba pri načítaní profilu po aktualizácii' });
-        }
-
-        if (rows.length === 0) {
-          return res.status(404).json({ error: 'Používateľ neexistuje' });
-        }
-
-        res.json(rows[0]);
-      }
+      [userId]
     );
-  });
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Používateľ neexistuje' });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('Chyba pri aktualizácii profilu:', err);
+    res.status(500).json({ error: 'Interná chyba servera' });
+  }
 };
+
 
 
 // Funkcia pre zmazanie účtu
 const deleteUserAccount = async (req, res) => {
-  const userId = req.userId;
+  const userId = req.user?.userId;
   if (!userId) {
     return res.status(401).json({ error: 'Neautorizovaný prístup' });
   }
 
   try {
-    // 1. Vymaž položky košíka používateľa
+    // 1️⃣ Vymaž všetky položky v košíku používateľa
     await db.query('DELETE FROM cart_items WHERE user_id = ?', [userId]);
 
-    // 2. Vymaž používateľa
-    await db.query('DELETE FROM user WHERE id = ?', [userId]);
+    // 2️⃣ Vymaž všetky tokeny na overenie emailu (ak existujú)
+    await db.query('DELETE FROM email_verification_tokens WHERE user_id = ?', [userId]);
 
-    res.json({ success: true, message: 'The account has been successfully deleted' });
+    // 3️⃣ Vymaž samotného používateľa
+    const [result] = await db.query('DELETE FROM user WHERE id = ?', [userId]);
 
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Používateľ neexistuje' });
+    }
+
+    res.json({ success: true, message: 'Účet bol úspešne vymazaný' });
   } catch (err) {
-    console.error('DB error:', err);
-    res.status(500).json({ error: 'Error deleting the account' });
+    console.error('Chyba pri mazaní účtu:', err);
+    res.status(500).json({ error: 'Chyba servera pri mazaní účtu' });
   }
 };
 
 
+
 // ADMIN - GET USER BY ID
-const getUserById = (req, res) => {
-  const userId = Number(req.params.id);
+const getUserById = async (req, res) => {
+  try {
+    const userId = Number(req.params.id);
 
-  // Overenie ID
-  if (isNaN(userId)) {
-    return res.status(400).json({ error: 'Neplatné ID používateľa' });
-  }
-
-  // Overenie admin práv
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Nie ste admin' });
-  }
-
-  // Vyhľadanie používateľa
-  db.query(
-    'SELECT id, name, email, profile_email, birth_date, mobile_number, address, city, postal_code FROM user WHERE id = ?',
-    [userId],
-    (err, result) => {
-      if (err) {
-        console.error('Chyba DB pri načítaní používateľa:', err);
-        return res.status(500).json({ error: 'Chyba pri načítaní používateľa' });
-      }
-
-      if (result.length === 0) {
-        return res.status(404).json({ error: 'Používateľ neexistuje' });
-      }
-
-      res.json(result[0]); // pošli detail používateľa
+    // Overenie ID
+    if (isNaN(userId)) {
+      return res.status(400).json({ error: 'Neplatné ID používateľa' });
     }
-  );
+
+    // Overenie admin práv
+    if (!req.user || req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Nie ste admin' });
+    }
+
+    // Vyhľadanie používateľa
+    const [rows] = await db.query(
+      'SELECT id, name, email, profile_email, birth_date, mobile_number, address, city, postal_code FROM user WHERE id = ?',
+      [userId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Používateľ neexistuje' });
+    }
+
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('Chyba DB pri načítaní používateľa:', err);
+    res.status(500).json({ error: 'Chyba pri načítaní používateľa' });
+  }
 };
 
 
 // ADMIN - Vypis objednavok daneho uzivatela 
-const getOrdersByUserId = (req, res) => {
-  const userId = Number(req.params.id);
+const getOrdersByUserId = async (req, res) => {
+  try {
+    const userId = Number(req.params.id);
 
-  if (isNaN(userId)) {
-    return res.status(400).json({ error: 'Neplatné ID používateľa' });
-  }
-
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Nie ste admin' });
-  }
-
-  db.query(
-    'SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC',
-    [userId],
-    (err, results) => {
-      if (err) {
-        console.error('Chyba DB pri načítaní objednávok:', err);
-        return res.status(500).json({ error: 'Chyba pri načítaní objednávok' });
-      }
-      // Ak chceš vrátiť aj položky, tu by si musel riešiť ďalší dotaz pre každú objednávku
-      res.json(results || []);
+    if (isNaN(userId)) {
+      return res.status(400).json({ error: 'Neplatné ID používateľa' });
     }
-  );
+
+    if (!req.user || req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Nie ste admin' });
+    }
+
+    // Načítanie objednávok
+    const [orders] = await db.query(
+      'SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC',
+      [userId]
+    );
+
+    // Načítanie položiek pre každú objednávku
+    for (const order of orders) {
+      const [items] = await db.query(
+        `SELECT oi.product_id, oi.quantity, oi.price AS item_price, p.name AS product_name
+         FROM order_items oi
+         JOIN products p ON oi.product_id = p.id
+         WHERE oi.order_id = ?`,
+        [order.id]
+      );
+      order.items = items;
+    }
+
+    res.json(orders || []);
+  } catch (err) {
+    console.error('Chyba DB pri načítaní objednávok:', err);
+    res.status(500).json({ error: 'Chyba pri načítaní objednávok' });
+  }
 };
 
 
+
 // ADMIN - DELETE USER
-const deleteUserById = (req, res) => {
-  const userIdToDelete = Number(req.params.id);
-  const loggedInUserId = Number(req.user.id); // pridaj Number() na istotu
+const deleteUserById = async (req, res) => {
+  try {
+    const userIdToDelete = Number(req.params.id);
+    const loggedInUserId = Number(req.user.userId); // oprava: req.user.userId
 
-  console.log('Žiadosť o vymazanie používateľa s ID:', userIdToDelete);
-  console.log('ID žiadateľa:', loggedInUserId);
-  console.log('Role žiadateľa:', req.user.role);
-
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Nie ste admin' });
-  }
-
-  if (isNaN(userIdToDelete)) {
-    return res.status(400).json({ error: 'Neplatné ID používateľa' });
-  }
-
-  // 1. Získaj používateľa z databázy
-  db.query('SELECT * FROM user WHERE id = ?', [userIdToDelete], (err, results) => {
-    if (err) {
-      console.error('Chyba pri načítaní používateľa:', err);
-      return res.status(500).json({ error: 'Chyba databázy pri kontrole používateľa' });
+    if (isNaN(userIdToDelete)) {
+      return res.status(400).json({ error: 'Neplatné ID používateľa' });
     }
 
-    if (results.length === 0) {
+    if (!req.user || req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Nie ste admin' });
+    }
+
+    // Získanie používateľa
+    const [users] = await db.query('SELECT * FROM user WHERE id = ?', [userIdToDelete]);
+    if (users.length === 0) {
       return res.status(404).json({ error: 'Používateľ neexistuje' });
     }
 
-    const targetUser = results[0];
-    console.log('userIdToDelete:', userIdToDelete, typeof userIdToDelete);
-    console.log('loggedInUserId:', loggedInUserId, typeof loggedInUserId);
+    const targetUser = users[0];
 
-    // 2. Zabránime vymazaniu samého seba
+    // Bezpečnostné kontroly
     if (userIdToDelete === loggedInUserId) {
       return res.status(403).json({ error: 'You cannot delete yourself.' });
     }
-
-    // 3. Zabránime vymazaniu hlavného admina (napr. ID 1)
-    if (userIdToDelete === 1) {
+    if ([1, 32].includes(userIdToDelete)) {
       return res.status(403).json({ error: 'This user is protected from deletion.' });
     }
-
-    // 3.5 Zabránime vymazaniu používateľa s ID 32
-    if (userIdToDelete === 32) {
-      return res.status(403).json({ error: 'This user is protected from deletion.' });
-    }
-
-    // 4. Voliteľne: zabránime vymazaniu iného admina
     if (targetUser.role === 'admin') {
       return res.status(403).json({ error: 'You cannot delete another administrator.' });
     }
 
-    // 5. Ak prešiel všetky kontroly, vymaž ho
-    db.query('DELETE FROM user WHERE id = ?', [userIdToDelete], (deleteErr, result) => {
-      if (deleteErr) {
-        console.error('Chyba DB pri mazaní používateľa:', deleteErr);
-        return res.status(500).json({ error: 'Chyba pri mazaní používateľa' });
-      }
+    // Vymazanie používateľa
+    await db.query('DELETE FROM user WHERE id = ?', [userIdToDelete]);
 
-      res.json({ success: true, message: 'Používateľ bol vymazaný' });
-    });
-  });
+    res.json({ success: true, message: 'Používateľ bol vymazaný' });
+
+  } catch (err) {
+    console.error('DB error deleteUserById:', err);
+    res.status(500).json({ error: 'Chyba pri mazaní používateľa' });
+  }
 };
 
 
+
 // ADMIN - Zmena roly používateľa (napr. na admina)
-const updateUserRole = (req, res) => {
-  const targetUserId = Number(req.params.id); // ID používateľa, ktorému chceme zmeniť rolu
-  const { role } = req.body; // očakávame { role: 'admin' } alebo { role: 'user' }
+const updateUserRole = async (req, res) => {
+  try {
+    const targetUserId = Number(req.params.id); // ID používateľa
+    const { role } = req.body;
 
-  // Iba admin môže meniť role
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Nemáte oprávnenie meniť roly' });
-  }
-
-  if (!['user', 'admin'].includes(role)) {
-    return res.status(400).json({ error: 'Neplatná rola. Povolené sú len "user" alebo "admin"' });
-  }
-
-  const query = 'UPDATE user SET role = ? WHERE id = ?';
-  db.query(query, [role, targetUserId], (err, result) => {
-    if (err) {
-      console.error('Chyba pri zmene roly:', err);
-      return res.status(500).json({ error: 'Chyba pri aktualizácii roly' });
+    if (!req.user || req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Nemáte oprávnenie meniť roly' });
     }
+
+    if (!['user', 'admin'].includes(role)) {
+      return res.status(400).json({ error: 'Neplatná rola. Povolené sú len "user" alebo "admin"' });
+    }
+
+    const [result] = await db.query('UPDATE user SET role = ? WHERE id = ?', [role, targetUserId]);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Používateľ neexistuje' });
     }
 
     res.json({ message: `Rola používateľa bola zmenená na '${role}'` });
-  });
+
+  } catch (err) {
+    console.error('DB error updateUserRole:', err);
+    res.status(500).json({ error: 'Chyba pri aktualizácii roly' });
+  }
 };
 
 
