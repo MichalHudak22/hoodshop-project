@@ -13,24 +13,38 @@ const {
 } = require('../controllers/productController');
 
 const authenticateToken = require('../middleware/authenticateToken');
-const upload = require('../middleware/uploadMiddleware'); // 👈 pridaj import
+const upload = require('../middleware/uploadMiddleware');
 
-// GET all products 
+// =====================================================
+// Všetky GET routy musia byť pred wildcard `/:slug`
+// =====================================================
+
+// GET all products
 router.get('/all', getAllProducts);
 
-// Načítanie produktov podľa značky (napr. Nike)
+// GET products by brand
 router.get('/brand/:brandName', getProductsByBrand);
 
-// pre Home-carousel
+// Home carousel
 router.get('/carousel-top', getTopCarouselProducts);
 
-// Vyhľadávanie podľa mena
+// Search products by name
 router.get('/search', searchProductsByName);
 
-// GET /products/:category/carousel
+// Carousel by category
 router.get('/:category/carousel', getCarouselByCategory);
 
-// POST pridanie produktu - len pre adminov
+// Products by category & type
+router.get('/:category/:type', getProductsByCategoryAndType);
+
+// GET single product by slug (musí byť úplne na konci, aby neblokovalo iné route)
+router.get('/:slug', getProductBySlug);
+
+// =====================================================
+// POST / DELETE routes pre adminov
+// =====================================================
+
+// POST add product (admin only)
 router.post(
   '/',
   authenticateToken,
@@ -40,16 +54,11 @@ router.post(
     }
     next();
   },
-  upload.single('image'), // 👈 spracuj upload obrázku pod menom "image"
-  addProduct // 👈 kontrolér bude pracovať s req.file a req.body
+  upload.single('image'),
+  addProduct
 );
 
-
-
-// ⚠️ Toto musí byť na konci!
-router.get('/:category/:type', getProductsByCategoryAndType);
-
-// DELETE /products/:slug - len pre adminov
+// DELETE product by slug (admin only)
 router.delete(
   '/:slug',
   authenticateToken,
@@ -61,9 +70,5 @@ router.delete(
   },
   deleteProductBySlug
 );
-
-
-// GET /products/:slug
-router.get('/:slug', getProductBySlug);
 
 module.exports = router;

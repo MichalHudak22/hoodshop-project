@@ -5,14 +5,12 @@ const fs = require('fs');
 
 // GET products by brand
 const getProductsByBrand = (req, res) => {
-  let { brandName } = req.params;
+  const { brandName } = req.params;
 
-  // ✅ Debug: vypíšme, čo backend dostane
-  console.log('brandName param from URL:', brandName);
-
-  // ✅ Očistenie medzier a prevod na lowercase
+  // Trim a lowercase pre istotu
   const cleanBrand = brandName.trim().toLowerCase();
 
+  console.log('brandName param from URL:', brandName);
   console.log('cleanBrand used for SQL query:', cleanBrand);
 
   const sql = `
@@ -27,10 +25,12 @@ const getProductsByBrand = (req, res) => {
       console.error('DB error getProductsByBrand:', err);
       return res.status(500).json({ error: 'Chyba servera' });
     }
-    console.log('Products returned:', results.length);
-    res.json(results);
+
+    console.log('Products found:', results.length);
+    return res.json(results);
   });
 };
+
 
 
 
