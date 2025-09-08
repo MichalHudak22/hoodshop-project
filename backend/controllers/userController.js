@@ -29,7 +29,7 @@ const transporter = nodemailer.createTransport({
   auth: {
     user: process.env.EMAIL_USER, // napr. tvojemail@gmail.com
     pass: process.env.EMAIL_PASS, // alebo App Password
-    
+
   },
 });
 
@@ -65,8 +65,9 @@ const createUser = async (req, res) => {
     );
 
     // 5️⃣ Odoslanie overovacieho emailu s BASE_URL z env
-    const frontendURL = process.env.BASE_URL || 'http://localhost:5173';
+    const frontendURL = process.env.VITE_FRONTEND_URL || 'http://localhost:5173';
     const verificationLink = `${frontendURL}/verify-email?token=${token}`;
+
 
     await transporter.sendMail({
       to: email,

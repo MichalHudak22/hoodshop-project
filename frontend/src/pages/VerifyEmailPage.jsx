@@ -6,7 +6,8 @@ const VerifyEmailPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-const baseURL = 'https://hoodshop-project.onrender.com';
+  // Použijeme env premennú pre backend
+  const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
   const token = searchParams.get('token');
 
   useEffect(() => {
@@ -18,7 +19,6 @@ const baseURL = 'https://hoodshop-project.onrender.com';
     console.log('Overujem email s tokenom:', token);
 
     fetch(`${baseURL}/user/verify-email?token=${token}`)
-
       .then((res) => res.json())
       .then((data) => {
         console.log('Odpoveď z overenia:', data);
@@ -29,13 +29,13 @@ const baseURL = 'https://hoodshop-project.onrender.com';
         }
       })
       .catch(() => setStatus('error'));
-  }, [token]);
+  }, [token, baseURL]);
 
   // Automatické presmerovanie po úspechu
   useEffect(() => {
     if (status === 'success') {
       const timer = setTimeout(() => {
-        navigate('/login');  // zmeň na svoju prihlasovaciu stránku
+        navigate('/login');  // Presmerovanie na prihlasovaciu stránku
       }, 3000);
 
       return () => clearTimeout(timer);
