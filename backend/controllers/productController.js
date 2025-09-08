@@ -2,7 +2,6 @@ const db = require('../database');
 const path = require('path');
 const fs = require('fs');
 
-
 // GET products by brand
 const getProductsByBrand = (req, res) => {
   const { brandName } = req.params;
@@ -13,9 +12,10 @@ const getProductsByBrand = (req, res) => {
   console.log('brandName param from URL:', brandName);
   console.log('cleanBrand used for SQL query:', cleanBrand);
 
+  // Použitie LIKE pre istotu, aby sa ignorovali padding alebo CHAR typy
   const sql = `
     SELECT * FROM products 
-    WHERE LOWER(brand) = ? 
+    WHERE LOWER(brand) LIKE ? 
     ORDER BY id DESC 
     LIMIT 20
   `;
@@ -27,9 +27,17 @@ const getProductsByBrand = (req, res) => {
     }
 
     console.log('Products found:', results.length);
+
+    // Otestujeme, či naozaj máme výsledky
+    if (!results || results.length === 0) {
+      console.log(`No products found for brand: ${cleanBrand}`);
+      return res.json([]);
+    }
+
     return res.json(results);
   });
 };
+
 
 
 
