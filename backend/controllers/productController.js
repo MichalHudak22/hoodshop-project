@@ -2,10 +2,16 @@ const db = require('../database');
 const path = require('path');
 const fs = require('fs');
 
+
 // GET products by brand
 const getProductsByBrand = (req, res) => {
   const { brandName } = req.params;
-  const sql = 'SELECT * FROM products WHERE brand = ? ORDER BY id DESC LIMIT 20';
+  const sql = `
+    SELECT * FROM products 
+    WHERE LOWER(brand) = LOWER(?) 
+    ORDER BY id DESC 
+    LIMIT 20
+  `;
 
   db.query(sql, [brandName], (err, results) => {
     if (err) {
