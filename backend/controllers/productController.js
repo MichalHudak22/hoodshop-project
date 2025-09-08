@@ -5,22 +5,33 @@ const fs = require('fs');
 
 // GET products by brand
 const getProductsByBrand = (req, res) => {
-  const { brandName } = req.params;
+  let { brandName } = req.params;
+
+  // ✅ Debug: vypíšme, čo backend dostane
+  console.log('brandName param from URL:', brandName);
+
+  // ✅ Očistenie medzier a prevod na lowercase
+  const cleanBrand = brandName.trim().toLowerCase();
+
+  console.log('cleanBrand used for SQL query:', cleanBrand);
+
   const sql = `
     SELECT * FROM products 
-    WHERE LOWER(brand) = LOWER(?) 
+    WHERE LOWER(brand) = ? 
     ORDER BY id DESC 
     LIMIT 20
   `;
 
-  db.query(sql, [brandName], (err, results) => {
+  db.query(sql, [cleanBrand], (err, results) => {
     if (err) {
       console.error('DB error getProductsByBrand:', err);
       return res.status(500).json({ error: 'Chyba servera' });
     }
+    console.log('Products returned:', results.length);
     res.json(results);
   });
 };
+
 
 
 // GET top carousel products (one product per category/type pair)
