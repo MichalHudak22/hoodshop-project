@@ -65,8 +65,9 @@ const createUser = async (req, res) => {
     );
 
     // 5️⃣ Odoslanie overovacieho emailu s BASE_URL z env
-    const frontendURL = process.env.VITE_FRONTEND_URL || 'http://localhost:5173';
-    const verificationLink = `${frontendURL}/verify-email?token=${token}`;
+   const frontendURL = process.env.FRONTEND_URL;
+const verificationLink = `${frontendURL}/verify-email?token=${token}`;
+
 
 
     await transporter.sendMail({

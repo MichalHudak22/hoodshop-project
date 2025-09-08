@@ -7,7 +7,7 @@ const VerifyEmailPage = () => {
   const navigate = useNavigate();
 
   // Použijeme env premennú pre backend
-  const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
   const token = searchParams.get('token');
 
   useEffect(() => {
