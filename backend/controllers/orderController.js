@@ -124,6 +124,8 @@ const getAllOrders = async (req, res) => {
       order.items = items;
     }
 
+    console.log('Orders with items:', orders);
+
     res.json(orders);
   } catch (err) {
     console.error('Chyba pri získavaní všetkých objednávok:', err);
