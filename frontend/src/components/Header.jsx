@@ -7,6 +7,8 @@ import { Menu, X, User, ShoppingCart } from 'lucide-react';
 import SportsDropdown from './SportsDropdown';
 import SearchBar from './SearchBar';
 
+ const baseURL = 'https://hoodshop-project.onrender.com'; // produkčný backend
+
 const Header = () => {
   const { user, logout } = useContext(AuthContext);
   const { cartCount, refreshCartCount } = useContext(CartContext);
