@@ -38,6 +38,7 @@ const BrandDetail = () => {
 
         const productRes = await fetch(`${baseURL}/products/brand/${data.name.toLowerCase()}`);
 
+
         const productData = await productRes.json();
         setProducts(productData);
       } catch (error) {
