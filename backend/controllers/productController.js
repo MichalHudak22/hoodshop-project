@@ -3,42 +3,37 @@ const path = require('path');
 const fs = require('fs');
 
 // GET products by brand
-const getProductsByBrand = (req, res) => {
+const getProductsByBrand = async (req, res) => {
   const { brandName } = req.params;
 
-  // Trim a lowercase pre istotu
   const cleanBrand = brandName.trim().toLowerCase();
 
   console.log('brandName param from URL:', brandName);
   console.log('cleanBrand used for SQL query:', cleanBrand);
 
-  // Použitie LIKE pre istotu, aby sa ignorovali padding alebo CHAR typy
   const sql = `
     SELECT * FROM products 
-    WHERE LOWER(brand) LIKE ? 
+    WHERE LOWER(brand) = ? 
     ORDER BY id DESC 
     LIMIT 20
   `;
 
-  db.query(sql, [cleanBrand], (err, results) => {
-    if (err) {
-      console.error('DB error getProductsByBrand:', err);
-      return res.status(500).json({ error: 'Chyba servera' });
-    }
+  try {
+    const [results] = await db.query(sql, [cleanBrand]);
 
     console.log('Products found:', results.length);
 
-    // Otestujeme, či naozaj máme výsledky
     if (!results || results.length === 0) {
       console.log(`No products found for brand: ${cleanBrand}`);
       return res.json([]);
     }
 
     return res.json(results);
-  });
+  } catch (err) {
+    console.error('DB error getProductsByBrand:', err);
+    return res.status(500).json({ error: 'Chyba servera' });
+  }
 };
-
-
 
 
 
