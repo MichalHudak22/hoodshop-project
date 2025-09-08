@@ -14,14 +14,12 @@ const BrandDetail = () => {
   const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
 
-  // Načítanie všetkých značiek
+  // Načítanie všetkých značiek (len raz)
   useEffect(() => {
     const fetchAllBrands = async () => {
       try {
-        console.log("Fetching all brands...");
         const res = await fetch(`${baseURL}/api/brands`);
         const data = await res.json();
-        console.log("All brands fetched:", data);
         setBrands(data);
       } catch (error) {
         console.error("Chyba pri načítaní značiek:", error);
@@ -30,29 +28,30 @@ const BrandDetail = () => {
     fetchAllBrands();
   }, []);
 
-  // Načítanie konkrétnej značky a jej produktov
+  // Načítanie brandu podľa slug (len keď sa slug zmení)
   useEffect(() => {
-    const fetchBrand = async () => {
+    const fetchBrandAndProducts = async () => {
+      if (!slug) return;
+
       try {
-        console.log("Fetching brand by slug:", slug);
         const res = await fetch(`${baseURL}/api/brands/${slug}`);
         const data = await res.json();
-        console.log("Brand fetched:", data);
         setBrand(data);
 
-        console.log(`Fetching products for brand: ${data.name.toLowerCase()}`);
-        const productRes = await fetch(`${baseURL}/products/brand/${data.name.toLowerCase()}`);
-        const productData = await productRes.json();
-        console.log("Products fetched:", productData);
-        setProducts(productData);
+        // fetch products len raz po načítaní brandu
+        if (data?.name) {
+          const productRes = await fetch(`${baseURL}/products/brand/${data.name.toLowerCase()}`);
+          const productData = await productRes.json();
+          setProducts(productData);
+        }
       } catch (error) {
         console.error("Chyba pri načítaní brandu alebo produktov:", error);
       }
     };
-    fetchBrand();
-  }, [slug]);
 
-  // Pridanie produktu do košíka
+    fetchBrandAndProducts();
+  }, [slug]); // ⚠️ iba slug ako dependency
+
   const handleAddToCart = async (product) => {
     const sessionId = localStorage.getItem("sessionId");
     const token = localStorage.getItem("token");
@@ -70,15 +69,12 @@ const BrandDetail = () => {
 
       const data = await response.json();
       if (response.ok) {
-        console.log("Product added to cart:", product);
         setMessage("Product added to cart!");
         refreshCartCount();
-        setTimeout(() => setMessage(''), 3000);
       } else {
-        console.log("Failed to add to cart:", data);
         setMessage("Failed to add to cart: " + data.message);
-        setTimeout(() => setMessage(''), 3000);
       }
+      setTimeout(() => setMessage(''), 3000);
     } catch (error) {
       console.error("Error adding to cart:", error);
       setMessage("Error adding to cart");
@@ -86,12 +82,7 @@ const BrandDetail = () => {
     }
   };
 
-  console.log("Current brand state:", brand);
-  console.log("Current products state:", products);
-
-  if (!brand) {
-    return <div className="text-white text-center py-10">Načítava sa...</div>;
-  }
+  if (!brand) return <div className="text-white text-center py-10">Načítava sa...</div>;
 
   return (
     <section className="bg-black">
@@ -119,16 +110,13 @@ const BrandDetail = () => {
       </section>
 
       {/* Carousel */}
-      {products.length > 0 ? (
+      {products.length > 0 && (
         <div className="relative z-10 p-8 bg-black">
           <h2 className="text-4xl font-semibold text-white mb-6 text-center">
             Products by {brand.name}
           </h2>
-          {console.log("Rendering ProductsCarousel with products:", products)}
           <ProductsCarousel slides={products} handleAddToCart={handleAddToCart} />
         </div>
-      ) : (
-        console.log("No products to render carousel")
       )}
 
       {/* Lišta značiek */}
@@ -148,13 +136,14 @@ const BrandDetail = () => {
       </div>
 
       {/* Sekcia produktov */}
-      {console.log("Rendering ProductSection with products:", products)}
-      <ProductSection
-        title={`Explore ${brand.name} Products`}
-        products={products}
-        backgroundImage={`${baseURL}${brand.background_image || "/img/bg-default.jpg"}`}
-        onAddToCart={handleAddToCart}
-      />
+      {products.length > 0 && (
+        <ProductSection
+          title={`Explore ${brand.name} Products`}
+          products={products}
+          backgroundImage={`${baseURL}${brand.background_image || "/img/bg-default.jpg"}`}
+          onAddToCart={handleAddToCart}
+        />
+      )}
 
       {/* Message */}
       {message && (
