@@ -124,7 +124,7 @@ const getAllOrders = async (req, res) => {
       order.items = items;
     }
 
-    console.log('Orders with items:', orders);
+    console.log('Orders with items ready to send:', orders);
 
     res.json(orders);
   } catch (err) {
