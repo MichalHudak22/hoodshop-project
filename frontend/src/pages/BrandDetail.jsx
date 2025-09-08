@@ -36,7 +36,8 @@ const BrandDetail = () => {
         const data = await res.json();
         setBrand(data);
 
-        const productRes = await fetch(`${baseURL}/products/brand/${data.name}`);
+        const productRes = await fetch(`${baseURL}/products/brand/${data.name.toLowerCase()}`);
+
         const productData = await productRes.json();
         setProducts(productData);
       } catch (error) {
