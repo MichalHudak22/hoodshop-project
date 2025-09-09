@@ -35,6 +35,7 @@ const transporter = nodemailer.createTransport({
 
 const createUser = async (req, res) => {
   const { name, email, password } = req.body;
+  const defaultAvatarUrl = 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1755594977/default-avatar_z3c30l.jpg';
 
   try {
     // 1️⃣ Overenie, či už email existuje
@@ -46,10 +47,10 @@ const createUser = async (req, res) => {
     // 2️⃣ Hashovanie hesla
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 3️⃣ Vloženie používateľa
+    // 3️⃣ Vloženie používateľa s default avatarom
     const [insertResult] = await db.query(
-      'INSERT INTO user (name, email, password, is_verified) VALUES (?, ?, ?, false)',
-      [name, email, hashedPassword]
+      'INSERT INTO user (name, email, password, is_verified, user_photo, user_photo_public_id) VALUES (?, ?, ?, false, ?, NULL)',
+      [name, email, hashedPassword, defaultAvatarUrl]
     );
 
     const userId = insertResult.insertId;
@@ -64,11 +65,9 @@ const createUser = async (req, res) => {
       [userId, token, expiresAtFormatted]
     );
 
-    // 5️⃣ Odoslanie overovacieho emailu s BASE_URL z env
-   const frontendURL = process.env.FRONTEND_URL;
-const verificationLink = `${frontendURL}/verify-email?token=${token}`;
-
-
+    // 5️⃣ Odoslanie overovacieho emailu s FRONTEND_URL z env
+    const frontendURL = process.env.FRONTEND_URL;
+    const verificationLink = `${frontendURL}/verify-email?token=${token}`;
 
     await transporter.sendMail({
       to: email,

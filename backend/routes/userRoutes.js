@@ -22,7 +22,7 @@ const router = express.Router();
 // Tu definuj limiter pre login max 5 pokusov a ban na 10 minut
 const loginLimiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 10 minút
-  max: 5,
+  max: 50,
   message: {
     status: 429,
     error: "Príliš veľa pokusov o prihlásenie, skúste to o 10 minút znova."

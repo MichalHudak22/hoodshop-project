@@ -93,7 +93,7 @@ function Profile() {
   };
 
 
-  // Default Phodo funkcia pre nastavenie defaultnej fotky pre avatara 
+  // Default Photo funkcia pre nastavenie defaultnej fotky pre avatara 
   const setDefaultPhoto = async () => {
     try {
       const response = await fetch(`${baseURL}/user/upload/default-photo`, {
