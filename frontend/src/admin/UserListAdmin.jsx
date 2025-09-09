@@ -114,8 +114,8 @@ export default function UserListWithDelete() {
   // bezpečný filter
   const filteredUsers = Array.isArray(users)
     ? users.filter(user =>
-        user.email?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     : [];
 
   const adminCount = Array.isArray(users)
@@ -178,9 +178,8 @@ export default function UserListWithDelete() {
               <li
                 key={user.id}
                 onClick={() => setSelectedUserId(user.id)}
-                className={`cursor-pointer bg-gray-800 hover:bg-gray-900 p-4 rounded-lg shadow border-2 ${
-                  selectedUserId === user.id ? 'border-blue-400 bg-gray-900' : 'border-blue-100'
-                }`}
+                className={`cursor-pointer bg-gray-800 hover:bg-gray-900 p-4 rounded-lg shadow border-2 ${selectedUserId === user.id ? 'border-blue-400 bg-gray-900' : 'border-blue-100'
+                  }`}
               >
                 <p className="text-lg font-semibold">{user.name}</p>
                 <p className="text-sm text-gray-300">{user.email}</p>
@@ -224,10 +223,10 @@ export default function UserListWithDelete() {
         >
           {selectedUserId
             ? (Array.isArray(users)
-                ? users.find(u => u.id === selectedUserId)?.role === 'admin'
-                  ? 'Set as User'
-                  : 'Set as Admin'
-                : 'Set as Admin')
+              ? users.find(u => u.id === selectedUserId)?.role === 'admin'
+                ? 'Set as User'
+                : 'Set as Admin'
+              : 'Set as Admin')
             : 'Set as Admin'}
         </button>
 
@@ -238,6 +237,12 @@ export default function UserListWithDelete() {
         >
           {loading ? 'Mažem...' : 'Delete'}
         </button>
+      </div>
+
+      {/* ❗ Rezervované miesto pre error alebo message */}
+      <div className="mt-3 h-6 md:h-8 flex items-center justify-center">
+        {error && <p className="text-red-500 text-center">{error}</p>}
+        {message && <p className="text-green-400 text-center">{message}</p>}
       </div>
 
       {showConfirmModal && selectedUser && (
