@@ -195,13 +195,20 @@ const Header = () => {
   >
     {/* Ak existuje profilová fotka */}
     {user.user_photo && (
-       <div className="flex justify-center mb-3">
-              <img
-                src={user.user_photo.startsWith('http') ? user.user_photo : `${baseURL}${user.user_photo}`}
-                alt="Profile"
-                className="w-16 h-16 rounded-full object-cover border-2 border-gray-500"
-              />
-            </div>
+<div className="flex justify-center mb-3">
+  <img
+    src={
+      user?.user_photo
+        ? user.user_photo.startsWith('http')
+          ? user.user_photo
+          : `${baseURL}${user.user_photo}`
+        : 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1755594977/default-avatar_z3c30l.jpg'
+    }
+    alt="Profile"
+    className="w-16 h-16 rounded-full object-cover border-2 border-gray-500"
+  />
+</div>
+
     )}
 
     {/* Meno alebo email */}
