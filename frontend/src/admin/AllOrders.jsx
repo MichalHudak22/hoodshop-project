@@ -7,14 +7,16 @@ const AllOrders = () => {
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
+
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get('/api/orders/admin', {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
+        const res = await axios.get(`${baseURL}/api/orders/admin`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
+
         // bezpečný zápis do state
         setOrders(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
@@ -33,11 +35,11 @@ const AllOrders = () => {
   // bezpečný filter
   const filteredOrders = Array.isArray(orders)
     ? orders.filter(order =>
-        terms.every(term =>
-          (order.order_number || '').toLowerCase().includes(term) ||
-          (order.user_email || '').toLowerCase().includes(term)
-        )
+      terms.every(term =>
+        (order.order_number || '').toLowerCase().includes(term) ||
+        (order.user_email || '').toLowerCase().includes(term)
       )
+    )
     : [];
 
   return (
