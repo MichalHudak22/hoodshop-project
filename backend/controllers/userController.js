@@ -429,7 +429,18 @@ const updateUserRole = async (req, res) => {
       return res.status(400).json({ error: 'Neplatná rola. Povolené sú len "user" alebo "admin"' });
     }
 
-    const [result] = await db.query('UPDATE user SET role = ? WHERE id = ?', [role, targetUserId]);
+    // 🚨 Check: ak je to "boh" admin, nedovoľ zmenu
+    const SUPER_ADMIN_ID = 32;
+    if (targetUserId === SUPER_ADMIN_ID) {
+      return res.status(403).json({
+        error: 'Tento admin je BOH a jeho rolu nemôžeš zmeniť 😎'
+      });
+    }
+
+    const [result] = await db.query(
+      'UPDATE user SET role = ? WHERE id = ?',
+      [role, targetUserId]
+    );
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Používateľ neexistuje' });
@@ -442,6 +453,7 @@ const updateUserRole = async (req, res) => {
     res.status(500).json({ error: 'Chyba pri aktualizácii roly' });
   }
 };
+
 
 
 module.exports = { getUsers, createUser, loginUser, getUserProfile, updateUserProfile, deleteUserAccount, deleteUserById, getOrdersByUserId, getUserById, updateUserRole, verifyEmail };
