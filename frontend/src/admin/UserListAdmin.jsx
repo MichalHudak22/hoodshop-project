@@ -114,8 +114,8 @@ export default function UserListWithDelete() {
   // bezpečný filter
   const filteredUsers = Array.isArray(users)
     ? users.filter(user =>
-      user.email?.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+        user.email?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     : [];
 
   const adminCount = Array.isArray(users)
@@ -132,11 +132,7 @@ export default function UserListWithDelete() {
 
   return (
     <div className=''>
-      {error && (
-        <p className="text-red-500 mb-4 text-center" role="alert">
-          {error}
-        </p>
-      )}
+     
 
       <div className="max-w-3xl mx-auto mb-4 text-center">
         <p className="text-white font-semibold text-lg lg:text-xl">
@@ -178,8 +174,9 @@ export default function UserListWithDelete() {
               <li
                 key={user.id}
                 onClick={() => setSelectedUserId(user.id)}
-                className={`cursor-pointer bg-gray-800 hover:bg-gray-900 p-4 rounded-lg shadow border-2 ${selectedUserId === user.id ? 'border-blue-400 bg-gray-900' : 'border-blue-100'
-                  }`}
+                className={`cursor-pointer bg-gray-800 hover:bg-gray-900 p-4 rounded-lg shadow border-2 ${
+                  selectedUserId === user.id ? 'border-blue-400 bg-gray-900' : 'border-blue-100'
+                }`}
               >
                 <p className="text-lg font-semibold">{user.name}</p>
                 <p className="text-sm text-gray-300">{user.email}</p>
@@ -223,10 +220,10 @@ export default function UserListWithDelete() {
         >
           {selectedUserId
             ? (Array.isArray(users)
-              ? users.find(u => u.id === selectedUserId)?.role === 'admin'
-                ? 'Set as User'
-                : 'Set as Admin'
-              : 'Set as Admin')
+                ? users.find(u => u.id === selectedUserId)?.role === 'admin'
+                  ? 'Set as User'
+                  : 'Set as Admin'
+                : 'Set as Admin')
             : 'Set as Admin'}
         </button>
 
@@ -239,11 +236,11 @@ export default function UserListWithDelete() {
         </button>
       </div>
 
-      {/* ❗ Rezervované miesto pre error alebo message */}
-      <div className="mt-3 h-6 md:h-8 flex items-center justify-center">
-        {error && <p className="text-red-500 text-center">{error}</p>}
-        {message && <p className="text-green-400 text-center">{message}</p>}
-      </div>
+       {error && (
+        <p className="text-red-500 mb-4 text-center" role="alert">
+          {error}
+        </p>
+      )}
 
       {showConfirmModal && selectedUser && (
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
