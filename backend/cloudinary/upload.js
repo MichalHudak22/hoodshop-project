@@ -1,15 +1,15 @@
+// cloudinary/upload.js
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const cloudinary = require('./cloudinary'); // tvoj cloudinary config
+const cloudinary = require('./cloudinary');
 
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'profile_photos', // priečinok na Cloudinary
+    folder: 'profile_photos',
     allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
   },
 });
 
-const upload = multer({ storage });
-
-module.exports = upload;
+const uploadSingle = multer({ storage }).single('photo'); // 'photo' = názov poľa vo form-data
+module.exports = uploadSingle;
