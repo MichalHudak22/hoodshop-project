@@ -56,33 +56,34 @@ export default function ShippingPriceConfig() {
     }, 3000);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError(null);
 
-    const changedMethods = Array.from(dirtyFields);
-    if (changedMethods.length === 0) {
-      showMessage('No prices have been changed.', 'info');
-      return;
-    }
+  const changedMethods = Array.from(dirtyFields);
+  if (changedMethods.length === 0) {
+    showMessage('No prices have been changed.', 'info');
+    return;
+  }
 
-    try {
-      await Promise.all(
-        changedMethods.map(name =>
-          axios.post('/api/config/shipping-prices', {
-            name,
-            price: prices[name] === '' ? 0 : parseFloat(prices[name])
-          })
-        )
-      );
+  try {
+    await Promise.all(
+      changedMethods.map(name =>
+        axios.post(`${baseURL}/api/config/shipping-prices`, {
+          name,
+          price: prices[name] === '' ? 0 : parseFloat(prices[name])
+        })
+      )
+    );
 
-      setDirtyFields(new Set());
-      showMessage('Delivery prices have been saved.', 'success');
-    } catch (e) {
-      setError('Chyba pri ukladaní cien dopravy');
-      console.error(e);
-    }
-  };
+    setDirtyFields(new Set());
+    showMessage('Delivery prices have been saved.', 'success');
+  } catch (e) {
+    setError('Chyba pri ukladaní cien dopravy');
+    console.error(e);
+  }
+};
+
 
   if (loading) return <p>Načítavam ceny dopravy...</p>;
   if (error) return <p className="text-red-600">{error}</p>;
