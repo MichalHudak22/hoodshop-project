@@ -433,7 +433,7 @@ const updateUserRole = async (req, res) => {
     const SUPER_ADMIN_ID = 32;
     if (targetUserId === SUPER_ADMIN_ID) {
       return res.status(403).json({
-        error: 'Tento admin je BOH a jeho rolu nemôžeš zmeniť 😎'
+        error: 'This admin is GOD and you cannot change their role. 😎'
       });
     }
 

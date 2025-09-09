@@ -60,20 +60,20 @@ const ProjectInfo = () => {
           >
             🛠️ Technologies Used
           </motion.h2>
+<motion.ul
+  variants={fadeInUp}
+  initial="hidden"
+  animate="visible"
+  custom={5}
+  className="list-disc space-y-2 px-4 mx-auto max-w-2xl text-left text-gray-200"
+>
+  <li><strong>Frontend:</strong> React + Tailwind CSS</li>
+  <li><strong>Backend:</strong> Express (Node.js) with route/controller architecture</li>
+  <li><strong>Database:</strong> TiDB (connected via Render, with environment variables configured)</li>
+  <li><strong>Authentication:</strong> JWT + bcrypt + email verification</li>
+  <li><strong>Security:</strong> Input validation, XSS & SQL injection protection, brute-force defense</li>
+</motion.ul>
 
-          <motion.ul
-            variants={fadeInUp}
-            initial="hidden"
-            animate="visible"
-            custom={5}
-            className="list-disc space-y-2 px-4 mx-auto max-w-2xl text-left text-gray-200"
-          >
-            <li><strong>Frontend:</strong> React + Tailwind CSS</li>
-            <li><strong>Backend:</strong> Express (Node.js) with route/controller architecture</li>
-            <li><strong>Database:</strong> MySQL (managed with MySQL Workbench)</li>
-            <li><strong>Authentication:</strong> JWT + bcrypt + email verification</li>
-            <li><strong>Security:</strong> Input validation, XSS & SQL injection protection, brute-force defense</li>
-          </motion.ul>
 
           {/* Admin Capabilities */}
           <motion.h2
@@ -172,6 +172,17 @@ const ProjectInfo = () => {
           >
             The backend architecture utilizes modular Express controllers and routes, ensuring clean, reusable, and maintainable code.
           </motion.p>
+
+          <motion.p
+            className="text-white text-center"
+            variants={fadeInUp}
+            initial="hidden"
+            animate="visible"
+            custom={13}
+          >
+            The backend architecture utilizes modular Express controllers and routes, ensuring clean, reusable, and maintainable code. I connected the frontend and backend on Render, integrating it with a TiDB database, configuring environment variables, and ensuring seamless communication across the full stack.
+          </motion.p>
+
 
           <motion.p
             className="text-white text-center"
