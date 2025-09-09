@@ -7,6 +7,8 @@ const typeOptions = {
   cycling: ['clothes', 'bike', 'helmets', 'gloves'],
 };
 
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
+
 const AddProductForm = () => {
   const [formData, setFormData] = useState({
     name: '', category: '', brand: '', price: '', type: '',
@@ -80,12 +82,13 @@ const AddProductForm = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post('/products', data, {
+      const res = await axios.post(`${baseURL}/products`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
       });
+
 
       setMessage(res.data.message);
       setError(null);
@@ -215,72 +218,72 @@ const AddProductForm = () => {
             </select>
           </div>
         </div>
-{/* Carousel & Image container */}
-<div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mt-6">
-  {/* Carousel group field (readonly with checkbox) */}
-  <div className="md:w-1/2 px-2">
-    <label className="block font-semibold mb-1">Carousel Group</label>
-    <input
-      type="text"
-      name="carousel_group"
-      value={formData.carousel_group}
-      readOnly
-      disabled
-      className="w-full p-2 bg-gray-300 text-black border border-blue-800 rounded outline-none cursor-not-allowed"
-    />
-    <div className="mt-2 flex items-center gap-2">
-      <input
-        type="checkbox"
-        id="includeCarouselGroup"
-        checked={includeCarouselGroup}
-        onChange={() => setIncludeCarouselGroup(!includeCarouselGroup)}
-        className="accent-green-500 w-6 h-6"
-      />
-      <label htmlFor="includeCarouselGroup" className="text-[16px] text-blue-100">
-        Include <code>carousel_group</code> in product
-      </label>
-    </div>
-  </div>
+        {/* Carousel & Image container */}
+        <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mt-6">
+          {/* Carousel group field (readonly with checkbox) */}
+          <div className="md:w-1/2 px-2">
+            <label className="block font-semibold mb-1">Carousel Group</label>
+            <input
+              type="text"
+              name="carousel_group"
+              value={formData.carousel_group}
+              readOnly
+              disabled
+              className="w-full p-2 bg-gray-300 text-black border border-blue-800 rounded outline-none cursor-not-allowed"
+            />
+            <div className="mt-2 flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="includeCarouselGroup"
+                checked={includeCarouselGroup}
+                onChange={() => setIncludeCarouselGroup(!includeCarouselGroup)}
+                className="accent-green-500 w-6 h-6"
+              />
+              <label htmlFor="includeCarouselGroup" className="text-[16px] text-blue-100">
+                Include <code>carousel_group</code> in product
+              </label>
+            </div>
+          </div>
 
-  {/* Image input */}
-  <div className="md:w-1/2 min-h-56 md:min-h-36 px-2 bg-gray-700 p-3 bg-opacity-70 rounded-lg">
-    <label className="block font-semibold mb-1 text-center md:text-left">
-      Image<span className="text-red-400 ml-1">*</span>
-    </label>
+          {/* Image input */}
+          <div className="md:w-1/2 min-h-56 md:min-h-36 px-2 bg-gray-700 p-3 bg-opacity-70 rounded-lg">
+            <label className="block font-semibold mb-1 text-center md:text-left">
+              Image<span className="text-red-400 ml-1">*</span>
+            </label>
 
-    <div className="flex flex-col md:flex-row md:items-center gap-4 text-center md:text-left">
-      {/* Upload button + file name */}
-      <div className="flex flex-col items-center md:items-start">
-        <label
-          htmlFor="file-upload"
-          className="cursor-pointer bg-blue-700 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition"
-        >
-          Upload Image
-        </label>
-        {imageFile && (
-          <span className="text-sm text-green-200 mt-2 md:mt-1">{imageFile.name}</span>
-        )}
-      </div>
+            <div className="flex flex-col md:flex-row md:items-center gap-4 text-center md:text-left">
+              {/* Upload button + file name */}
+              <div className="flex flex-col items-center md:items-start">
+                <label
+                  htmlFor="file-upload"
+                  className="cursor-pointer bg-blue-700 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition"
+                >
+                  Upload Image
+                </label>
+                {imageFile && (
+                  <span className="text-sm text-green-200 mt-2 md:mt-1">{imageFile.name}</span>
+                )}
+              </div>
 
-      {/* Image preview */}
-      {imageFile && (
-        <img
-          src={URL.createObjectURL(imageFile)}
-          alt="Preview"
-          className="w-20 h-20 border rounded mx-auto md:mx-0"
-        />
-      )}
-    </div>
+              {/* Image preview */}
+              {imageFile && (
+                <img
+                  src={URL.createObjectURL(imageFile)}
+                  alt="Preview"
+                  className="w-20 h-20 border rounded mx-auto md:mx-0"
+                />
+              )}
+            </div>
 
-    <input
-      id="file-upload"
-      type="file"
-      accept="image/*"
-      onChange={handleImageChange}
-      className="hidden"
-    />
-  </div>
-</div>
+            <input
+              id="file-upload"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="hidden"
+            />
+          </div>
+        </div>
 
 
 
