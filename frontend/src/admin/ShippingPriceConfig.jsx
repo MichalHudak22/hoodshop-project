@@ -11,6 +11,8 @@ export default function ShippingPriceConfig() {
   const [message, setMessage] = useState(null); // hláška pre používateľa
   const [messageType, setMessageType] = useState(''); // success | info | error
 
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
+
   useEffect(() => {
     async function fetchPrices() {
       try {
