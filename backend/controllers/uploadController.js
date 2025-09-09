@@ -5,9 +5,6 @@ const cloudinary = require('../cloudinary/cloudinary');
 // Upload / replace profile photo
 exports.uploadProfilePhoto = (req, res) => {
   uploadSingle(req, res, async (err) => {
-    console.log('💡 Multer callback začal');
-    console.log('err:', err);
-
     if (err) return res.status(400).json({ success: false, message: err.message });
 
     const userId = req.userId;
@@ -22,8 +19,8 @@ exports.uploadProfilePhoto = (req, res) => {
         await cloudinary.uploader.destroy(oldPublicId);
       }
 
-      const imageUrl = req.file.path;
-      const publicId = req.file.filename;
+      const imageUrl = req.file.path;      // Cloudinary URL
+      const publicId = req.file.filename;  // Cloudinary public_id
 
       await db.query(
         'UPDATE user SET user_photo = ?, user_photo_public_id = ? WHERE id = ?',
@@ -53,6 +50,7 @@ exports.setDefaultProfilePhoto = async (req, res) => {
       await cloudinary.uploader.destroy(oldPublicId);
     }
 
+    // Default avatar → user_photo_public_id = NULL
     await db.query(
       'UPDATE user SET user_photo = ?, user_photo_public_id = NULL WHERE id = ?',
       [defaultUrl, userId]

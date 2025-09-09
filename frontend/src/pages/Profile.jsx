@@ -104,14 +104,14 @@ function Profile() {
       });
 
       const data = await response.json();
-      if (data.success) {
-        setUser(prev => ({ ...prev, user_photo: data.photo }));
-        setSelectedFile(null);
 
-        // 🧼 Resetuj file input, aby bolo možné znova nahrať rovnaký súbor
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
+      if (data.success) {
+        console.log('Default photo returned:', data.photo); // Cloudinary URL
+        setUser(prev => ({ ...prev, user_photo: data.photo }));
+
+        // Reset file input
+        if (fileInputRef.current) fileInputRef.current.value = '';
+        setSelectedFile(null);
       } else {
         console.error('Chyba pri nastavovaní default fotky:', data.message);
       }
@@ -119,6 +119,7 @@ function Profile() {
       console.error('Server error:', error);
     }
   };
+
 
   // Formular
   useEffect(() => {
@@ -255,16 +256,13 @@ function Profile() {
               <div className="w-56 h-56 rounded-full overflow-hidden border-2 border-gray-400">
                 <img
                   src={
-                    user.user_photo
-                      ? user.user_photo.startsWith('http')
-                        ? user.user_photo          // už celá URL, napr. Cloudinary
-                        : `${baseURL}${user.user_photo}` // lokálny obrázok na serveri
-                      : "/img/default-avatar.jpg"       // default avatar
+                    user?.user_photo
+                      ? user.user_photo
+                      : 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1694260000/profile_photos/default-avatar.jpg'
                   }
                   alt="Profilová fotka"
                   className="w-full h-full object-cover"
                 />
-
               </div>
 
               {/* Tlačidlo Default Photo */}
