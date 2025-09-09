@@ -1,34 +1,8 @@
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
 const db = require('../database');
+const upload = require('../cloudinary/upload'); // multer-storage-cloudinary
+const cloudinary = require('../cloudinary/cloudinary');
 
-// Nastavenie úložiska
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const userId = req.userId;
-    const userFolder = path.join(__dirname, '..', 'uploads', 'profile_photos', userId.toString());
-    if (!fs.existsSync(userFolder)) fs.mkdirSync(userFolder, { recursive: true });
-    cb(null, userFolder);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = Date.now() + '-' + file.originalname;
-    cb(null, uniqueName);
-  },
-});
-
-const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    const allowed = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.jfif'];
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (allowed.includes(ext)) cb(null, true);
-    else cb(new Error('Nepovolený formát obrázku'));
-  },
-}).single('photo');
-
-// Hlavná funkcia pre upload
+// Upload / replace profile photo
 exports.uploadProfilePhoto = (req, res) => {
   upload(req, res, async (err) => {
     if (err) return res.status(400).json({ success: false, message: err.message });
@@ -37,47 +11,60 @@ exports.uploadProfilePhoto = (req, res) => {
     if (!userId) return res.status(401).json({ success: false, message: 'Neautorizovaný prístup.' });
     if (!req.file) return res.status(400).json({ success: false, message: 'Súbor nebol odoslaný.' });
 
-    const fileName = req.file.filename;
-    const relativePath = `/uploads/profile_photos/${userId}/${fileName}`;
-    const userFolder = path.join(__dirname, '..', 'uploads', 'profile_photos', userId.toString());
-
     try {
-      // Vymazať staré fotky okrem aktuálnej
-      const allFiles = fs.readdirSync(userFolder);
-      for (const file of allFiles) {
-        if (file !== fileName) fs.unlinkSync(path.join(userFolder, file));
+      // 1️⃣ Zisti starý avatar (public_id)
+      const [rows] = await db.query('SELECT user_photo_public_id FROM user WHERE id = ?', [userId]);
+      const oldPublicId = rows && rows[0] ? rows[0].user_photo_public_id : null;
+
+      // 2️⃣ Zmaž starý obrázok, ak nie je default
+      if (oldPublicId) {
+        await cloudinary.uploader.destroy(oldPublicId);
       }
 
-      // Uložiť cestu do DB cez pool
-      await db.query('UPDATE user SET user_photo = ? WHERE id = ?', [relativePath, userId]);
+      // 3️⃣ Nahraj nový avatar – multer-storage-cloudinary už to spraví
+      const imageUrl = req.file.path;      // URL obrázka na Cloudinary
+      const publicId = req.file.filename;  // public_id na mazanie
 
-      return res.json({ success: true, photo: relativePath });
+      // 4️⃣ Ulož do DB
+      await db.query(
+        'UPDATE user SET user_photo = ?, user_photo_public_id = ? WHERE id = ?',
+        [imageUrl, publicId, userId]
+      );
+
+      return res.json({ success: true, photo: imageUrl });
     } catch (error) {
-      console.error('Chyba pri mazaní alebo ukladaní obrázka:', error);
+      console.error('Chyba pri ukladaní obrázka:', error);
       return res.status(500).json({ success: false, message: 'Chyba pri ukladaní do databázy.' });
     }
   });
 };
 
-// Nastavenie defaultnej fotky
+// Reset profile photo na default
 exports.setDefaultProfilePhoto = async (req, res) => {
   const userId = req.userId;
   if (!userId) return res.status(401).json({ success: false, message: 'Neautorizovaný prístup.' });
 
-  const defaultPath = '/uploads/profile_photos/default-avatar.jpg';
-  const userFolder = path.join(__dirname, '..', 'uploads', 'profile_photos', userId.toString());
+  // Default avatar – môžeš si dať Cloudinary URL
+const defaultUrl = 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1694260000/profile_photos/default-avatar.jpg';
+
 
   try {
-    // Aktualizovať DB
-    await db.query('UPDATE user SET user_photo = ? WHERE id = ?', [defaultPath, userId]);
+    // 1️⃣ Zisti starý avatar
+    const [rows] = await db.query('SELECT user_photo_public_id FROM user WHERE id = ?', [userId]);
+    const oldPublicId = rows && rows[0] ? rows[0].user_photo_public_id : null;
 
-    // Vymazať všetky vlastné fotky používateľa
-    if (fs.existsSync(userFolder)) {
-      const files = fs.readdirSync(userFolder);
-      for (const file of files) fs.unlinkSync(path.join(userFolder, file));
+    // 2️⃣ Zmaž starý avatar, ak existuje
+    if (oldPublicId) {
+      await cloudinary.uploader.destroy(oldPublicId);
     }
 
-    return res.json({ success: true, photo: defaultPath });
+    // 3️⃣ Ulož default avatar do DB
+    await db.query(
+      'UPDATE user SET user_photo = ?, user_photo_public_id = NULL WHERE id = ?',
+      [defaultUrl, userId]
+    );
+
+    return res.json({ success: true, photo: defaultUrl });
   } catch (error) {
     console.error('Chyba pri nastavovaní defaultnej fotky:', error);
     return res.status(500).json({ success: false, message: 'Chyba pri nastavovaní defaultnej fotky.' });
