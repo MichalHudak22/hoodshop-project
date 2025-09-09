@@ -10,29 +10,30 @@ export default function ShippingPriceConfig() {
   const [dirtyFields, setDirtyFields] = useState(new Set());
   const [message, setMessage] = useState(null); // hláška pre používateľa
   const [messageType, setMessageType] = useState(''); // success | info | error
-useEffect(() => {
-  async function fetchPrices() {
-    try {
-      const res = await axios.get(`${baseURL}/api/config/shipping-prices`);
 
-      if (Array.isArray(res.data)) {
-        const pricesObj = {};
-        res.data.forEach(({ name, price }) => {
-          pricesObj[name] = price != null ? price.toString() : '';
-        });
-        setPrices(pricesObj);
-      } else {
-        setError('Očakával som pole s cenami dopravy');
+  useEffect(() => {
+    async function fetchPrices() {
+      try {
+        const res = await axios.get(`${baseURL}/api/config/shipping-prices`);
+        console.log('Response z backendu:', res.data);
+        if (Array.isArray(res.data)) {
+          const pricesObj = {};
+          res.data.forEach(({ name, price }) => {
+            pricesObj[name] = price != null ? price.toString() : '';
+          });
+          setPrices(pricesObj);
+        } else {
+          setError('Očakával som pole s cenami dopravy');
+        }
+      } catch (e) {
+        setError('Chyba pri načítaní cien dopravy');
+        console.error(e);
+      } finally {
+        setLoading(false);
       }
-    } catch (e) {
-      setError('Chyba pri načítaní cien dopravy');
-      console.error(e);
-    } finally {
-      setLoading(false);
     }
-  }
-  fetchPrices();
-}, [baseURL]); // <- pridaj aj baseURL ako dependency
+    fetchPrices();
+  }, [baseURL]); // <- pridaj aj baseURL ako dependency
 
 
   const handleChange = (method, value) => {
@@ -118,9 +119,8 @@ useEffect(() => {
           {/* Info Message with fixed height */}
           <div className="h-6 mt-2">
             {message && (
-              <p className={`text-sm transition-opacity duration-300 ${
-                messageType === 'success' ? 'text-green-400' : 'text-yellow-300'
-              }`}>
+              <p className={`text-sm transition-opacity duration-300 ${messageType === 'success' ? 'text-green-400' : 'text-yellow-300'
+                }`}>
                 {message}
               </p>
             )}
