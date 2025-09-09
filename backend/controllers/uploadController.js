@@ -36,11 +36,12 @@ exports.uploadProfilePhoto = (req, res) => {
 };
 
 // Reset profile photo na default
+// Reset profile photo na default
 exports.setDefaultProfilePhoto = async (req, res) => {
   const userId = req.userId;
   if (!userId) return res.status(401).json({ success: false, message: 'Neautorizovaný prístup.' });
 
-  const defaultUrl = 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1694260000/profile_photos/default-avatar.jpg';
+  const defaultUrl = 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1755594977/default-avatar_z3c30l.jpg';
 
   try {
     const [rows] = await db.query('SELECT user_photo_public_id FROM user WHERE id = ?', [userId]);
@@ -50,7 +51,6 @@ exports.setDefaultProfilePhoto = async (req, res) => {
       await cloudinary.uploader.destroy(oldPublicId);
     }
 
-    // Default avatar → user_photo_public_id = NULL
     await db.query(
       'UPDATE user SET user_photo = ?, user_photo_public_id = NULL WHERE id = ?',
       [defaultUrl, userId]
@@ -62,3 +62,4 @@ exports.setDefaultProfilePhoto = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Chyba pri nastavovaní defaultnej fotky.' });
   }
 };
+

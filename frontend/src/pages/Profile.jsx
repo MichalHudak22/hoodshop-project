@@ -258,7 +258,7 @@ function Profile() {
                   src={
                     user?.user_photo
                       ? user.user_photo
-                      : 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1694260000/profile_photos/default-avatar.jpg'
+                      : 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1755594977/default-avatar_z3c30l.jpg'
                   }
                   alt="Profilová fotka"
                   className="w-full h-full object-cover"
