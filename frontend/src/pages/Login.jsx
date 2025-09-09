@@ -15,43 +15,50 @@ function Login() {
 
   const baseURL = 'https://hoodshop-project.onrender.com'; // <-- Render URL
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    fetch(`${baseURL}/user/login`, {   // <-- použitie baseURL
+  try {
+    const res = await fetch(`${baseURL}/user/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          setError(data.error);
-          setMessage('');
-        } else if (data.message === 'Email is not verified. Please verify your account before logging in.') {
-          setError('Email is not verified. Please verify your account before logging in.');
-          setMessage('');
-        } else {
-          setMessage(data.message);
-          setError('');
+    });
+    const data = await res.json();
 
-          login({
-            email: data.email,
-            name: data.name,
-            role: data.role,
-            token: data.token,
-          });
+    if (data.error) {
+      setError(data.error);
+      setMessage('');
+      return;
+    } else if (data.message === 'Email is not verified. Please verify your account before logging in.') {
+      setError(data.message);
+      setMessage('');
+      return;
+    }
 
-          refreshCartCount();
-          navigate('/profile');
-        }
-      })
-      .catch((err) => {
-        console.error('Error during login:', err);
-        setError('An error occurred while logging in.');
-        setMessage('');
-      });
-  };
+    // ✅ Načítaj kompletné údaje používateľa
+    const profileRes = await fetch(`${baseURL}/user/profile`, {
+      headers: { Authorization: `Bearer ${data.token}` },
+    });
+    const profileData = await profileRes.json();
+
+    // Nastav user v kontexte aj localStorage
+    const completeUser = { ...profileData, token: data.token };
+    login(completeUser);
+    localStorage.setItem('user', JSON.stringify(completeUser));
+    localStorage.setItem('token', data.token);
+
+    refreshCartCount();
+    navigate('/profile');
+    setError('');
+    setMessage(data.message);
+  } catch (err) {
+    console.error('Error during login:', err);
+    setError('An error occurred while logging in.');
+    setMessage('');
+  }
+};
+
 
   return (
     <div
