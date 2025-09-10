@@ -130,37 +130,52 @@ const verifyEmail = async (req, res) => {
 
 
 
+const { getAttempts, registerFailedAttempt, resetAttempts } = require('../middleware/failedLoginAttempts');
+
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    // 1️⃣ Načítame používateľa podľa emailu
+    // 1️⃣ Skontrolujeme, či nie je účet zablokovaný
+    const attemptData = getAttempts(email);
+    if (attemptData.lockUntil && Date.now() < attemptData.lockUntil) {
+      const minutesLeft = Math.ceil((attemptData.lockUntil - Date.now()) / 60000);
+      return res.status(429).json({ error: `Účet je dočasne zablokovaný. Skúste znova o ${minutesLeft} min.` });
+    }
+
+    // 2️⃣ Načítame používateľa podľa emailu
     const [users] = await db.query('SELECT * FROM user WHERE email = ?', [email]);
     if (users.length === 0) {
+      registerFailedAttempt(email);
       return res.status(404).json({ error: 'Používateľ s týmto emailom neexistuje.' });
     }
 
     const user = users[0];
 
-    // 2️⃣ Skontrolujeme, či je email overený
+    // 3️⃣ Skontrolujeme, či je email overený
     if (user.is_verified === 0) {
+      registerFailedAttempt(email);
       return res.status(403).json({ error: 'Email nie je overený. Skontroluj svoj email.' });
     }
 
-    // 3️⃣ Porovnanie hesla
+    // 4️⃣ Porovnanie hesla
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      registerFailedAttempt(email);
       return res.status(400).json({ error: 'Nesprávne heslo.' });
     }
 
-    // 4️⃣ Vytvorenie JWT tokenu
+    // 5️⃣ Reset pokusov po úspešnom prihlásení
+    resetAttempts(email);
+
+    // 6️⃣ Vytvorenie JWT tokenu
     const token = jwt.sign(
       { userId: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: '6h' }
     );
 
-    // 5️⃣ Odpoveď klientovi
+    // 7️⃣ Odpoveď klientovi
     res.status(200).json({
       message: 'Prihlásenie úspešné',
       token,

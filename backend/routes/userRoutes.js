@@ -1,5 +1,4 @@
 const express = require('express');
-const rateLimit = require('express-rate-limit');
 
 const {
   getUsers,
@@ -17,25 +16,13 @@ const {
 
 const authenticateToken = require('../middleware/authenticateToken');
 const authorizeAdmin = require('../middleware/authorizeAdmin');
-const router = express.Router();
 
-// Tu definuj limiter pre login max 5 pokusov a ban na 10 minut
-const loginLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 minút
-  max: 50,
-  message: {
-    status: 429,
-    error: "Príliš veľa pokusov o prihlásenie, skúste to o 10 minút znova."
-  },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+const router = express.Router();
 
 router.get('/', getUsers);
 router.post('/', createUser);
 
-// Pridaj limiter ako middleware pre login endpoint
-router.post('/login', loginLimiter, loginUser);
+router.post('/login', loginUser); // <-- tu už len samotný loginUser
 
 router.get('/verify-email', verifyEmail);
 
