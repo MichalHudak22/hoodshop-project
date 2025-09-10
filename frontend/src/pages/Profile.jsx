@@ -15,7 +15,7 @@ const inputs = [
 ];
 
 function Profile() {
-  const [user, setUser] = useState(null);
+  const { user, login, logout } = useContext(AuthContext);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
@@ -67,30 +67,32 @@ function Profile() {
 
     fetch(`${baseURL}/user/upload/photo`, {
       method: 'POST',
-      headers: {
-        Authorization: 'Bearer ' + token,
-      },
+      headers: { Authorization: 'Bearer ' + token },
       body: formData,
     })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
           console.log('Fotka nahraná, cesta:', data.photo);
-          setUser(prev => ({ ...prev, user_photo: data.photo }));
+
+          // 👉 update user v AuthContext
+          login({ ...user, user_photo: data.photo, token });
+
           setSelectedFile(null);
           if (fileInputRef.current) fileInputRef.current.value = '';
           setSuccess('Photo was uploaded successfully.');
           setTimeout(() => setSuccess(''), 3000);
         } else {
           setUploadError('Chybný obrázok.');
-          setTimeout(() => setUploadError(''), 3000); // ⏱️ automaticky zmizne po 3s
+          setTimeout(() => setUploadError(''), 3000);
         }
       })
       .catch(() => {
         setUploadError('Chybný obrázok.');
-        setTimeout(() => setUploadError(''), 3000); // ⏱️ automaticky zmizne po 3s
+        setTimeout(() => setUploadError(''), 3000);
       });
   };
+
 
 
   // Default Photo funkcia pre nastavenie defaultnej fotky pre avatara 
@@ -98,18 +100,17 @@ function Profile() {
     try {
       const response = await fetch(`${baseURL}/user/upload/default-photo`, {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
 
       const data = await response.json();
 
       if (data.success) {
-        console.log('Default photo returned:', data.photo); // Cloudinary URL
-        setUser(prev => ({ ...prev, user_photo: data.photo }));
+        console.log('Default photo returned:', data.photo);
 
-        // Reset file input
+        // 👉 update user v AuthContext
+        login({ ...user, user_photo: data.photo, token: localStorage.getItem('token') });
+
         if (fileInputRef.current) fileInputRef.current.value = '';
         setSelectedFile(null);
       } else {
@@ -130,78 +131,91 @@ function Profile() {
       return;
     }
 
-    fetch(`${baseURL}/user/profile`, {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          setError(data.error);
-        } else {
-          setUser(data);
-        }
-      })
-      .catch(() => setError('Chyba pri načítaní údajov o používateľovi'));
+   fetch(`${baseURL}/user/profile`, {
+  method: 'GET',
+  headers: { Authorization: `Bearer ${token}` },
+})
+  .then((res) => res.json())
+  .then((data) => {
+    if (data.error) {
+      setError(data.error);
+    } else {
+      // 👉 update user v AuthContext
+      login({ ...data, token });
+    }
+  })
+  .catch(() => setError('Chyba pri načítaní údajov o používateľovi'));
+
   }, [navigate]);
 
   // Handler pre update stavov políčok
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setUser((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const { name, value } = e.target;
+  login({
+    ...user,
+    [name]: value,
+    token: localStorage.getItem('token'),
+  });
+};
 
-  // Handler pre uloženie zmien
-  const handleSave = () => {
-    const token = localStorage.getItem('token');
 
-    const allowedFields = ['name', 'email', 'profile_email', 'birth_date', 'mobile_number', 'address', 'city', 'postal_code'];
+// Handler pre uloženie zmien
+const handleSave = () => {
+  const token = localStorage.getItem('token');
 
-    // Vytvoriť iba objekt s povolenými údajmi
-    const filteredUserData = allowedFields.reduce((acc, key) => {
-      if (user[key] !== undefined) {
-        acc[key] = user[key];
-      }
-      return acc;
-    }, {});
+  const allowedFields = [
+    'name',
+    'email',
+    'profile_email',
+    'birth_date',
+    'mobile_number',
+    'address',
+    'city',
+    'postal_code',
+  ];
 
-    fetch(`${baseURL}/user/profile`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(filteredUserData),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) {
-          setError(data.error);
-          setSuccess('');
-        } else {
-          setSuccess('Profile was successfully saved.');
-          setError('');
+  // Vytvoriť iba objekt s povolenými údajmi
+  const filteredUserData = allowedFields.reduce((acc, key) => {
+    if (user[key] !== undefined) {
+      acc[key] = user[key];
+    }
+    return acc;
+  }, {});
 
-          // 🛠️ Zachovať user_photo a prípadne ďalšie údaje, ktoré backend nevracia
-          setUser(prev => ({ ...prev, ...data }));
-
-          setTimeout(() => {
-            setSuccess('');
-          }, 3000);
-        }
-      })
-
-      .catch(() => {
-        setError('Error saving profile.');
+  fetch(`${baseURL}/user/profile`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(filteredUserData),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.error) {
+        setError(data.error);
         setSuccess('');
-      });
-  };
+      } else {
+        setSuccess('Profile was successfully saved.');
+        setError('');
 
-  const { logout } = useContext(AuthContext);
+        // 👉 update globálneho usera v AuthContext
+        login({
+          ...user, // zachováš pôvodné údaje (napr. user_photo, role…)
+          ...data, // prepíšeš hodnoty, ktoré prišli z backendu
+          token,   // nechaj uložený token
+        });
 
+        setTimeout(() => {
+          setSuccess('');
+        }, 3000);
+      }
+    })
+    .catch(() => {
+      setError('Error saving profile.');
+      setSuccess('');
+    });
+};
 
 
   if (!user) return <div>Načítavam...</div>;

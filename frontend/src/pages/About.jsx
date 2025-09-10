@@ -162,17 +162,6 @@ const ProjectInfo = () => {
             <li>Sanitized input to prevent SQL injection and XSS attacks</li>
           </motion.ul>
 
-          {/* Final Thoughts */}
-          <motion.p
-            className="text-white text-center"
-            variants={fadeInUp}
-            initial="hidden"
-            animate="visible"
-            custom={13}
-          >
-            The backend architecture utilizes modular Express controllers and routes, ensuring clean, reusable, and maintainable code.
-          </motion.p>
-
           <motion.p
             className="text-white text-center"
             variants={fadeInUp}
