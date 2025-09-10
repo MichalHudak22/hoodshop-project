@@ -14,7 +14,7 @@ const CyclingBike = () => {
   const baseURL = 'https://hoodshop-project.onrender.com'; // 🔹 produkčný backend
 
   useEffect(() => {
-    axios.get(`${baseURL}/products/cycling/bike`)
+    axios.get(`${baseURL}/products/cycling/bikes`)
       .then(response => {
         setBikes(Array.isArray(response.data) ? response.data : response.data.products || []);
       })

@@ -16,7 +16,7 @@ const FeaturedCyclingHighlights = () => {
   useEffect(() => {
     setErrorMessage(''); // vymažeme chybu pred novým fetchom
 
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/cycling/bike`)
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/cycling/bikes`)
       .then(response => {
         const highlighted = response.data.filter(p => p.highlight_title && p.description);
         setFeaturedBikes(highlighted.slice(0, 2));
