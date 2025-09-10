@@ -17,7 +17,7 @@ const HockeyHelmets = () => {
   useEffect(() => {
     axios.get(`${baseURL}/products/hockey/helmets`)
       .then(response => setHelmets(response.data))
-      .catch(error => console.error('Chyba pri načítavaní hokejových prilieb:', error));
+      .catch(error => console.error('Chyba pri načítavaní hokejových prilieb::', error));
   }, []);
 
   const handleAddToCart = async (product) => {
