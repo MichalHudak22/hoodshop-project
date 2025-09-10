@@ -48,7 +48,7 @@ const getTopCarouselProducts = async (req, res) => {
     { category: "hockey", type: "helmets" },
     { category: "hockey", type: "skates" },
     { category: "hockey", type: "sticks" },
-    { category: "cycling", type: "bike" },
+    { category: "cycling", type: "bikes" },
     { category: "cycling", type: "gloves" },
     { category: "cycling", type: "helmets" },
     { category: "cycling", type: "clothes" },
