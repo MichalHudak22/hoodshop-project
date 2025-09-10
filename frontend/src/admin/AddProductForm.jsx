@@ -4,7 +4,7 @@ import axios from 'axios';
 const typeOptions = {
   football: ['jersey', 'ball', 'cleats', 'shinguards'],
   hockey: ['jersey', 'sticks', 'skates', 'helmets'],
-  cycling: ['clothes', 'bike', 'helmets', 'gloves'],
+  cycling: ['clothes', 'bikes', 'helmets', 'gloves'],
 };
 
   const baseURL = import.meta.env.VITE_API_BASE_URL;
