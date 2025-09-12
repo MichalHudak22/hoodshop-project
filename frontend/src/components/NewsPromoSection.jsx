@@ -1,23 +1,24 @@
 const newsItems = [
   {
-    title: 'Top 5 Must-Have Items for Football Season',
-    description: 'Get ready for the pitch with our essential gear checklist.',
+    title: 'Find the Perfect Football Cleats',
+    description: 'Discover how the right pair of cleats can boost your performance on the pitch.',
     linkText: 'Read More',
-    href: '/sports/football', // sem pošleme usera
+    href: '/sports/football/cleats', // ⚽ futbalové kopačky
   },
   {
     title: 'How to Choose the Best Bike Helmet',
     description: 'Safety first! Tips to find the perfect helmet for your rides.',
     linkText: 'Read More',
-    href: '/sports/cycling/helmets',
+    href: '/sports/cycling/helmets', // 🚴 prilby
   },
   {
-    title: 'Hockey Gear: What Beginners Need to Know',
-    description: 'Starting out on the ice? Here’s your starter pack.',
+    title: 'Hockey Skates Buying Guide',
+    description: 'From fit to blade type — learn how to pick the right skates for the ice.',
     linkText: 'Read More',
-    href: '/sports/hockey',
+    href: '/sports/hockey/skates', // 🏒 hokejové korčule
   },
 ];
+
 
 const NewsPromoSection = () => {
   const frontendURL = import.meta.env.VITE_FRONTEND_URL; // vezmeme URL frontendu z .env
