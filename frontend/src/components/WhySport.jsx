@@ -32,7 +32,7 @@ const WhySport = () => {
   return (
   <section className="bg-[#102b5e] py-16 px-4">
   <div className="max-w-8xl mx-auto rounded-xl shadow-lg xl:p-8">
-    <h2 className="text-4xl font-bold text-center text-gray-100 mb-12">
+    <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-gray-100 mb-12">
       Why Sports Matter
     </h2>
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
@@ -41,7 +41,7 @@ const WhySport = () => {
           key={idx}
           className="bg-[#0b1d3f] rounded-lg p-6 shadow-md md:w-[420px] md:m-auto lg:w-full h-full"
         >
-          <h3 className="text-2xl font-semibold text-gray-100 mb-3">
+          <h3 className="text-xl md:text-2xl font-semibold text-gray-100 mb-3">
             {sport.title}
           </h3>
           <ul className="text-gray-300 space-y-2 text-md lg:text-base list-disc list-outside break-words whitespace-normal">
