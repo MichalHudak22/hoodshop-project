@@ -31,7 +31,7 @@ const WhySport = () => {
 
   return (
   <section className="bg-[#000000] py-16 px-4">
-  <div className="max-w-8xl mx-auto rounded-xl shadow-lg xl:p-8">
+  <div className="max-w-8xl mx-auto rounded-xl shadow-lg">
     <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-gray-100 mb-6 md:mb-12">
       Why Sports Matter
     </h2>

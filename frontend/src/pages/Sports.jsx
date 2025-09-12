@@ -98,7 +98,7 @@ function Sports() {
   
   <div className="relative z-10">
     <h1 className='text-2xl sm:text-3xl md:text-4xl text-center pb-5 md:pb-10 text-white font-bold'>
-      Explore Our Top Sports Categories
+      Discover Our Top Sports Categories
     </h1>
     <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
       {cards.map((card) => (
