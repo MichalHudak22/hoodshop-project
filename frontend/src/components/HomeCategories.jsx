@@ -60,7 +60,7 @@ export default function SportsSection() {
 
             {/* Overlay s kategóriami a tlačidlom, viditeľný pri hover */}
             <div className="absolute inset-0 bg-black bg-opacity-60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-center items-center text-white p-4">
-              <h3 className="text-2xl font-bold mb-4">{name}</h3>
+              <h3 className="text-3xl md:text-4xl font-bold mb-4">{name}</h3>
 
               <ul className="mb-6 space-y-1">
                 {categories.map(({ name: catName, link: catLink }) => (
