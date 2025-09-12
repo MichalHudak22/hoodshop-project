@@ -65,7 +65,7 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
                   <img
                     src={imageUrl}
                     alt={slide.name}
-                    className="h-[180] md:h-[240px] mb-2 transition duration-300"
+                    className="h-[180px] md:h-[240px] mb-2 transition duration-300"
                   />
                   <p className="text-green-600 text-xl font-semibold mb-1">{slide.price} €</p>
                 </Link>
