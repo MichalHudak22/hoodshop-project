@@ -22,7 +22,7 @@ const HomeBrands = () => {
 
   return (
     <section
-      className="relative py-12 px-6 bg-black overflow-hidden"
+      className="relative py-8 md:py-12 px-6 bg-black overflow-hidden"
       style={{
         backgroundImage: `url(${bgImage})`,
         backgroundSize: 'cover',
@@ -34,7 +34,7 @@ const HomeBrands = () => {
       <div className="absolute inset-0 bg-black opacity-60 z-0"></div>
 
       <div className="relative z-10 max-w-4xl mx-auto px-4">
-        <h2 className="text-4xl font-bold mb-6 text-white text-center">Top Brands</h2>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 text-white text-center">Top Brands</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8">
           {brands.map(brand => {
