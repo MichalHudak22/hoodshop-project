@@ -97,7 +97,7 @@ function Sports() {
   <div className="absolute inset-0 bg-black bg-opacity-30"></div> {/* Tmavý overlay */}
   
   <div className="relative z-10">
-    <h1 className='text-2xl sm:text-3xl md:text-4xl text-center pb-5 md:pb-0 md:py-5 text-white font-bold'>
+    <h1 className='text-2xl sm:text-3xl md:text-4xl text-center pb-5 md:py-5 text-white font-bold'>
       Explore Our Top Sports Categories
     </h1>
     <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
