@@ -19,7 +19,7 @@ const CustomCarousel = ({ slides }) => {
       }}
       speed={1000}
       navigation
-      pagination={{ clickable: true }}
+      pagination={false}
       className="w-full h-[500px] xl:h-[650px] border-b-8 border-black"
     >
       {slides.map((slide, index) => (

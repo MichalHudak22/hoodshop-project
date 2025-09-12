@@ -33,7 +33,7 @@ const NewsPromoSection = () => {
   <div className="absolute inset-0 bg-black bg-opacity-30"></div> {/* Tmavý overlay */}
 
   <div className="relative z-10 max-w-7xl mx-auto">
-    <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-white mb-12">
+    <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-white mb-6 md:mb-12">
       Tips, News & Promos
     </h2>
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
