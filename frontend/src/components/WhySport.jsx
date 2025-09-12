@@ -39,7 +39,7 @@ const WhySport = () => {
       {sections.map((sport, idx) => (
         <div
           key={idx}
-          className="bg-[#071a3f] rounded-lg p-6 shadow-md md:w-[420px] md:m-auto lg:w-full h-full"
+          className="bg-[#071530] rounded-lg p-6 shadow-md md:w-[420px] md:m-auto lg:w-full h-full hover:bg-[#0e2553]"
         >
           <h3 className="text-xl md:text-2xl font-semibold text-gray-100 mb-3">
             {sport.title}
