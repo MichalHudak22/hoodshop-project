@@ -45,7 +45,7 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
           1280: { slidesPerView: 5 },
           1536: { slidesPerView: 6 },
         }}
-        className="w-full h-[420px] relative z-20"
+        className="w-full h-[380px] relative z-20"
       >
         {slides.map((slide, index) => {
           const productSlug = slide.name.toLowerCase().replace(/\s+/g, '-');
@@ -61,7 +61,7 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
               <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-start p-4 text-center hover:shadow-xl transition relative">
                 <Link to={`/product/${productSlug}`} className="flex-grow hover:brightness-110">
                   <h2 className="h-[42px] text-lg font-bold mb-1 text-black">{slide.name}</h2>
-                  <p className="text-sm text-gray-600 mb-2">{slide.brand}</p>
+                  <p className="text-sm text-gray-600 my-2">{slide.brand}</p>
                   <img
                     src={imageUrl}
                     alt={slide.name}
