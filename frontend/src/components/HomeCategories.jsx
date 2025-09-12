@@ -38,9 +38,9 @@ const sports = [
 
 export default function SportsSection() {
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12">
+    <div className="max-w-7xl mx-auto px-4 py-6 md:py-12">
       {/* Nadpis nad kartami */}
-      <h1 className="text-4xl font-bold mb-8 text-center">
+      <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-8 text-center">
         Find Gear for Your Favorite Sport
       </h1>
 
