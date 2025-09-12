@@ -30,7 +30,7 @@ const WhySport = () => {
   ];
 
   return (
-  <section className="bg-[#102b5e] py-16 px-4">
+  <section className="bg-[#000000] py-16 px-4">
   <div className="max-w-8xl mx-auto rounded-xl shadow-lg xl:p-8">
     <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-gray-100 mb-6 md:mb-12">
       Why Sports Matter
@@ -39,7 +39,7 @@ const WhySport = () => {
       {sections.map((sport, idx) => (
         <div
           key={idx}
-          className="bg-[#0b1d3f] rounded-lg p-6 shadow-md md:w-[420px] md:m-auto lg:w-full h-full"
+          className="bg-[#15346e] rounded-lg p-6 shadow-md md:w-[420px] md:m-auto lg:w-full h-full"
         >
           <h3 className="text-xl md:text-2xl font-semibold text-gray-100 mb-3">
             {sport.title}
