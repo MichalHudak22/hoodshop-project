@@ -74,7 +74,7 @@ function Home() {
       </div>
 
       <div className="py-8">
-        <h2 className="text-4xl font-bold mb-6 text-center">Popular Products</h2>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 text-center">Popular Products</h2>
         <ProductsCarousel slides={carouselSlides} handleAddToCart={handleAddToCart} />
       </div>
 
