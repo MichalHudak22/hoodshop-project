@@ -13,7 +13,7 @@ const FootballCategories = () => {
     backgroundAttachment: 'fixed',
   }}
 >
-  <div className="mx-auto px-4 lg:px-5 xl:px-8 md:py-6 md:bg-black bg-opacity-40 lg:bg-opacity-50 lg:border-[7px] lg:border-black lg:rounded-lg max-w-5xl xl:max-w-[80%]">
+  <div className="mx-auto px-4 lg:px-5 xl:px-8 md:py-6 bg-black bg-opacity-40 lg:bg-opacity-50 lg:border-[7px] lg:border-black lg:rounded-lg max-w-5xl xl:max-w-[80%]">
     <h2 className="text-xl lg:text-3xl font-bold mb-8 text-center text-white">Explore Football Categories</h2>
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-12 gap-y-12">
       {[
