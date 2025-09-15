@@ -59,34 +59,49 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
             : `${baseURL}${slide.image}`;
 
           return (
-            <SwiperSlide key={index}>
-              <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-start p-4 text-center hover:shadow-xl transition relative">
-                <Link
-                  to={`/product/${productSlug}`}
-                  className="flex-grow hover:brightness-110"
-                >
-                  <h2 className="h-[42px] text-lg font-bold mb-1 text-black">{slide.name}</h2>
-                  <p className="text-sm text-gray-600 my-2">{slide.brand}</p>
-                  <img
-                    src={imageUrl}
-                    alt={slide.name}
-                    className="h-[180px] md:h-[240px] mb-2 transition duration-300"
-                  />
-                  <p className="text-green-600 text-xl font-semibold mb-1">
-                    {slide.price} €
-                  </p>
-                </Link>
-                <button
-                  onClick={() => handleClick(slide)}
-                  disabled={isLoading}
-                  className={`mt-2 w-full py-2 rounded-xl bg-blue-700 text-white font-semibold hover:bg-blue-600 transition ${
-                    isLoading ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
-                >
-                  {isLoading ? 'Pridávam...' : 'Add to Cart'}
-                </button>
-              </div>
-            </SwiperSlide>
+          <SwiperSlide key={index}>
+  <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-start p-4 text-center hover:shadow-xl transition relative">
+    
+    {/* Názov s odkazom */}
+    <h2 className="h-[42px] text-lg font-bold mb-1 text-black">
+      <Link 
+        to={`/product/${productSlug}`} 
+        className="hover:underline"
+      >
+        {slide.name}
+      </Link>
+    </h2>
+
+    {/* Značka */}
+    <p className="text-sm text-gray-600 my-2">{slide.brand}</p>
+
+    {/* Obrázok ako odkaz */}
+    <Link to={`/product/${productSlug}`} className="block">
+      <img
+        src={imageUrl}
+        alt={slide.name}
+        className="h-[180px] md:h-[240px] mb-2 transition duration-300 hover:brightness-110"
+      />
+    </Link>
+
+    {/* Cena */}
+    <p className="text-green-600 text-xl font-semibold mb-1">
+      {slide.price} €
+    </p>
+
+    {/* Add to Cart tlačidlo */}
+    <button
+      onClick={() => handleClick(slide)}
+      disabled={isLoading}
+      className={`mt-2 w-full py-2 rounded-xl bg-blue-700 text-white font-semibold hover:bg-blue-600 transition ${
+        isLoading ? 'opacity-50 cursor-not-allowed' : ''
+      }`}
+    >
+      {isLoading ? 'Pridávam...' : 'Add to Cart'}
+    </button>
+  </div>
+</SwiperSlide>
+
           );
         })}
       </Swiper>
