@@ -17,7 +17,7 @@ function BrandsGrid({ brands, bgImage }) {
       <div className="absolute inset-0 bg-black opacity-60 z-0"></div>
 
       <div className="relative z-10 max-w-6xl mx-auto px-4">
-        <h1 className="text-4xl font-bold my-5 md:my-8 text-white text-center">All Brands</h1>
+        <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-5 md:mb-8 md:mt-8 text-white text-center">All Brands</h1>
 
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
           {brands.map((brand) => {

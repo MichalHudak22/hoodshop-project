@@ -51,7 +51,7 @@ return (
   />
 
   <div className="absolute inset-0 flex items-end md:items-center justify-start md:px-4 md:pl-2 md:pt-32">
-    <div className="bg-black bg-opacity-50 p-4 md:p-6 md:rounded-lg max-w-3xl text-white transform md:translate-y-12">
+    <div className="bg-black bg-opacity-40 p-4 md:p-6 md:rounded-lg max-w-3xl text-white transform md:translate-y-12">
       <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-blue-200 drop-shadow-lg">
         Discover top sports equipment for football, hockey, and cycling
       </h1>
