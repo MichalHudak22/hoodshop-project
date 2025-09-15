@@ -7,7 +7,7 @@ const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
   const baseURL = 'https://hoodshop-project.onrender.com'; // produkčný backend
 
   return (
-    <section className="relative py-16 px-6 bg-black overflow-hidden border-b-4 border-black">
+    <section className="relative py-10 md:py-16 px-6 bg-black overflow-hidden border-b-4 border-black">
       <div
         className="absolute inset-0 z-0"
         style={{
@@ -30,12 +30,12 @@ const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
             <img
               src={`${baseURL}${product.image}`}
               alt={product.name}
-              className="w-[60%] md:max-w-sm rounded-lg shadow-xl object-contain hover:brightness-110"
+              className="w-[70%] mx-auto md:max-w-sm rounded-lg shadow-xl object-contain hover:brightness-110"
             />
           </Link>
 
           <div className="max-w-xl text-center md:text-left">
-            <h2 className="text-2xl font-bold mb-2 text-gray-100">{product.name}</h2>
+            <h2 className="text-xl md:text-2xl font-bold mb-2 text-gray-100">{product.name}</h2>
             <p className="text-lg text-gray-100 pb-2">
               <strong>Brand:</strong> {product.brand}
             </p>
@@ -50,7 +50,7 @@ const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
                 Add to Cart
               </button>
             </div>
-            <p className="text-lg text-white p-3 rounded-xl">{product.description}</p>
+            <p className="text-[14px] md:text-lg text-white p-3 rounded-xl">{product.description}</p>
           </div>
         </div>
       </div>
