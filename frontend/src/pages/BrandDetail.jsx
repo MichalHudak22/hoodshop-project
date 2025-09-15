@@ -111,8 +111,8 @@ const BrandDetail = () => {
 
       {/* Carousel */}
       {products.length > 0 && (
-        <div className="relative z-10 py-8 bg-black">
-          <h2 className="text-4xl font-semibold text-white mb-6 text-center">
+        <div className="relative z-10 pt-8 pb-3 bg-black">
+          <h2 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-white mb-6 text-center">
             Products by {brand.name}
           </h2>
           <ProductsCarousel slides={products} handleAddToCart={handleAddToCart} />
@@ -121,7 +121,7 @@ const BrandDetail = () => {
 
       {/* Lišta značiek */}
       <div className="bg-white py-2 px-4 shadow-inner my-8">
-        <h1 className="text-4xl font-semibold text-center py-5">Our Brand Collection</h1>
+        <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-center py-5">Our Brand Collection</h1>
         <div className="flex flex-wrap justify-center gap-2 sm:gap-4 xl:gap-8">
           {brands.map((b) => (
             <a key={b.id} href={`/brands/${b.name.toLowerCase()}`}>
