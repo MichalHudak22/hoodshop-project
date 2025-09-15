@@ -121,7 +121,7 @@ useEffect(() => {
       }}
     >
       {/* Overlay pre stmavenie */}
-      <div className="absolute inset-0 bg-black opacity-80 z-0" />
+      <div className="absolute inset-0 bg-black bg-opacity-30 md:bg-opacity-50 z-0" />
 
       {/* Obsah s priehľadným pozadím */}
       <div className="relative z-10 max-w-4xl mx-auto p-6 bg-black bg-oapcity-30 md:bg-opacity-50 lg:rounded-xl lg:border-2 border-gray-500">
