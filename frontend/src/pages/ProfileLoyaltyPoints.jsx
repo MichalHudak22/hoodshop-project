@@ -39,7 +39,7 @@ function ProfileLoyaltyPoints() {
           <ProfileNavigation />
 
           {profile && (
-            <div className="mt-6 bg-black bg-opacity-50 md:bg-opacity-70 p-6 rounded-xl shadow-md text-center md:border-2 border-gray-600">
+            <div className="mt-6 bg-black bg-opacity-50 md:bg-opacity-70 p-6 rounded-xl shadow-md text-center lg:border-2 border-gray-600">
               <h3 className="text-2xl font-semibold text-blue-100 mb-2">Welcome, {profile.name}!</h3>
               <p className="text-lg text-white">
                 You currently have <span className="font-bold text-5xl p-3 text-yellow-400"><br className='md:hidden'></br>{profile.loyalty_points}</span> loyalty points.
@@ -61,7 +61,7 @@ function ProfileLoyaltyPoints() {
         </div>
 
           {/* Info o vernostnych bodoch */}
-         <div className="max-w-5xl mx-auto bg-black bg-opacity-50 md:bg-opacity-70 shadow-md rounded-2xl p-6 mt-10 text-gray-800 border-2 border-gray-600">
+         <div className="max-w-5xl mx-auto bg-black bg-opacity-50 md:bg-opacity-70 shadow-md rounded-2xl p-6 mt-10 text-gray-800 lg:border-2 border-gray-600">
             <h2 className="text-2xl text-blue-100 font-bold mb-4 text-center">🎁 Loyalty Points – Your Reward for Every Purchase</h2>
             <p className="mb-4 text-white">
               We truly value every customer, and that’s why we’ve introduced a <strong>loyalty program</strong> that rewards you for shopping with us.
