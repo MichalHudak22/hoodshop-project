@@ -80,7 +80,7 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
       <img
         src={imageUrl}
         alt={slide.name}
-        className="h-[180px] md:h-[240px] mb-2 transition duration-300 hover:brightness-110"
+        className="h-[180px] mb-2 transition duration-300 hover:brightness-110"
       />
     </Link>
 
