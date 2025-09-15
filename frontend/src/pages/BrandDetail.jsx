@@ -111,7 +111,7 @@ const BrandDetail = () => {
 
       {/* Carousel */}
       {products.length > 0 && (
-        <div className="relative z-10 p-8 bg-black">
+        <div className="relative z-10 py-8 bg-black">
           <h2 className="text-4xl font-semibold text-white mb-6 text-center">
             Products by {brand.name}
           </h2>
