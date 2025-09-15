@@ -124,8 +124,8 @@ useEffect(() => {
       <div className="absolute inset-0 bg-black opacity-40 z-0" />
 
       {/* Obsah s priehľadným pozadím */}
-      <div className="relative z-10 max-w-4xl mx-auto p-6 bg-black bg-opacity-60 lg:rounded-xl border-2 border-gray-500">
-        <h1 className="text-3xl font-bold mb-4 text-center py-3 text-blue-200">
+      <div className="relative z-10 max-w-4xl mx-auto p-6 bg-black bg-opacity-50 lg:rounded-xl lg:border-2 border-gray-500">
+        <h1 className="text-2xl lg:text-3xl font-bold mb-4 text-center py-3 text-blue-200">
           Shopping Cart
         </h1>
         <ul className="space-y-4">
@@ -168,7 +168,7 @@ useEffect(() => {
                 <button
                   type="button"
                   onClick={() => handleRemove(item.id)}
-                  className="ml-2 text-red-500 text-[16px] hover:text-red-500 hover:scale-105"
+                  className="ml-3 text-red-500 text-[16px] hover:text-red-500 hover:scale-105"
                 >
                   Remove
                 </button>
