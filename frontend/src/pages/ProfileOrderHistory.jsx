@@ -96,7 +96,7 @@ function OrderHistory() {
                   <strong>Order No.</strong> {order.order_number}
                 </h2>
 
-                <div className="flex flex-col items-center md:flex-row justify-around text-md lg:text-lg">
+                <div className="flex flex-col items-center md:flex-row justify-around text-[14px] lg:text-lg">
                   <div className="mb-4 text-left w-[235px]">
                     <p><strong>Date:</strong> {new Date(order.created_at).toLocaleString()}</p>
                     <p><strong>Name:</strong> {order.full_name}</p>

@@ -74,7 +74,7 @@ const HockeySticks = () => {
           <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
             Discover Elite <span className="text-blue-200">Hockey Sticks</span>
           </h1>
-          <p className="text-md md:text-lg lg:text-xl text-gray-100 leading-relaxed">
+          <p className="text-[14px] md:text-lg lg:text-xl text-gray-100 leading-relaxed">
             Dominate the rink with precision-engineered hockey sticks designed for{' '}
             <span className="text-blue-200 font-medium">power</span>,{' '}
             <span className="text-blue-200 font-medium">accuracy</span>, and{' '}

@@ -127,7 +127,7 @@ const HockeyPage = () => {
           <h1 className="text-xl md:text-3xl lg:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
             {parseColoredText(title)}
           </h1>
-          <p className="text-md md:text-xl lg:text-2xl leading-relaxed drop-shadow-sm">
+          <p className="text-[14px] md:text-xl lg:text-2xl leading-relaxed drop-shadow-sm">
             {parseColoredText(paragraph)}
           </p>
         </div>

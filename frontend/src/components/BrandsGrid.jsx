@@ -40,7 +40,7 @@ function BrandsGrid({ brands, bgImage }) {
                 ></div>
 
                 <div className="bg-black min-h-[75px] flex text-white text-center items-center justify-center py-2">
-                  <span className="text-md font-semibold">
+                  <span className="text-[14px] font-semibold">
                     {brand.brand_info || brand.name}
                   </span>
                 </div>

@@ -105,7 +105,7 @@ const AllOrders = () => {
                       {itemsArray.length > 0 && (
                         <div>
                           <p className="font-semibold mb-2 text-blue-200">Products:</p>
-                          <ul className="list-none list-inside space-y-1 text-sm md:text-md">
+                          <ul className="list-none list-inside space-y-1 text-sm md:text-[14px]">
                             {itemsArray.map((item, index) => {
                               const price = parseFloat(item.item_price || 0);
                               const total = item.quantity * price;

@@ -81,7 +81,7 @@ const CyclingHelmets = () => {
           <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
             Top-Quality <span className="text-blue-200">Cycling Helmets</span> for Every Ride
           </h1>
-          <p className="text-md md:text-lg lg:text-xl text-gray-100 leading-relaxed">
+          <p className="text-[14px] md:text-lg lg:text-xl text-gray-100 leading-relaxed">
             Discover our selection of premium helmets for{' '}
             <span className="text-blue-200 font-medium">safety</span>,{' '}
             <span className="text-blue-200 font-medium">comfort</span>, and{' '}

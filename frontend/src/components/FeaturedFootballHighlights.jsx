@@ -95,7 +95,7 @@ const FeaturedFootballHighlights = () => {
               className="flex flex-col h-full bg-white rounded-lg overflow-hidden shadow-lg hover:brightness-125 transition"
             >
               {/* Nadpis */}
-              <h3 className="py-4 px-3 text-md md:min-h-[80px] font-bold bg-black text-white text-center">
+              <h3 className="py-4 px-3 text-[14px] md:min-h-[80px] font-bold bg-black text-white text-center">
                 {product?.highlight_title || `${name} Featured Product`}
               </h3>
 

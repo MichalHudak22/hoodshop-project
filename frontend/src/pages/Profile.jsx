@@ -306,7 +306,7 @@ const handleSave = () => {
                 {/* Zobrazenie názvu vybraného súboru */}
                 <div className='h-5'>
                   {selectedFile && (
-                    <p className="text-md text-gray-100 italic">{selectedFile.name}</p>
+                    <p className="text-[14px] text-gray-100 italic">{selectedFile.name}</p>
                   )}
                 </div>
               </div>
@@ -355,7 +355,7 @@ const handleSave = () => {
                 >
                   <label
                     htmlFor={id}
-                    className="block pl-3 lg:pl-0 lg:mb-0 lg:w-1/3 xl:w-1/4 text-md lg:text-lg text-white"
+                    className="block pl-3 lg:pl-0 lg:mb-0 lg:w-1/3 xl:w-1/4 text-[14px] lg:text-lg text-white"
                   >
                     {label}
                   </label>

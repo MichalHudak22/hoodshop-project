@@ -79,7 +79,7 @@ const HockeySkates = () => {
           <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
             Find the Fastest <span className="text-blue-200">Hockey Skates</span>
           </h1>
-          <p className="text-md md:text-lg lg:text-xl text-gray-100 leading-relaxed">
+          <p className="text-[14px] md:text-lg lg:text-xl text-gray-100 leading-relaxed">
             Explore top-tier hockey skates designed for{' '}
             <span className="text-blue-200 font-medium">performance</span>,{' '}
             <span className="text-blue-200 font-medium">comfort</span>, and{' '}

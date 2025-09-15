@@ -83,7 +83,7 @@ const CyclingGloves = () => {
           <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
             Discover Premium <span className="text-blue-200">Cycling Gloves</span>
           </h1>
-          <p className="text-md md:text-lg lg:text-xl text-gray-100 leading-relaxed">
+          <p className="text-[14px] md:text-lg lg:text-xl text-gray-100 leading-relaxed">
             Ride longer and more{' '}
             <span className="text-blue-200 font-medium">comfortably</span> with our selection of{' '}
             <span className="text-blue-200 font-medium">high-performance</span> cycling gloves, designed for grip, breathability, and endurance.

@@ -135,7 +135,7 @@ const handleSubmit = (e) => {
   />
 
   {/* Rezervované miesto pre hlášku */}
-  <div className="min-h-[1.5rem] text-md text-center font-semibold">
+  <div className="min-h-[1.5rem] text-[14px] text-center font-semibold">
     <p className={`${passwordMatchMessage.includes('match') ? 'text-green-400' : 'text-red-500'}`}>
       {passwordMatchMessage}
     </p>

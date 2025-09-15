@@ -78,7 +78,7 @@ const FootballBalls = () => {
           <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
             Discover Legendary <span className="text-blue-200">Football Balls</span>
           </h1>
-          <p className="text-md md:text-lg lg:text-xl text-gray-100 leading-relaxed">
+          <p className="text-[14px] md:text-lg lg:text-xl text-gray-100 leading-relaxed">
             Explore our exclusive collection of premium football balls – including
             <span className="text-blue-200 font-medium"> iconic models</span> used in the{' '}
             <span className="text-blue-200 font-medium">FIFA World Cup</span> and{' '}

@@ -44,7 +44,7 @@ const WhySport = () => {
           <h3 className="text-xl md:text-2xl font-semibold text-gray-100 mb-3">
             {sport.title}
           </h3>
-          <ul className="text-gray-300 space-y-2 text-md lg:text-base list-disc list-outside break-words whitespace-normal">
+          <ul className="text-gray-300 space-y-2 text-[14px] lg:text-base list-disc list-outside break-words whitespace-normal">
             {sport.benefits.map((point, i) => (
               <li key={i}>{point}</li>
             ))}
