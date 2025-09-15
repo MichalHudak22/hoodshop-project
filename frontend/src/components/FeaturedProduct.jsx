@@ -50,7 +50,7 @@ const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
                 Add to Cart
               </button>
             </div>
-            <p className="text-[14px] md:text-lg text-white p-3 rounded-xl">{product.description}</p>
+            <p className="text-[16px] md:text-lg text-white p-3 rounded-xl">{product.description}</p>
           </div>
         </div>
       </div>

@@ -38,7 +38,7 @@ const BrandHeroSection = () => {
       }}
       speed={1000}
       navigation
-      pagination={{ clickable: true }}
+      pagination={false}
       className="w-full h-[500px] xl:h-[600px] border-b-8 border-black"
     >
       {brands.map((brand) => {
@@ -57,7 +57,7 @@ const BrandHeroSection = () => {
     />
 
     {/* Text a tlačidlo */}
-    <div className="bg-black bg-opacity-50 p-5 text-white max-w-lg text-left ml-0 xl:max-w-3xl xl:rounded-2xl xl:p-10 z-10">
+    <div className="bg-black bg-opacity-40 p-5 text-white max-w-lg text-left ml-0 xl:max-w-3xl xl:rounded-2xl xl:p-10 z-10">
       <h2 className="text-3xl font-luckiest font-bold tracking-widest text-outline mb-4 xl:text-[45px]">{brand.name}</h2>
       <p className="mb-4 xl:text-[24px]">{brand.brand_info}</p>
       <p className="mb-4 xl:text-2xl text-blue-200 font-semibold">{brand.brand_Text}</p>

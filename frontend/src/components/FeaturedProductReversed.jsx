@@ -49,7 +49,7 @@ const FeaturedProductReversed = ({ product, handleAddToCart, backgroundImage }) 
                 {product.price} €
               </p>
             </div>
-            <p className="text-lg text-white p-3 rounded-xl text-center md:text-left">{product.description}</p>
+            <p className="text-[16px] md:text-lg text-white p-3 rounded-xl text-center md:text-left">{product.description}</p>
           </div>
         </div>
       </div>
