@@ -98,7 +98,7 @@ const BrandDetail = () => {
         }}
       >
         <div className="absolute inset-0 bg-black opacity-40 z-0"></div>
-        <div className="relative z-10 max-w-4xl mx-auto text-white text-center mb-16">
+        <div className="relative z-10 max-w-4xl mx-auto text-white text-center mb-2 md:mb-16">
           <img
             src={`${baseURL}${brand.brand_image}`}
             alt={brand.name}

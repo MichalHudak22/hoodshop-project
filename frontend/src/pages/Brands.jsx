@@ -22,7 +22,7 @@ function Brands() {
       </div>
 
       {/* Lišta s logami značiek */}
-      <div className="bg-white py-2 px-4 shadow-inner">
+      <div className="bg-white py-3 px-4 shadow-inner">
         <div className="flex flex-wrap justify-center gap-2 sm:gap-4 xl:gap-8">
           {brands.map((brand) => (
             <a key={brand.id} href={`/brands/${brand.name.toLowerCase()}`}>
