@@ -259,7 +259,7 @@ const CheckoutPage = () => {
 
       {/* Obsah sekcie celeho formulara pre platbu */}
       <section className="relative z-10 w-full md:w-[90%] lg:w-[900px] mx-auto px-6 md:px-8 py-8 md:rounded-xl bg-black bg-opacity-60 lg:border-2 border-gray-500">
-        <h1 className="text-3xl lg:text-4xl text-blue-200 text-center font-bold mb-6">Checkout</h1>
+        <h1 className="text-2xl md:text-3xl lg:text-4xl text-blue-200 text-center font-bold mb-6">Checkout</h1>
 
         {/* Checkbox pre načítanie údajov z profilu */}
         {user && (
@@ -447,7 +447,7 @@ const CheckoutPage = () => {
         {/* Celková cena a tlačidlo */}
         <div className="text-center space-y-3">
           {/* Výpočet koľko bodov získa */}
-          <div className="mt-8 text-center text-blue-300 font-semibold text-lg">
+          <div className="mt-8 text-center text-blue-300 font-semibold text-sm md:text-lg">
             You will earn {Math.round(estimatedEarnedPoints)} loyalty points from this order.
           </div>
 
