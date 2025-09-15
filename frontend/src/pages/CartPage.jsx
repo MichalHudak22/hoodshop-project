@@ -168,7 +168,7 @@ useEffect(() => {
                 <button
                   type="button"
                   onClick={() => handleRemove(item.id)}
-                  className="ml-3 text-red-500 text-[16px] hover:text-red-500 hover:scale-105"
+                  className="ml-4 text-red-500 text-[16px] hover:text-red-500 hover:scale-105"
                 >
                   Remove
                 </button>
