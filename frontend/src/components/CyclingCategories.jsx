@@ -25,7 +25,7 @@ const CyclingCategories = () => {
             <Link
               key={to}
               to={to}
-              className="relative flex flex-col justify-start h-[300px] text-white text-xl font-semibold rounded-lg shadow-md overflow-hidden group hover:brightness-125 transition"
+              className="relative flex flex-col justify-start h-[250px] md:h-[300px] text-white text-xl font-semibold rounded-lg shadow-md overflow-hidden group hover:brightness-125 transition"
             >
               {/* Zväčšujúci sa pozadový obrázok */}
               <div
