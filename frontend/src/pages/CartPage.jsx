@@ -143,7 +143,7 @@ useEffect(() => {
                 />
                 <div>
                   <h2 className="text-base sm:text-lg font-semibold">{item.name}</h2>
-                  <p className="text-sm">${item.price}</p>
+                  <p className="text-sm">{item.price} €</p>
                 </div>
               </div>
 
@@ -180,7 +180,7 @@ useEffect(() => {
 
         <div className="text-center flex flex-col space-y-3 py-5">
           <h2 className="text-white text-lg lg:text-2xl font-semibold">
-            Total: <span className="text-green-500 text-2xl font-semibold">${total.toFixed(2)}</span>
+            Total: <span className="text-green-500 text-2xl font-semibold">{total.toFixed(2)} €</span>
           </h2>
           <Link to="/checkout">
             <button type="button" className="w-full md:w-[50%] lg:w-80 lg:text-xl bg-green-700 hover:bg-green-600 text-white font-semibold py-3 rounded-xl"
