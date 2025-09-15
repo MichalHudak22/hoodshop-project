@@ -25,7 +25,7 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
   };
 
   return (
-    <>
+    <div className="relative">
       <Swiper
         modules={[Autoplay, Navigation, Pagination]}
         loop={true}
@@ -35,7 +35,10 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
         }}
         speed={1000}
         navigation
-        pagination={{ clickable: true }}
+        pagination={{
+          clickable: true,
+          el: '.custom-pagination', // 👈 vlastný container
+        }}
         spaceBetween={20}
         breakpoints={{
           320: { slidesPerView: 2 },
@@ -51,7 +54,6 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
           const productSlug = slide.name.toLowerCase().replace(/\s+/g, '-');
           const isLoading = loadingIds.includes(slide.id);
 
-          // Priprav správnu URL obrázka
           const imageUrl = slide.image.startsWith('http')
             ? slide.image
             : `${baseURL}${slide.image}`;
@@ -59,7 +61,10 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
           return (
             <SwiperSlide key={index}>
               <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-start p-4 text-center hover:shadow-xl transition relative">
-                <Link to={`/product/${productSlug}`} className="flex-grow hover:brightness-110">
+                <Link
+                  to={`/product/${productSlug}`}
+                  className="flex-grow hover:brightness-110"
+                >
                   <h2 className="h-[42px] text-lg font-bold mb-1 text-black">{slide.name}</h2>
                   <p className="text-sm text-gray-600 my-2">{slide.brand}</p>
                   <img
@@ -67,7 +72,9 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
                     alt={slide.name}
                     className="h-[180px] md:h-[240px] mb-2 transition duration-300"
                   />
-                  <p className="text-green-600 text-xl font-semibold mb-1">{slide.price} €</p>
+                  <p className="text-green-600 text-xl font-semibold mb-1">
+                    {slide.price} €
+                  </p>
                 </Link>
                 <button
                   onClick={() => handleClick(slide)}
@@ -84,27 +91,23 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
         })}
       </Swiper>
 
+      {/* 👇 vlastný pagination container pod sliderom */}
+      <div className="custom-pagination flex justify-center mt-4"></div>
+
       <style>{`
-        .swiper-pagination-bullet {
-          background-color: #d1d5db; 
+        .custom-pagination .swiper-pagination-bullet {
+          background-color: #d1d5db;
           opacity: 1;
           width: 12px;
           height: 12px;
           margin: 6px;
           transition: background-color 0.3s ease;
         }
-
-        .swiper-pagination-bullet-active {
+        .custom-pagination .swiper-pagination-bullet-active {
           background-color: #2563eb;
         }
-
-        .swiper-pagination {
-          bottom: -5px !important;
-          z-index: 20; 
-          position: absolute; 
-        }
       `}</style>
-    </>
+    </div>
   );
 };
 
