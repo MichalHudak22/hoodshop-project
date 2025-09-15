@@ -84,7 +84,7 @@ const highlightedJerseys = Array.isArray(jerseys)
           <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
             Discover Iconic <span className="text-blue-200">Football Jerseys</span>
           </h1>
-          <p className="text-md md:text-lg lg:text-xl text-gray-100 leading-relaxed">
+          <p className="text-[14px] md:text-lg lg:text-xl text-gray-100 leading-relaxed">
             Explore our exclusive collection of football jerseys – from legendary clubs and national teams,
             featuring designs worn by your favorite players on the world’s biggest stages like the{' '}
             <span className="text-blue-200 font-medium">UEFA Champions League</span> and{' '}
