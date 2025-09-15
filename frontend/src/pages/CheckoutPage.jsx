@@ -440,7 +440,7 @@ const CheckoutPage = () => {
                   <p>Qty: {item.quantity}</p>
                 </div>
               </div>
-              <p className="text-green-500 font-semibold text-lg">{(item.price * item.quantity).toFixed(2)} €</p>
+              <p className="text-green-500 font-semibold text-sm md:text-lg">{(item.price * item.quantity).toFixed(2)} €</p>
             </li>
           ))}
         </ul>

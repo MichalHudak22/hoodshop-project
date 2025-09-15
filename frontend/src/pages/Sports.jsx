@@ -68,10 +68,10 @@ function Sports() {
           >
             <div className="absolute inset-0 bg-[url('/img/sports-bg.jpg')] bg-cover bg-center opacity-20"></div>
             <div className="relative z-10 max-w-3xl mx-auto">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
+              <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
                 Explore Our <span className="text-blue-200">World of Sports</span>
               </h1>
-              <p className="text-lg md:text-xl leading-relaxed drop-shadow-sm">
+              <p className="text-[14px] md:text-lg lg:text-xl leading-relaxed drop-shadow-sm">
                 From the pitch to the rink to the trail – find top gear and updates for{' '}
                 <span className="text-blue-200 font-medium">football</span>,{' '}
                 <span className="text-blue-200 font-medium">hockey</span>, and{' '}
