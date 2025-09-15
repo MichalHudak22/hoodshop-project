@@ -8,7 +8,7 @@ const FeaturedProductReversed = ({ product, handleAddToCart, backgroundImage }) 
   const baseURL = 'https://hoodshop-project.onrender.com'; // produkčný backend
 
   return (
-    <section className="relative py-16 px-6 mb-10 bg-black overflow-hidden border-b-4 border-black">
+    <section className="relative py-10 md:py-16 px-6 mb-10 bg-black overflow-hidden border-b-4 border-black">
       <div
         className="absolute inset-0 z-0"
         style={{
@@ -31,12 +31,12 @@ const FeaturedProductReversed = ({ product, handleAddToCart, backgroundImage }) 
             <img
               src={`${baseURL}${product.image}`} // <-- tu je zmena
               alt={product.name}
-              className="max-w-sm rounded-lg shadow-xl object-contain hover:brightness-110"
+              className="w-[75%] mx-auto md:max-w-sm rounded-lg shadow-xl object-contain hover:brightness-110"
             />
           </Link>
 
           <div className="max-w-xl text-center md:text-right">
-            <h2 className="text-2xl font-bold mb-2 text-gray-100">{product.name}</h2>
+            <h2 className="text-xl md:text-2xl font-bold mb-2 text-gray-100">{product.name}</h2>
             <p className="text-lg text-gray-100 pb-2"><strong>Brand:</strong> {product.brand}</p>
             <div className="flex flex-row-reverse md:flex-row gap-3 items-center w-[250px] m-auto md:w-full md:justify-end">
               <button
