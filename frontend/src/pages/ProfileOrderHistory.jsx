@@ -90,7 +90,7 @@ function OrderHistory() {
             return (
               <div
                 key={order.id}
-                className="lg:w-[85%] xl:w-[1024px] m-auto mb-6 p-4 border-2 border-gray-600 rounded-xl bg-black bg-opacity-80"
+                className="lg:w-[85%] xl:w-[1024px] m-auto mb-6 p-4 border-2 border-gray-600 rounded-xl bg-black bg-opacity-70"
               >
                 <h2 className="text-center text-xl lg:text-2xl text-blue-200 pb-3">
                   <strong>Order No.</strong> {order.order_number}
