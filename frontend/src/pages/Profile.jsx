@@ -257,7 +257,7 @@ const handleSave = () => {
         )}
 
         {/* Personal Info Form */}
-        <div className="flex flex-col lg:flex-row justify-center lg:w-[85%] xl:w-[1240px] items-start bg-black bg-opacity-80 md:border-2 border-gray-600 p-2">
+        <div className="flex flex-col lg:flex-row justify-center lg:w-[85%] xl:w-[1240px] items-start bg-black bg-opacity-50 md:bg-opacity-80 md:border-2 border-gray-600 p-2">
 
           {/* Sekcia na nahranie fotky */}
           <div className="py-6 rounded-lg shadow-lg w-full m-auto md:max-w-sm text-white">
