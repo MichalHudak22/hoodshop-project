@@ -258,7 +258,7 @@ const CheckoutPage = () => {
       <div className="absolute inset-0 bg-black opacity-40 z-0" />
 
       {/* Obsah sekcie celeho formulara pre platbu */}
-      <section className="relative z-10 w-full md:w-[90%] lg:w-[900px] mx-auto px-6 md:px-8 py-8 md:rounded-xl bg-black bg-opacity-60 lg:border-2 border-gray-500">
+      <section className="relative z-10 w-full md:w-[90%] lg:w-[900px] mx-auto px-6 md:px-8 py-8 md:rounded-xl bg-black bg-opacity-30 md:bg-opacity-50 lg:border-2 border-gray-500">
         <h1 className="text-2xl md:text-3xl lg:text-4xl text-blue-200 text-center font-bold mb-6">Checkout</h1>
 
         {/* Checkbox pre načítanie údajov z profilu */}
