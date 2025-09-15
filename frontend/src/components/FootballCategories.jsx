@@ -15,7 +15,7 @@ const FootballCategories = () => {
     >
       <div className="mx-auto px-4 lg:px-5 xl:px-8 py-6 bg-black bg-opacity-40 lg:bg-opacity-50 lg:border-[7px] lg:border-black lg:rounded-lg max-w-5xl xl:max-w-[80%]">
         <h2 className="text-xl lg:text-3xl font-bold mb-8 text-center text-white">Explore Football Categories</h2>
-        <div className="grid grid-cols-2 xl:grid-cols-4 gap-x-12 gap-y-12">
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-x-4 gap-y-4 md:gap-x-12 md:gap-y-12">
           {[
             { to: "jersey", bg: "/img/bg-jerseys.jpg", label: "Jerseys" },
             { to: "ball", bg: "/img/bg-balls.jpg", label: "Balls" },
@@ -25,7 +25,7 @@ const FootballCategories = () => {
             <Link
               key={to}
               to={to}
-              className="relative flex flex-col justify-start h-[300px] text-white text-xl font-semibold rounded-lg shadow-md overflow-hidden group hover:brightness-125 transition"
+              className="relative flex flex-col justify-start h-[250px] md:h-[300px] text-white text-xl font-semibold rounded-lg shadow-md overflow-hidden group hover:brightness-125 transition"
             >
               {/* Zväčšujúci sa pozadový obrázok */}
               <div
