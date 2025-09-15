@@ -31,7 +31,7 @@ const FeaturedProductReversed = ({ product, handleAddToCart, backgroundImage }) 
             <img
               src={`${baseURL}${product.image}`} // <-- tu je zmena
               alt={product.name}
-              className="w-[75%] mx-auto md:max-w-sm rounded-lg shadow-xl object-contain hover:brightness-110"
+              className="w-[70%] mx-auto md:max-w-sm rounded-lg shadow-xl object-contain hover:brightness-110"
             />
           </Link>
 

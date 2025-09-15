@@ -257,7 +257,7 @@ const handleSave = () => {
         )}
 
         {/* Personal Info Form */}
-        <div className="flex flex-col lg:flex-row justify-center lg:w-[85%] xl:w-[1240px] items-start bg-black bg-opacity-80 border-2 border-gray-600 p-2">
+        <div className="flex flex-col lg:flex-row justify-center lg:w-[85%] xl:w-[1240px] items-start bg-black bg-opacity-80 md:border-2 border-gray-600 p-2">
 
           {/* Sekcia na nahranie fotky */}
           <div className="py-6 rounded-lg shadow-lg w-full m-auto md:max-w-sm text-white">
@@ -396,7 +396,7 @@ const handleSave = () => {
         </div>
 
         {/* Delete Form */}
-        <div className="p-6 my-10 flex flex-col md:flex-row md:items-center md:justify-center w-full md:w-[90%] lg:w-[85%] xl:w-[1240px] text-white border-2 border-gray-600 bg-black bg-opacity-80 gap-4">
+        <div className="p-6 my-10 flex flex-col md:flex-row md:items-center md:justify-center w-full md:w-[90%] lg:w-[85%] xl:w-[1240px] text-white md:border-2 border-gray-600 bg-black bg-opacity-80 gap-4">
           <p className="text-sm xl:text-[16px] text-gray-100 max-w-md mx-auto text-center md:text-left">
             You can delete your account here, but be aware – all saved data associated with your account will be permanently lost.
           </p>
