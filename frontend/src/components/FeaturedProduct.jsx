@@ -28,9 +28,9 @@ const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
           {/* OBÁLENIE obrázku do Link komponentu */}
           <Link to={`/product/${productSlug}`}>
             <img
-              src={`${baseURL}${product.image}`} // <-- tu je zmena
+              src={`${baseURL}${product.image}`}
               alt={product.name}
-              className="max-w-sm rounded-lg shadow-xl object-contain hover:brightness-110"
+              className="w-[60%] md:max-w-sm rounded-lg shadow-xl object-contain hover:brightness-110"
             />
           </Link>
 
