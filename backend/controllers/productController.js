@@ -11,12 +11,13 @@ const getProductsByBrand = async (req, res) => {
   console.log('brandName param from URL:', brandName);
   console.log('cleanBrand used for SQL query:', cleanBrand);
 
+  // GET products by brand
   const sql = `
-    SELECT * FROM products 
-    WHERE LOWER(brand) = ? 
-    ORDER BY id DESC 
-    LIMIT 20
-  `;
+  SELECT * FROM products 
+  WHERE LOWER(brand) = ? AND is_active = 1
+  ORDER BY id DESC 
+  LIMIT 20
+`;
 
   try {
     const [results] = await db.query(sql, [cleanBrand]);
@@ -58,10 +59,12 @@ const getTopCarouselProducts = async (req, res) => {
     // Každý SELECT obalíme do UNION ALL
     let queries = productTypes.map(({ category, type }) => {
       return `(SELECT * FROM products 
-               WHERE category = ${db.escape(category)} 
-                 AND type = ${db.escape(type)} 
-               ORDER BY id DESC LIMIT 1)`;
+           WHERE category = ${db.escape(category)} 
+             AND type = ${db.escape(type)} 
+             AND is_active = 1
+           ORDER BY id DESC LIMIT 1)`;
     });
+
 
     const finalQuery = queries.join(" UNION ALL ");
 
@@ -79,7 +82,8 @@ const getTopCarouselProducts = async (req, res) => {
 // GET products by category and type
 const getProductsByCategoryAndType = async (req, res) => {
   const { category, type } = req.params;
-  const sql = "SELECT * FROM products WHERE category = ? AND type = ?";
+  const sql = "SELECT * FROM products WHERE category = ? AND type = ? AND is_active = 1";
+
 
   try {
     const [rows] = await db.query(sql, [category, type]);
@@ -98,7 +102,8 @@ const searchProductsByName = async (req, res) => {
     return res.status(400).json({ error: 'Chýba parameter vyhľadávania' });
   }
 
-  const sql = 'SELECT * FROM products WHERE LOWER(name) LIKE ? LIMIT 20';
+  const sql = 'SELECT * FROM products WHERE LOWER(name) LIKE ? AND is_active = 1 LIMIT 20';
+
 
   try {
     const [rows] = await db.query(sql, [`%${q.toLowerCase()}%`]);
@@ -113,7 +118,8 @@ const searchProductsByName = async (req, res) => {
 // GET products for carousel by category (using carousel_group pattern)
 const getCarouselByCategory = async (req, res) => {
   const { category } = req.params;
-  const sql = "SELECT * FROM products WHERE carousel_group LIKE ?";
+
+  const sql = "SELECT * FROM products WHERE carousel_group LIKE ? AND is_active = 1";
 
   try {
     const [rows] = await db.query(sql, [`${category}_%`]);
@@ -127,7 +133,8 @@ const getCarouselByCategory = async (req, res) => {
 // GET product detail by slug
 const getProductBySlug = async (req, res) => {
   const { slug } = req.params;
-  const sql = 'SELECT * FROM products WHERE slug = ?';
+
+  const sql = 'SELECT * FROM products WHERE slug = ? AND is_active = 1';
 
   try {
     const [rows] = await db.query(sql, [slug]);
@@ -144,7 +151,7 @@ const getProductBySlug = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   try {
-    const [results] = await db.query('SELECT * FROM products ORDER BY id DESC');
+    const [results] = await db.query('SELECT * FROM products WHERE is_active = 1 ORDER BY id DESC');
     res.json(results);
   } catch (err) {
     console.error('DB error getAllProducts:', err);
@@ -194,42 +201,27 @@ const addProduct = async (req, res) => {
 
 
 
-// ADMIN - Delete product by slug (and delete image file)
+// ADMIN - Soft delete product by slug
 const deleteProductBySlug = async (req, res) => {
   const { slug } = req.params;
 
   try {
-    // 1️⃣ Získať cestu k obrázku
-    const [results] = await db.query('SELECT image FROM products WHERE slug = ?', [slug]);
+    // 1️⃣ Skontrolovať, či produkt existuje
+    const [results] = await db.query('SELECT * FROM products WHERE slug = ?', [slug]);
 
     if (results.length === 0) {
       return res.status(404).json({ error: 'Produkt nebol nájdený' });
     }
 
-    const imagePath = results[0].image;
+    // 2️⃣ Soft delete: nastaviť is_active = 0
+    await db.query('UPDATE products SET is_active = 0 WHERE slug = ?', [slug]);
 
-    // 2️⃣ Vymazať obrázok (ak existuje)
-    if (imagePath) {
-      const fullPath = path.join(__dirname, '..', 'src', imagePath);
-      try {
-        await fs.promises.unlink(fullPath);
-      } catch (err) {
-        console.warn('Chyba pri mazaní obrázka:', err);
-        // pokračujeme aj keď sa nepodarí vymazať obrázok
-      }
-    }
-
-    // 3️⃣ Vymazať produkt z DB
-    await db.query('DELETE FROM products WHERE slug = ?', [slug]);
-
-    res.json({ message: 'Produkt bol vymazaný' });
+    res.json({ message: 'Produkt bol soft-vymazaný' });
   } catch (err) {
     console.error('DB error deleteProductBySlug:', err);
     res.status(500).json({ error: 'Chyba servera pri mazaní produktu' });
   }
 };
-
-
 
 module.exports = {
   getProductsByBrand,
