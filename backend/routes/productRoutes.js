@@ -38,11 +38,11 @@ router.get('/:category/carousel', getCarouselByCategory);
 // Products by category & type
 router.get('/:category/:type', getProductsByCategoryAndType);
 
-
 router.patch('/toggle/:slug', authenticateToken, toggleProductActive);
 
 // GET single product by slug (musí byť úplne na konci, aby neblokovalo iné route)
 router.get('/:slug', getProductBySlug);
+
 
 // =====================================================
 // POST / DELETE routes pre adminov
