@@ -51,7 +51,7 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
         className="w-full h-[380px] relative z-20"
       >
         {slides.map((slide, index) => {
-          const productSlug = slide.name.toLowerCase().replace(/\s+/g, '-');
+          const productSlug = slide.slug;
           const isLoading = loadingIds.includes(slide.id);
 
           const imageUrl = slide.image.startsWith('http')
