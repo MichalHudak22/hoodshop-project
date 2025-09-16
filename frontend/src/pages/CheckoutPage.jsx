@@ -69,7 +69,6 @@ const CheckoutPage = () => {
   };
 
 
-
   // pridanie poctu bodov z databazy 
   useEffect(() => {
     if (!user?.token) return;

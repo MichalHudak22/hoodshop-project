@@ -54,7 +54,7 @@ const addToCart = async (req, res) => {
 
 
 // ========================
-// Získanie obsahu košíka
+// Získanie obsahu košíka (len aktívne produkty)
 // ========================
 const getCart = async (req, res) => {
   const userId = req.userId || null;
@@ -69,29 +69,29 @@ const getCart = async (req, res) => {
 
   if (userId && sessionId) {
     query = `
-      SELECT cart_items.id AS cart_item_id, cart_items.quantity, products.id AS product_id,
-             products.name, products.price, products.image
-      FROM cart_items
-      JOIN products ON cart_items.product_id = products.id
-      WHERE cart_items.user_id = ? OR cart_items.session_id = ?
+      SELECT ci.id AS cart_item_id, ci.quantity, p.id AS product_id,
+             p.name, p.price, p.image
+      FROM cart_items ci
+      JOIN products p ON ci.product_id = p.id
+      WHERE (ci.user_id = ? OR ci.session_id = ?) AND p.is_active = 1
     `;
     params = [userId, sessionId];
   } else if (userId) {
     query = `
-      SELECT cart_items.id AS cart_item_id, cart_items.quantity, products.id AS product_id,
-             products.name, products.price, products.image
-      FROM cart_items
-      JOIN products ON cart_items.product_id = products.id
-      WHERE cart_items.user_id = ?
+      SELECT ci.id AS cart_item_id, ci.quantity, p.id AS product_id,
+             p.name, p.price, p.image
+      FROM cart_items ci
+      JOIN products p ON ci.product_id = p.id
+      WHERE ci.user_id = ? AND p.is_active = 1
     `;
     params = [userId];
   } else {
     query = `
-      SELECT cart_items.id AS cart_item_id, cart_items.quantity, products.id AS product_id,
-             products.name, products.price, products.image
-      FROM cart_items
-      JOIN products ON cart_items.product_id = products.id
-      WHERE cart_items.session_id = ?
+      SELECT ci.id AS cart_item_id, ci.quantity, p.id AS product_id,
+             p.name, p.price, p.image
+      FROM cart_items ci
+      JOIN products p ON ci.product_id = p.id
+      WHERE ci.session_id = ? AND p.is_active = 1
     `;
     params = [sessionId];
   }
