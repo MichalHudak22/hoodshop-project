@@ -228,6 +228,27 @@ const deleteProductBySlug = async (req, res) => {
   }
 };
 
+// productsController.js
+const toggleProductActive = async (req, res) => {
+  const slug = req.params.slug;
+
+  try {
+    const [result] = await db.query(
+      'UPDATE products SET is_active = NOT is_active WHERE slug = ?',
+      [slug]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Produkt nenájdený' });
+    }
+
+    res.status(200).json({ message: 'Stav produktu aktualizovaný' });
+  } catch (err) {
+    console.error('DB error toggleProductActive:', err);
+    res.status(500).json({ message: 'Chyba servera pri aktualizácii produktu' });
+  }
+};
+
 
 module.exports = {
   getProductsByBrand,
@@ -239,4 +260,5 @@ module.exports = {
   getAllProducts,
   addProduct,
   deleteProductBySlug,
+  toggleProductActive,
 };

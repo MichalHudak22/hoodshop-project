@@ -10,6 +10,7 @@ const {
   getAllProducts,
   addProduct,
   deleteProductBySlug,
+  toggleProductActive,
 } = require('../controllers/productController');
 
 const authenticateToken = require('../middleware/authenticateToken');
@@ -39,6 +40,8 @@ router.get('/:category/:type', getProductsByCategoryAndType);
 
 // GET single product by slug (musí byť úplne na konci, aby neblokovalo iné route)
 router.get('/:slug', getProductBySlug);
+
+router.patch('/toggle/:slug', authenticateToken, toggleProductActive);
 
 // =====================================================
 // POST / DELETE routes pre adminov
