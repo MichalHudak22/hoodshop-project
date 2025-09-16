@@ -233,13 +233,23 @@ const toggleProductActive = async (req, res) => {
   const slug = req.params.slug;
 
   try {
+    // Najprv zisti aktuálny stav produktu
+    const [productRows] = await db.query('SELECT id, is_active FROM products WHERE slug = ?', [slug]);
+    if (productRows.length === 0) {
+      return res.status(404).json({ message: 'Produkt nenájdený' });
+    }
+
+    const product = productRows[0];
+
+    // Prepni stav produktu
     const [result] = await db.query(
       'UPDATE products SET is_active = NOT is_active WHERE slug = ?',
       [slug]
     );
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ message: 'Produkt nenájdený' });
+    // Ak sa produkt stal inactive, odstráň ho z košíkov
+    if (product.is_active === 1) { // bol aktívny, teraz bude inactive
+      await db.query('DELETE FROM cart_items WHERE product_id = ?', [product.id]);
     }
 
     res.status(200).json({ message: 'Stav produktu aktualizovaný' });
@@ -248,6 +258,7 @@ const toggleProductActive = async (req, res) => {
     res.status(500).json({ message: 'Chyba servera pri aktualizácii produktu' });
   }
 };
+
 
 
 module.exports = {

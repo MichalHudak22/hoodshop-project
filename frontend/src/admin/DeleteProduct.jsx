@@ -66,19 +66,34 @@ const DeleteProduct = () => {
   const confirmToggle = async () => {
     try {
       const token = localStorage.getItem('token');
+
+      // prepnutie stavu produktu
       await axios.patch(
         `${BACKEND_URL}/products/toggle/${productToToggle}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      // Lokálna aktualizácia zoznamu
+      // lokálna aktualizácia zoznamu produktov
       const updated = allProducts.map((p) =>
         p.slug === productToToggle ? { ...p, is_active: p.is_active ? 0 : 1 } : p
       );
       setAllProducts(updated);
       setSelectedSlug(null);
       setMessage('Stav produktu bol aktualizovaný.');
+
+      // --- refresh počtu položiek v košíku ---
+      try {
+        const cartRes = await axios.get(`${BACKEND_URL}/cart/count`, {
+          headers: { 'x-session-id': localStorage.getItem('session_id') || '' }
+        });
+        const cartCount = cartRes.data.count || 0;
+        // tu aktualizujeme stav košíka, napr. cez context alebo state
+        setCartCount(cartCount);
+      } catch (err) {
+        console.error('Chyba pri aktualizácii počtu položiek v košíku', err);
+      }
+
     } catch (err) {
       console.error(err);
       setMessage('Chyba pri aktualizácii produktu.');
@@ -87,6 +102,7 @@ const DeleteProduct = () => {
       setProductToToggle(null);
     }
   };
+
 
   // Filter produktov podľa active/inactive
   const displayedProducts = filtered.filter((p) =>
@@ -128,9 +144,8 @@ const DeleteProduct = () => {
             displayedProducts.map((product) => (
               <li
                 key={product.slug}
-                className={`p-4 transition cursor-pointer hover:bg-gray-800 ${
-                  selectedSlug === product.slug ? 'bg-red-900 text-white' : ''
-                }`}
+                className={`p-4 transition cursor-pointer hover:bg-gray-800 ${selectedSlug === product.slug ? 'bg-red-900 text-white' : ''
+                  }`}
                 onClick={() => setSelectedSlug(product.slug)}
               >
                 <p className="text-lg font-medium">{product.name}</p>
