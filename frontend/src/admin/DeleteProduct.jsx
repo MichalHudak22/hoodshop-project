@@ -68,7 +68,6 @@ const DeleteProduct = () => {
   };
 
 
-
   const confirmToggle = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -192,11 +191,13 @@ const DeleteProduct = () => {
       <div className="flex flex-col justify-center mt-6">
         <button
           onClick={handleToggleClick}
-          className="w-[190px] bg-red-700 hover:bg-red-600 text-white py-2 px-4 text-sm md:text-lg rounded-lg transition mx-auto cursor-pointer"
+          className={`w-[190px] py-2 px-4 text-sm md:text-lg rounded-lg transition mx-auto cursor-pointer ${showInactive ? 'bg-green-700 hover:bg-green-600 text-white' : 'bg-red-700 hover:bg-red-600 text-white'
+            }`}
           disabled={!selectedSlug}
         >
-          Toggle Active/Inactive
+          {showInactive ? 'Activate Product' : 'Deactivate Product'}
         </button>
+
 
         <div className="min-h-[24px] mt-2 flex items-center justify-center">
           {message && <p className="text-green-400 text-center">{message}</p>}
