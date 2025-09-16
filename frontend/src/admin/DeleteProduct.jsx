@@ -122,9 +122,13 @@ const DeleteProduct = () => {
 
 
   // Filter produktov podľa active/inactive
-  const displayedProducts = filtered.filter((p) =>
-    showInactive ? p.is_active === 0 : p.is_active === 1
-  );
+const displayedProducts = allProducts
+  .filter(p =>
+    p.name.toLowerCase().includes(query.toLowerCase()) ||
+    p.slug.toLowerCase().includes(query.toLowerCase())
+  )
+  .filter(p => (showInactive ? p.is_active === 0 : p.is_active === 1));
+
 
   return (
     <div className="w-full mx-auto p-6 bg-black bg-opacity-70 text-white md:rounded-xl border border-gray-700">
