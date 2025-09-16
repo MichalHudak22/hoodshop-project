@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
+import { CartContext } from '../context/CartContext';
+
 
 const BACKEND_URL = 'https://hoodshop-project.onrender.com';
 
@@ -13,6 +15,8 @@ const DeleteProduct = () => {
   const [showModal, setShowModal] = useState(false);
   const [productToToggle, setProductToToggle] = useState(null);
   const [showInactive, setShowInactive] = useState(false); // stav zobrazenia
+  const { refreshCartCount } = useContext(CartContext);
+
 
   // Fetch products from backend
   useEffect(() => {
@@ -63,45 +67,58 @@ const DeleteProduct = () => {
     setShowModal(true);
   };
 
-  const confirmToggle = async () => {
-    try {
-      const token = localStorage.getItem('token');
 
-      // prepnutie stavu produktu
-      await axios.patch(
-        `${BACKEND_URL}/products/toggle/${productToToggle}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
 
-      // lokálna aktualizácia zoznamu produktov
-      const updated = allProducts.map((p) =>
-        p.slug === productToToggle ? { ...p, is_active: p.is_active ? 0 : 1 } : p
-      );
-      setAllProducts(updated);
-      setSelectedSlug(null);
-      setMessage('Stav produktu bol aktualizovaný.');
+ const confirmToggle = async () => {
+  try {
+    const token = localStorage.getItem('token');
 
-      // --- refresh počtu položiek v košíku ---
+    // 1. Prepnutie stavu produktu na backend
+    await axios.patch(
+      `${BACKEND_URL}/products/toggle/${productToToggle}`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    // 2. Lokálna aktualizácia produktov (okamžitý efekt)
+    const updated = allProducts.map((p) =>
+      p.slug === productToToggle ? { ...p, is_active: p.is_active ? 0 : 1 } : p
+    );
+    setAllProducts(updated);
+    setSelectedSlug(null);
+    setMessage('Stav produktu bol aktualizovaný.');
+
+    // 2a. Aktualizácia filtered podľa showInactive, aby sa produkt presunul
+    setFiltered(updated.filter(p =>
+      showInactive ? p.is_active === 0 : p.is_active === 1
+    ));
+
+    // 3. Ak produkt je teraz inactive, odstrániť ho z košíka
+    const toggledProduct = updated.find(p => p.slug === productToToggle);
+    if (!toggledProduct.is_active) {
       try {
-        const cartRes = await axios.get(`${BACKEND_URL}/cart/count`, {
-          headers: { 'x-session-id': localStorage.getItem('session_id') || '' }
-        });
-        const cartCount = cartRes.data.count || 0;
-        // tu aktualizujeme stav košíka, napr. cez context alebo state
-        setCartCount(cartCount);
-      } catch (err) {
-        console.error('Chyba pri aktualizácii počtu položiek v košíku', err);
-      }
+        const sessionId = localStorage.getItem('session_id') || '';
+        const headers = token
+          ? { Authorization: `Bearer ${token}` }
+          : { 'x-session-id': sessionId };
 
-    } catch (err) {
-      console.error(err);
-      setMessage('Chyba pri aktualizácii produktu.');
-    } finally {
-      setShowModal(false);
-      setProductToToggle(null);
+        await axios.delete(`${BACKEND_URL}/cart/remove/${productToToggle}`, { headers });
+      } catch (err) {
+        console.error('Chyba pri odstraňovaní produktu z košíka', err);
+      }
     }
-  };
+
+    // 4. Aktualizovať počet položiek v košíku cez CartContext
+    refreshCartCount();
+
+  } catch (err) {
+    console.error(err);
+    setMessage('Chyba pri aktualizácii produktu.');
+  } finally {
+    setShowModal(false);
+    setProductToToggle(null);
+  }
+};
 
 
   // Filter produktov podľa active/inactive
@@ -168,7 +185,7 @@ const DeleteProduct = () => {
       <div className="flex flex-col justify-center mt-6">
         <button
           onClick={handleToggleClick}
-          className="w-[190px] bg-red-700 hover:bg-red-600 text-white py-2 px-4 text-sm md:text-lg rounded-lg transition mx-auto"
+          className="w-[190px] bg-red-700 hover:bg-red-600 text-white py-2 px-4 text-sm md:text-lg rounded-lg transition mx-auto cursor-pointer"
           disabled={!selectedSlug}
         >
           Toggle Active/Inactive
