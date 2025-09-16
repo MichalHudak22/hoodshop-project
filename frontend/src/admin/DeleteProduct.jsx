@@ -69,65 +69,68 @@ const DeleteProduct = () => {
 
 
 
- const confirmToggle = async () => {
-  try {
-    const token = localStorage.getItem('token');
+  const confirmToggle = async () => {
+    try {
+      const token = localStorage.getItem('token');
 
-    // 1. Prepnutie stavu produktu na backend
-    await axios.patch(
-      `${BACKEND_URL}/products/toggle/${productToToggle}`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+      // 1. Prepnutie stavu produktu na backend
+      await axios.patch(
+        `${BACKEND_URL}/products/toggle/${productToToggle}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-    // 2. Lokálna aktualizácia produktov (okamžitý efekt)
-    const updated = allProducts.map((p) =>
-      p.slug === productToToggle ? { ...p, is_active: p.is_active ? 0 : 1 } : p
-    );
-    setAllProducts(updated);
-    setSelectedSlug(null);
-    setMessage('Stav produktu bol aktualizovaný.');
+      // 2. Lokálna aktualizácia produktov (okamžitý efekt)
+      const updated = allProducts.map((p) =>
+        p.slug === productToToggle ? { ...p, is_active: p.is_active ? 0 : 1 } : p
+      );
+      setAllProducts(updated);
+      setSelectedSlug(null);
+      setMessage('Stav produktu bol aktualizovaný.');
 
-    // 2a. Aktualizácia filtered podľa showInactive, aby sa produkt presunul
-    setFiltered(updated.filter(p =>
-      showInactive ? p.is_active === 0 : p.is_active === 1
-    ));
+      // 2a. Aktualizácia filtered podľa showInactive, aby sa produkt presunul
+      setFiltered(updated.filter(p =>
+        showInactive ? p.is_active === 0 : p.is_active === 1
+      ));
 
-    // 3. Ak produkt je teraz inactive, odstrániť ho z košíka
-    const toggledProduct = updated.find(p => p.slug === productToToggle);
-    if (!toggledProduct.is_active) {
-      try {
-        const sessionId = localStorage.getItem('session_id') || '';
-        const headers = token
-          ? { Authorization: `Bearer ${token}` }
-          : { 'x-session-id': sessionId };
+      // 3. Ak produkt je teraz inactive, odstrániť ho z košíka
+      const toggledProduct = updated.find(p => p.slug === productToToggle);
+      if (!toggledProduct.is_active) {
+        try {
+          const sessionId = localStorage.getItem('session_id') || '';
+          const headers = token
+            ? { Authorization: `Bearer ${token}` }
+            : { 'x-session-id': sessionId };
 
-        await axios.delete(`${BACKEND_URL}/cart/remove/${productToToggle}`, { headers });
-      } catch (err) {
-        console.error('Chyba pri odstraňovaní produktu z košíka', err);
+          await axios.delete(`${BACKEND_URL}/cart/remove/${productToToggle}`, { headers });
+        } catch (err) {
+          // ignorujeme 404, všetko ostatné logujeme
+          if (err.response?.status !== 404) {
+            console.error('Chyba pri odstraňovaní produktu z košíka', err);
+          }
+        }
       }
+
+      // 4. Aktualizovať počet položiek v košíku cez CartContext
+      refreshCartCount();
+
+    } catch (err) {
+      console.error(err);
+      setMessage('Chyba pri aktualizácii produktu.');
+    } finally {
+      setShowModal(false);
+      setProductToToggle(null);
     }
-
-    // 4. Aktualizovať počet položiek v košíku cez CartContext
-    refreshCartCount();
-
-  } catch (err) {
-    console.error(err);
-    setMessage('Chyba pri aktualizácii produktu.');
-  } finally {
-    setShowModal(false);
-    setProductToToggle(null);
-  }
-};
+  };
 
 
   // Filter produktov podľa active/inactive
-const displayedProducts = allProducts
-  .filter(p =>
-    p.name.toLowerCase().includes(query.toLowerCase()) ||
-    p.slug.toLowerCase().includes(query.toLowerCase())
-  )
-  .filter(p => (showInactive ? p.is_active === 0 : p.is_active === 1));
+  const displayedProducts = allProducts
+    .filter(p =>
+      p.name.toLowerCase().includes(query.toLowerCase()) ||
+      p.slug.toLowerCase().includes(query.toLowerCase())
+    )
+    .filter(p => (showInactive ? p.is_active === 0 : p.is_active === 1));
 
 
   return (
