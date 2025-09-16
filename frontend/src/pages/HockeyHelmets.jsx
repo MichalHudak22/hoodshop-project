@@ -61,7 +61,7 @@ const HockeyHelmets = () => {
     brand: p.brand,
     price: p.price,
     image: `${baseURL}${p.image}`,
-    slug: product.slug,
+    slug: p.slug, 
   }));
 
   // Zvýraznené produkty
