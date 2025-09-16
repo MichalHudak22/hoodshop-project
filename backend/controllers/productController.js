@@ -206,22 +206,27 @@ const deleteProductBySlug = async (req, res) => {
   const { slug } = req.params;
 
   try {
-    // 1️⃣ Skontrolovať, či produkt existuje
-    const [results] = await db.query('SELECT * FROM products WHERE slug = ?', [slug]);
-
-    if (results.length === 0) {
+    // 1️⃣ Zisti produkt podľa slug
+    const [products] = await db.query('SELECT id FROM products WHERE slug = ?', [slug]);
+    if (products.length === 0) {
       return res.status(404).json({ error: 'Produkt nebol nájdený' });
     }
 
-    // 2️⃣ Soft delete: nastaviť is_active = 0
-    await db.query('UPDATE products SET is_active = 0 WHERE slug = ?', [slug]);
+    const productId = products[0].id;
 
-    res.json({ message: 'Produkt bol soft-vymazaný' });
+    // 2️⃣ Soft delete produktu
+    await db.query('UPDATE products SET is_active = 0 WHERE id = ?', [productId]);
+
+    // 3️⃣ Odstránenie produktu zo všetkých košíkov
+    await db.query('DELETE FROM cart_items WHERE product_id = ?', [productId]);
+
+    res.json({ message: 'Produkt bol soft-vymazaný a odstránený z košíkov používateľov' });
   } catch (err) {
     console.error('DB error deleteProductBySlug:', err);
     res.status(500).json({ error: 'Chyba servera pri mazaní produktu' });
   }
 };
+
 
 module.exports = {
   getProductsByBrand,
