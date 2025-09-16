@@ -11,7 +11,8 @@ const DeleteProduct = () => {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [productToDelete, setProductToDelete] = useState(null);
+  const [productToToggle, setProductToToggle] = useState(null);
+  const [showInactive, setShowInactive] = useState(false); // stav zobrazenia
 
   // Fetch products from backend
   useEffect(() => {
@@ -52,41 +53,66 @@ const DeleteProduct = () => {
     setFiltered(filteredResults);
   };
 
-  const handleDeleteClick = () => {
+  // Tlačidlo pre prepnutie stavu produktu (active <-> inactive)
+  const handleToggleClick = () => {
     if (!selectedSlug) {
-      setMessage('Najprv vyber produkt, ktorý chceš vymazať.');
+      setMessage('Najprv vyber produkt, ktorý chceš zmeniť.');
       return;
     }
-    setProductToDelete(selectedSlug);
+    setProductToToggle(selectedSlug);
     setShowModal(true);
   };
 
-  const confirmDelete = async () => {
+  const confirmToggle = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`${BACKEND_URL}/products/${productToDelete}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.patch(
+        `${BACKEND_URL}/products/toggle/${productToToggle}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-      const updated = allProducts.filter((p) => p.slug !== productToDelete);
+      // Lokálna aktualizácia zoznamu
+      const updated = allProducts.map((p) =>
+        p.slug === productToToggle ? { ...p, is_active: p.is_active ? 0 : 1 } : p
+      );
       setAllProducts(updated);
-      setFiltered(updated);
       setSelectedSlug(null);
-      setMessage('Produkt bol úspešne vymazaný.');
+      setMessage('Stav produktu bol aktualizovaný.');
     } catch (err) {
       console.error(err);
-      setMessage('Chyba pri vymazávaní produktu.');
+      setMessage('Chyba pri aktualizácii produktu.');
     } finally {
       setShowModal(false);
-      setProductToDelete(null);
+      setProductToToggle(null);
     }
   };
+
+  // Filter produktov podľa active/inactive
+  const displayedProducts = filtered.filter((p) =>
+    showInactive ? p.is_active === 0 : p.is_active === 1
+  );
 
   return (
     <div className="w-full mx-auto p-6 bg-black bg-opacity-70 text-white md:rounded-xl border border-gray-700">
       <h2 className="text-xl pb-5 md:text-2xl lg:text-3xl font-semibold mb-4 text-center text-blue-200">
-        Search and Delete Product
+        {showInactive ? 'Inactive Products' : 'Active Products'}
       </h2>
+
+      <div className="flex justify-center gap-4 mb-4">
+        <button
+          onClick={() => setShowInactive(false)}
+          className={`px-4 py-2 rounded-lg ${!showInactive ? 'bg-blue-600' : 'bg-gray-700'}`}
+        >
+          Active Products
+        </button>
+        <button
+          onClick={() => setShowInactive(true)}
+          className={`px-4 py-2 rounded-lg ${showInactive ? 'bg-blue-600' : 'bg-gray-700'}`}
+        >
+          Inactive Products
+        </button>
+      </div>
 
       <input
         type="text"
@@ -98,8 +124,8 @@ const DeleteProduct = () => {
 
       <div className="h-[400px] max-w-3xl mx-auto overflow-y-auto scrollbar scrollbar-thumb-gray-500 scrollbar-track-gray-800 rounded-lg border-2 border-gray-300">
         <ul className="divide-y divide-gray-700">
-          {Array.isArray(filtered) && filtered.length > 0 ? (
-            filtered.map((product) => (
+          {Array.isArray(displayedProducts) && displayedProducts.length > 0 ? (
+            displayedProducts.map((product) => (
               <li
                 key={product.slug}
                 className={`p-4 transition cursor-pointer hover:bg-gray-800 ${
@@ -111,13 +137,14 @@ const DeleteProduct = () => {
                 <p className="text-sm text-blue-200">
                   <span className="text-gray-200">Brand:</span> {product.brand}{' '}
                   <span className="text-gray-200">| Category:</span> {product.category}{' '}
-                  <span className="text-gray-100">| Type:</span> {product.type}
+                  <span className="text-gray-100">| Type:</span> {product.type}{' '}
+                  <span className="text-gray-100">| Status:</span> {product.is_active ? 'Active' : 'Inactive'}
                 </p>
               </li>
             ))
           ) : (
             <li className="p-4 text-red-400 text-center">
-              {loading ? 'Loading products...' : 'Nepodarilo sa načítať produkty.'}
+              {loading ? 'Loading products...' : 'Žiadne produkty na zobrazenie.'}
             </li>
           )}
         </ul>
@@ -125,11 +152,11 @@ const DeleteProduct = () => {
 
       <div className="flex flex-col justify-center mt-6">
         <button
-          onClick={handleDeleteClick}
+          onClick={handleToggleClick}
           className="w-[190px] bg-red-700 hover:bg-red-600 text-white py-2 px-4 text-sm md:text-lg rounded-lg transition mx-auto"
           disabled={!selectedSlug}
         >
-          Delete Product
+          Toggle Active/Inactive
         </button>
 
         <div className="min-h-[24px] mt-2 flex items-center justify-center">
@@ -142,19 +169,19 @@ const DeleteProduct = () => {
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
           <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-500 max-w-md w-full">
             <h3 className="text-xl text-white font-semibold mb-4 text-center">
-              Do you really want to delete this product?
+              Chceš naozaj zmeniť stav produktu?
             </h3>
             <div className="flex justify-center space-x-4">
               <button
-                onClick={confirmDelete}
+                onClick={confirmToggle}
                 className="bg-red-700 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
               >
-                Delete
+                Confirm
               </button>
               <button
                 onClick={() => {
                   setShowModal(false);
-                  setProductToDelete(null);
+                  setProductToToggle(null);
                 }}
                 className="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
               >

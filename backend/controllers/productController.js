@@ -151,13 +151,14 @@ const getProductBySlug = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
   try {
-    const [results] = await db.query('SELECT * FROM products WHERE is_active = 1 ORDER BY id DESC');
+    const [results] = await db.query('SELECT * FROM products ORDER BY id DESC');
     res.json(results);
   } catch (err) {
     console.error('DB error getAllProducts:', err);
     res.status(500).json({ error: 'Chyba servera' });
   }
 };
+
 
 
 // ADMIN - Add product
