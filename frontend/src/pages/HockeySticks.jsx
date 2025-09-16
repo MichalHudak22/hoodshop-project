@@ -59,6 +59,7 @@ const HockeySticks = () => {
     brand: p.brand,
     price: p.price,
     image: `${baseURL}${p.image}`, // absolútna URL pre carousel
+    slug: product.slug,
   }));
 
   const highlighted = sticks.filter(s => s.highlight_title && s.description);

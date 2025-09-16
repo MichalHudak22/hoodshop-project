@@ -64,6 +64,7 @@ const CyclingBike = () => {
     brand: product.brand,
     price: product.price,
     image: `${baseURL}${product.image}`,
+    slug: product.slug,
   }));
 
   const highlighted = bikes.filter(p => p.highlight_title && p.description);

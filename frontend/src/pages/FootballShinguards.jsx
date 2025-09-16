@@ -65,6 +65,7 @@ const FootballShinguards = () => {
     brand: product.brand,
     price: product.price,
     image: `${baseURL}${product.image}`, // 🔹 obrázky z produkčného backendu
+    slug: product.slug,
   })) : [];
 
   const highlightedShinguards = Array.isArray(shinguards) ? shinguards.filter(s => s.highlight_title && s.description) : [];

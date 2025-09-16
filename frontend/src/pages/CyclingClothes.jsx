@@ -65,6 +65,7 @@ const CyclingClothesPage = () => {
     brand: product.brand,
     price: product.price,
     image: `${baseURL}${product.image}`, // 🔹 produkčný backend URL
+    slug: product.slug,
   }));
 
   const highlighted = clothes.filter(p => p.highlight_title && p.description);

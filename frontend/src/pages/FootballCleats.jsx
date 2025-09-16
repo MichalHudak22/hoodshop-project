@@ -65,6 +65,7 @@ const FootballCleatsPage = () => {
     brand: product.brand,
     price: product.price,
     image: `${baseURL}${product.image}`, // 🔹 obrázky z produkčného backendu
+    slug: product.slug,
   })) : [];
 
   const highlightedCleats = Array.isArray(cleats) ? cleats.filter(cleat => cleat.highlight_title && cleat.description) : [];

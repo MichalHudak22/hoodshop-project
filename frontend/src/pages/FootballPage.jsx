@@ -78,6 +78,7 @@ const handleAddToCart = async (jersey) => {
     brand: product.brand,
     price: product.price,
     image: product.image,
+    slug: product.slug,
   }));
 
   // Funkcia na parsovanie [color=#xxxxxx]text[/color]

@@ -65,6 +65,7 @@ const CyclingHelmets = () => {
     brand: product.brand,
     price: product.price,
     image: `${baseURL}${product.image}`, // 🔹 obrázky z produkčného backendu
+    slug: product.slug,
   }));
 
   // Výber 2 zvýraznených produktov

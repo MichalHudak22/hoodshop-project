@@ -113,6 +113,7 @@ const HockeyPage = () => {
     brand: product.brand,
     price: product.price,
     image: product.image,
+    slug: product.slug,
   }));
 
   return (

@@ -62,6 +62,7 @@ const HockeySkates = () => {
     brand: product.brand,
     price: product.price,
     image: `${baseURL}${product.image}`,
+    slug: product.slug,
   })) : [];
 
   const highlightedSkates = Array.isArray(skates) ? skates.filter(s => s.highlight_title && s.description) : [];

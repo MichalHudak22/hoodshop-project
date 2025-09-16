@@ -58,7 +58,8 @@ const HockeyJerseys = () => {
     name: product.name,
     brand: product.brand,
     price: product.price,
-    image: `${baseURL}${product.image}`, // absolútna URL pre carousel
+    image: `${baseURL}${product.image}`, // absolútna URL pre 
+    slug: product.slug,
   }));
 
   const highlightedJerseys = jerseys.filter(j => j.highlight_title && j.description);

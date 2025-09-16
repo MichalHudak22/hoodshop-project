@@ -62,7 +62,8 @@ const FootballBalls = () => {
     name: product.name,
     brand: product.brand,
     price: product.price,
-    image: `${baseURL}${product.image}`, // 🔹 obrázky z produkčného backendu
+    image: `${baseURL}${product.image}`, // 🔹 obrázky z produkčného 
+    slug: product.slug,
   })) : [];
 
   const highlightedBalls = Array.isArray(balls) ? balls.filter(ball => ball.highlight_title && ball.description) : [];
