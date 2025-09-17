@@ -25,14 +25,15 @@ const FeaturedProductReversed = ({ product, handleAddToCart, backgroundImage }) 
           {product.highlight_title}
         </h1>
         <div className="flex flex-col md:flex-row-reverse items-center justify-center gap-8">
-          
+
           {/* OBÁLENIE obrázku do Link komponentu */}
           <Link to={`/product/${productSlug}`}>
             <img
-              src={`${baseURL}${product.image}`} // <-- tu je zmena
+              src={product.image.startsWith('http') ? product.image : `${baseURL}${product.image}`}
               alt={product.name}
               className="w-[70%] mx-auto md:max-w-sm rounded-lg shadow-xl object-contain hover:brightness-110"
             />
+
           </Link>
 
           <div className="max-w-xl text-center md:text-right">
