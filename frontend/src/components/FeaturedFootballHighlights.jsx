@@ -61,6 +61,8 @@ const FeaturedFootballHighlights = () => {
             // ✅ použiť priamo image z DB, či už je Cloudinary alebo full URL
             const imageUrl = product?.image || '';
 
+
+
             return (
               <Link
                 key={`${name}-${index}`}
