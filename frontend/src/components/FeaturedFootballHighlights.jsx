@@ -8,67 +8,38 @@ const FeaturedFootballHighlights = () => {
   const [featuredCleats, setFeaturedCleats] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ dynamická URL
+  const baseURL = ''; // ❌ už netreba, obrázky sú Cloudinary URL
 
   useEffect(() => {
-    setErrorMessage(''); // Vyčistí chybu pred načítaním
+    setErrorMessage('');
 
-    // Lopty
-    axios.get(`${baseURL}/products/football/ball`)
-      .then(response => {
-        const highlightedBalls = response.data.filter(ball => ball.highlight_title && ball.description);
-        setFeaturedBalls(highlightedBalls.slice(0, 2));
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/football/ball`)
+      .then(res => {
+        const highlighted = res.data.filter(p => p.highlight_title && p.description);
+        setFeaturedBalls(highlighted.slice(0, 2));
       })
-      .catch(() => {
-        setErrorMessage('Nepodarilo sa načítať football lôpt.');
-      });
+      .catch(() => setErrorMessage('Nepodarilo sa načítať football lôpt.'));
 
-    // Dresy
-    axios.get(`${baseURL}/products/football/jersey`)
-      .then(response => {
-        const highlightedJerseys = response.data.filter(jersey => jersey.highlight_title && jersey.description);
-        setFeaturedJerseys(highlightedJerseys.slice(0, 2));
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/football/jersey`)
+      .then(res => {
+        const highlighted = res.data.filter(p => p.highlight_title && p.description);
+        setFeaturedJerseys(highlighted.slice(0, 2));
       })
-      .catch(() => {
-        setErrorMessage('Nepodarilo sa načítať football dresov.');
-      });
+      .catch(() => setErrorMessage('Nepodarilo sa načítať football dresov.'));
 
-    // Kopačky
-    axios.get(`${baseURL}/products/football/cleats`)
-      .then(response => {
-        const highlightedCleats = response.data.filter(cleat => cleat.highlight_title && cleat.description);
-        setFeaturedCleats(highlightedCleats.slice(0, 2));
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/football/cleats`)
+      .then(res => {
+        const highlighted = res.data.filter(p => p.highlight_title && p.description);
+        setFeaturedCleats(highlighted.slice(0, 2));
       })
-      .catch(() => {
-        setErrorMessage('Nepodarilo sa načítať football kopačiek.');
-      });
+      .catch(() => setErrorMessage('Nepodarilo sa načítať football kopačiek.'));
   }, []);
 
-  // Spojenie všetkých produktov do jedného poľa
   const featuredItems = [];
-
   for (let i = 0; i < 2; i++) {
-    if (featuredJerseys[i]) {
-      featuredItems.push({
-        name: "Nike",
-        product: featuredJerseys[i],
-        defaultBg: "/img/nike-jersey.jpg",
-      });
-    }
-    if (featuredCleats[i]) {
-      featuredItems.push({
-        name: "Puma",
-        product: featuredCleats[i],
-        defaultBg: "/img/puma-cleats.jpg",
-      });
-    }
-    if (featuredBalls[i]) {
-      featuredItems.push({
-        name: "Adidas",
-        product: featuredBalls[i],
-        defaultBg: "/img/adidas-ball.jpg",
-      });
-    }
+    if (featuredJerseys[i]) featuredItems.push({ name: 'Nike', product: featuredJerseys[i] });
+    if (featuredCleats[i]) featuredItems.push({ name: 'Puma', product: featuredCleats[i] });
+    if (featuredBalls[i]) featuredItems.push({ name: 'Adidas', product: featuredBalls[i] });
   }
 
   return (
@@ -88,28 +59,25 @@ const FeaturedFootballHighlights = () => {
         </h2>
 
         <div className="w-full xl:w-[90%] 2xl:max-w-[90%] mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-          {featuredItems.map(({ name, product, defaultBg }, index) => (
+          {featuredItems.map(({ name, product }, index) => (
             <Link
               key={`${name}-${index}`}
               to={`/product/${product?.slug || ''}`}
               className="flex flex-col h-full bg-white rounded-lg overflow-hidden shadow-lg hover:brightness-125 transition"
             >
-              {/* Nadpis */}
               <h3 className="py-4 px-3 text-[14px] md:min-h-[80px] font-bold bg-black text-white text-center">
                 {product?.highlight_title || `${name} Featured Product`}
               </h3>
 
-              {/* Obrázok s efektom priblíženia */}
               <div className="relative h-64 overflow-hidden shadow-lg group">
                 <img
-                  src={product ? `${baseURL}${product.image}` : defaultBg} // ✅ dynamická URL
+                  src={product?.image} // ✅ priamo URL z Cloudinary
                   alt={product?.highlight_title || `${name} default`}
                   className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-10"></div>
               </div>
 
-              {/* Popis */}
               <div className="bg-black bg-opacity-90 text-white text-sm p-4 flex-1">
                 {product?.description || `Explore top products from ${name}.`}
               </div>
