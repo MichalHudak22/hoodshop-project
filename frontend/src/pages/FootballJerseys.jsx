@@ -66,7 +66,9 @@ const slides = Array.isArray(jerseys) ? jerseys.map(product => ({
   name: product.name,
   brand: product.brand,
   price: product.price,
-  image: `${baseURL}${product.image}`,
+  image: product.image.trim().startsWith('http')
+    ? product.image.trim()
+    : `${baseURL}${product.image.trim()}`,
   slug: product.slug,
 })) : [];
 
