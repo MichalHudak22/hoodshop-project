@@ -50,57 +50,58 @@ const [summaryRes, topProductsRes] = await Promise.all([
   const pointsToEuro = (points) => (points / 10).toFixed(2);
 
   return (
-    <div className="p-4 w-full mx-auto rounded-lg shadow-lg text-blue-300">
-      <h3 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-5 text-center text-blue-200">
-        Orders Summary
-      </h3>
+   <div className="p-6 bg-gray-800 bg-opacity-50 rounded-md space-y-4">
+  <h3 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-5 text-center text-blue-200">
+    Orders Summary
+  </h3>
 
-      <div className="flex flex-col space-y-4">
-        <div className="flex justify-between items-center bg-gray-700 text-lg bg-opacity-50 rounded-md p-3">
-          <span>Total number of orders:</span>
-          <span className="font-semibold bg-yellow-400 text-black text-3xl lg:text-4xl p-2 rounded-lg">
-            {summary.totalOrders ?? 0}
-          </span>
-        </div>
+  <div className="flex flex-col space-y-3">
+    <div className="flex justify-between items-center bg-gray-700 bg-opacity-50 p-3 rounded-md">
+      <span>Total number of orders:</span>
+      <span className="font-semibold bg-yellow-400 text-black text-3xl lg:text-4xl p-2 rounded-lg">
+        {summary.totalOrders ?? 0}
+      </span>
+    </div>
 
-        <div className="flex flex-col bg-gray-700 text-lg bg-opacity-50 rounded-md p-3">
-          <div className="flex justify-between">
-            <span>Total loyalty points used:</span>
-            <span className="font-semibold text-yellow-400 text-lg">
-              {summary.totalUsedPoints?.toLocaleString('sk-SK') ?? 0}
-            </span>
-          </div>
-          <div className="flex justify-between mt-1 text-[15px] italic">
-            <span>Value in euros (10 points = 1 €):</span>
-            <span className="text-yellow-400">{pointsToEuro(summary.totalUsedPoints ?? 0)} €</span>
-          </div>
-        </div>
-
-        <div className="flex justify-between items-center bg-gray-700 bg-opacity-50 text-lg rounded-md p-3">
-          <span>Total revenue:</span>
-          <span className="font-bold bg-green-400 text-black p-2 rounded-lg text-2xl lg:text-3xl 2xl:text-4xl">
-            {summary.totalRevenue?.toLocaleString('sk-SK') ?? 0} €
-          </span>
-        </div>
-
-        {/* Top produkty */}
-        <div className="bg-gray-800 bg-opacity-70 p-4 rounded-md mt-4">
-          <h4 className="text-lg font-semibold mb-2 text-center text-blue-200">Top 10 Best-Selling Products</h4>
-          {topProducts.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center">Žiadne dáta o predajoch.</p>
-          ) : (
-            <ul className="space-y-1 text-base text-yellow-300">
-              {topProducts.map((product, index) => (
-                <li key={index} className="flex justify-between">
-                  <span className="font-medium text-white">{index + 1}. {product.name || 'Unknown'}</span>
-                  <span>{product.quantity ?? 0} ks</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+    <div className="flex flex-col bg-gray-700 bg-opacity-50 rounded-md p-3">
+      <div className="flex justify-between">
+        <span>Total loyalty points used:</span>
+        <span className="font-semibold text-yellow-400 text-lg">
+          {summary.totalUsedPoints?.toLocaleString('sk-SK') ?? 0}
+        </span>
+      </div>
+      <div className="flex justify-between mt-1 text-[15px] italic">
+        <span>Value in euros (10 points = 1 €):</span>
+        <span className="text-yellow-400">{pointsToEuro(summary.totalUsedPoints ?? 0)} €</span>
       </div>
     </div>
+
+    <div className="flex justify-between items-center bg-gray-700 bg-opacity-50 rounded-md p-3">
+      <span>Total revenue:</span>
+      <span className="font-bold bg-green-400 text-black p-2 rounded-lg text-2xl lg:text-3xl 2xl:text-4xl">
+        {summary.totalRevenue?.toLocaleString('sk-SK') ?? 0} €
+      </span>
+    </div>
+
+    {/* Top produkty */}
+    <div className="bg-gray-700 bg-opacity-50 p-3 rounded-md mt-4">
+      <h4 className="text-lg font-semibold mb-2 text-center text-blue-200">Top 10 Best-Selling Products</h4>
+      {topProducts.length === 0 ? (
+        <p className="text-sm text-gray-400 text-center">Žiadne dáta o predajoch.</p>
+      ) : (
+        <ul className="space-y-1 text-base text-yellow-300">
+          {topProducts.map((product, index) => (
+            <li key={index} className="flex justify-between">
+              <span className="font-medium text-white">{index + 1}. {product.name || 'Unknown'}</span>
+              <span>{product.quantity ?? 0} ks</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </div>
+</div>
+
   );
 }
 
