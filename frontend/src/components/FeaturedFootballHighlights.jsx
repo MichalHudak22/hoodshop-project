@@ -20,21 +20,30 @@ const FeaturedFootballHighlights = () => {
   useEffect(() => {
     setErrorMessage('');
 
-    const fetchProducts = async (type, setter) => {
-      try {
-        const res = await axios.get(`${apiBase}/products/football/${type}`);
-        const highlighted = res.data
-          .filter((p) => p.highlight_title && p.description)
-          .map((p) => ({
-            ...p,
-            image: fixCloudinaryUrl(p.image), // ✅ tu už obrázok zostane čisto Cloudinary
-          }));
-        setter(highlighted.slice(0, 2));
-      } catch (err) {
-        console.error(`[ERROR] Fetch ${type} failed:`, err);
-        setErrorMessage(`Nepodarilo sa načítať football ${type}.`);
-      }
-    };
+const fetchProducts = async (type, setter) => {
+  try {
+    const res = await axios.get(`${apiBase}/products/football/${type}`);
+
+    // 1️⃣ Dáta priamo z backendu
+    console.log(`[FETCHED ${type}] RAW:`, res.data.map(p => p.image));
+
+    const highlighted = res.data
+      .filter((p) => p.highlight_title && p.description)
+      .map((p) => ({
+        ...p,
+        image: fixCloudinaryUrl(p.image),
+      }));
+
+    // 2️⃣ Dáta po fixCloudinaryUrl
+    console.log(`[FETCHED ${type}] FIXED:`, highlighted.map(p => p.image));
+
+    setter(highlighted.slice(0, 2));
+  } catch (err) {
+    console.error(`[ERROR] Fetch ${type} failed:`, err);
+    setErrorMessage(`Nepodarilo sa načítať football ${type}.`);
+  }
+};
+
 
     fetchProducts('ball', setFeaturedBalls);
     fetchProducts('jersey', setFeaturedJerseys);

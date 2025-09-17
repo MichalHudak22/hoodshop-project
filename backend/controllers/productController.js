@@ -87,14 +87,20 @@ const getProductsByCategoryAndType = async (req, res) => {
   try {
     const [rows] = await db.query(sql, [category, type]);
 
-    // 🔧 tu upravíme URL
+    // 1️⃣ Dáta priamo z DB
+    console.log("➡️ DB RAW images:", rows.map(p => p.image));
+
+    // 2️⃣ Oprava URL (ak treba)
     const fixedRows = rows.map(p => {
       let image = p.image;
-      if (image && image.startsWith('https//')) {
-        image = image.replace('https//', 'https://');
+      if (image && image.startsWith("https//")) {
+        image = image.replace("https//", "https://");
       }
       return { ...p, image };
     });
+
+    // 3️⃣ Dáta ktoré posielame do frontu
+    console.log("➡️ API RESPONSE images:", fixedRows.map(p => p.image));
 
     res.json(fixedRows);
   } catch (err) {
@@ -102,6 +108,7 @@ const getProductsByCategoryAndType = async (req, res) => {
     res.status(500).json({ error: "Chyba servera" });
   }
 };
+
 
 
 
