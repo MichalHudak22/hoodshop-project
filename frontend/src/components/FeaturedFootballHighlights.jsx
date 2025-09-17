@@ -19,6 +19,7 @@ const FeaturedFootballHighlights = () => {
         const highlighted = res.data.filter(p => p.highlight_title && p.description);
         setter(highlighted.slice(0, 2));
       } catch (err) {
+        console.error(err);
         setErrorMessage(`Nepodarilo sa načítať football ${type}.`);
       }
     };
@@ -58,9 +59,23 @@ const FeaturedFootballHighlights = () => {
 
         <div className="w-full xl:w-[90%] 2xl:max-w-[90%] mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
           {featuredItems.map(({ name, product }, index) => {
-            // ✅ Ak image začína "http", použije sa priamo Cloudinary URL
-            // ✅ Inak pridá apiBase pred lokálnu cestu
-            const imageUrl = product?.image?.startsWith('http') ? product.image : `${apiBase}${product.image}`;
+            // --- LOGY na diagnostiku ---
+            console.log(`[DEBUG] Product ${index}:`, product);
+            console.log(`[DEBUG] Raw image URL:`, product?.image);
+
+            // --- Oprava chybného https//
+            let imageUrl = product?.image || '';
+            if (imageUrl.startsWith('https//')) {
+              console.warn(`[WARN] Fixing malformed URL for product ${product?.name}`);
+              imageUrl = imageUrl.replace('https//', 'https://');
+            }
+
+            // --- Ak nie je Cloudinary, pridáme apiBase pred lokálnu cestu ---
+            if (!imageUrl.startsWith('http')) {
+              imageUrl = `${apiBase}${imageUrl}`;
+            }
+
+            console.log(`[DEBUG] Final imageUrl:`, imageUrl);
 
             return (
               <Link
