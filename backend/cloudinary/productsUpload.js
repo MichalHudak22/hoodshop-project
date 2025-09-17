@@ -1,12 +1,12 @@
-const cloudinary = require('./cloudinary'); // tvoje existujúce cloudinary.js
-const db = require('../database');          // tvoje existujúce db.js
+const cloudinary = require('./cloudinary'); 
+const db = require('../database');          
 const fs = require('fs');
 const path = require('path');
 
-async function uploadFootballJerseys() {
+async function uploadFootballJersey() {
   try {
-    // cesta k priečinku s obrázkami football/jerseys
-    const baseDir = path.join(__dirname, '..', 'src', 'img', 'products', 'football', 'jerseys');
+    // opravená cesta k priečinku
+    const baseDir = path.join(__dirname, '..', 'src', 'img', 'products', 'football', 'jersey');
 
     if (!fs.existsSync(baseDir) || !fs.statSync(baseDir).isDirectory()) {
       console.error('❌ Cesta k priečinku neexistuje alebo nie je priečinok:', baseDir);
@@ -17,34 +17,29 @@ async function uploadFootballJerseys() {
 
     for (const file of files) {
       const filePath = path.join(baseDir, file);
-      const slug = path.parse(file).name; // napr. 'jersey1.jpg' -> 'jersey1'
+      const slug = path.parse(file).name;
 
       try {
-        // Upload na Cloudinary
         const result = await cloudinary.uploader.upload(filePath, {
-          folder: `products/football/jerseys`,
+          folder: `products/football/jersey`,
         });
 
         console.log(`✅ ${file} uploaded: ${result.secure_url}`);
 
-        // Aktualizácia stĺpca 'image' v DB podľa slugu
         await db.query(
           'UPDATE products SET image = ? WHERE slug = ?',
           [result.secure_url, slug]
         );
-
       } catch (err) {
         console.error(`❌ Chyba pri uploadovaní ${file}:`, err);
       }
     }
 
-    console.log('🎉 Upload football/jerseys dokončený!');
+    console.log('🎉 Upload football/jersey dokončený!');
   } catch (err) {
     console.error('❌ Chyba pri spracovaní priečinku:', err);
-  } finally {
-    db.end(); // uzavrieme pool pripojení
   }
 }
 
 // Spustenie skriptu
-uploadFootballJerseys();
+uploadFootballJersey();
