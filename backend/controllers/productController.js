@@ -84,15 +84,25 @@ const getProductsByCategoryAndType = async (req, res) => {
   const { category, type } = req.params;
   const sql = "SELECT * FROM products WHERE category = ? AND type = ? AND is_active = 1";
 
-
   try {
     const [rows] = await db.query(sql, [category, type]);
-    res.json(rows);
+
+    const cloudinaryBase = "https://res.cloudinary.com/dd8gjvv80/image/upload";
+
+    const fixedRows = rows.map(product => ({
+      ...product,
+      image: product.image.startsWith("http")
+        ? product.image
+        : `${cloudinaryBase}${product.image}`, // ak je len relatívna cesta
+    }));
+
+    res.json(fixedRows);
   } catch (err) {
     console.error("DB error getProductsByCategoryAndType:", err);
     res.status(500).json({ error: "Chyba servera" });
   }
 };
+
 
 
 // GET search products by name (q= query param)
@@ -141,12 +151,20 @@ const getProductBySlug = async (req, res) => {
     if (rows.length === 0) {
       return res.status(404).json({ error: 'Produkt nebol nájdený' });
     }
-    res.json(rows[0]);
+
+    const cloudinaryBase = "https://res.cloudinary.com/dd8gjvv80/image/upload";
+    const product = rows[0];
+    product.image = product.image.startsWith("http")
+      ? product.image
+      : `${cloudinaryBase}${product.image}`;
+
+    res.json(product);
   } catch (err) {
     console.error('DB error getProductBySlug:', err);
     res.status(500).json({ error: 'Chyba servera' });
   }
 };
+
 
 
 const getAllProducts = async (req, res) => {
