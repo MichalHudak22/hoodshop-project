@@ -5,11 +5,12 @@ const {
   placeOrder,
   getOrdersSummary,
   getTopProducts,
-  getAllOrders, // <--- pridaj
+  getAllOrders, // <--- už tam máš
+  getTopCustomers, // <--- pridaj toto
 } = require('../controllers/orderController');
 
 const authenticateToken = require('../middleware/authenticateToken');
-const authorizeAdmin = require('../middleware/authorizeAdmin'); // <--- pridaj ak ešte nie je
+const authorizeAdmin = require('../middleware/authorizeAdmin');
 
 // POST /api/orders - vytvorenie objednávky
 router.post('/', authenticateToken.optional, placeOrder);
@@ -22,6 +23,9 @@ router.get('/top-products', authenticateToken, getTopProducts);
 
 // ✅ GET /api/orders/admin - všetky objednávky pre adminov
 router.get('/admin', authenticateToken, authorizeAdmin, getAllOrders);
+
+// ✅ GET /api/orders/top-customers - top 5 zákazníkov
+router.get('/top-customers', authenticateToken, authorizeAdmin, getTopCustomers);
 
 // test endpoint
 router.get('/test', (req, res) => {

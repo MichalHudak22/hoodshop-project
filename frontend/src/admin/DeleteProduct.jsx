@@ -209,7 +209,7 @@ const DeleteProduct = () => {
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
           <div className="bg-gray-900 p-6 rounded-lg shadow-lg border border-gray-500 max-w-md w-full">
             <h3 className="text-xl text-white font-semibold mb-4 text-center">
-              Chceš naozaj zmeniť stav produktu?
+              Do you really want to change the product status?
             </h3>
             <div className="flex justify-center space-x-4">
               <button

@@ -187,6 +187,37 @@ const getTopProducts = async (req, res) => {
   }
 };
 
-module.exports = { placeOrder, getAllOrders, getOrdersSummary, getTopProducts };
+const getTopCustomers = async (req, res) => {
+  if (!req.user || req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Prístup zamietnutý' });
+  }
+
+  try {
+    const [customers] = await db.query(`
+      SELECT 
+          o.user_id,
+          o.full_name,
+          SUM(o.total_price) AS total_spent,
+          COUNT(*) AS orders_count
+      FROM orders o
+      WHERE o.user_id IS NOT NULL
+      GROUP BY o.user_id, o.full_name
+      ORDER BY total_spent DESC
+      LIMIT 5
+    `);
+
+    res.json(customers);
+  } catch (err) {
+    console.error("Chyba pri získavaní top zákazníkov:", err);
+    res.status(500).json({ error: "Chyba databázy pri načítaní top zákazníkov" });
+  }
+};
+
+
+module.exports = { placeOrder, 
+                   getAllOrders, 
+                   getOrdersSummary, 
+                   getTopProducts, 
+                   getTopCustomers };
 
 

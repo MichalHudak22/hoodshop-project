@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import UserListAdmin from '../admin/UserListAdmin';
 import OrdersSummary from '../admin/OrdersSummary';
+import TopCustomers from '../admin/TopCustomers';
 import ShippingPriceConfig from '../admin/ShippingPriceConfig';
 import ColorfulTextEditor from '../admin/ColorfulTextEditor';
 import AddProductForm from '../admin/AddProductForm';
@@ -31,6 +32,9 @@ function AdminPage() {
         <div className="grid gap-5 grid-cols-1 lg:grid-cols-2 xl:grid-cols-6">
           <div className="lg:col-span-1 xl:col-span-2 bg-black bg-opacity-70 md:rounded-xl p-5 shadow-lg border border-gray-700">
             <OrdersSummary />
+          </div>
+               <div className="lg:col-span-1 xl:col-span-2 bg-black bg-opacity-70 md:rounded-xl p-5 shadow-lg border border-gray-700">
+            <TopCustomers/>
           </div>
           <div className="bg-black bg-opacity-60 md:bg-opacity-70 md:rounded-xl p-5 shadow-lg lg:col-span-1 xl:col-span-4 border border-gray-700">
             <h2 className="text-2xl lg:text-3xl font-semibold text-center text-blue-200 mb-4">User List</h2>
