@@ -59,6 +59,12 @@ const FeaturedFootballHighlights = () => {
           {featuredItems.map(({ name, product }, index) => {
             const imageUrl = product?.image || ''; // 🔹 len Cloudinary URL
 
+            // ✅ Pridáme apiBase len ak URL nie je absolútna
+            const finalImageUrl = imageUrl.startsWith('http://') || imageUrl.startsWith('https://')
+              ? imageUrl
+              : `${apiBase}${imageUrl}`;
+
+
             return (
               <Link
                 key={`${name}-${index}`}
@@ -71,10 +77,11 @@ const FeaturedFootballHighlights = () => {
 
                 <div className="relative h-64 overflow-hidden shadow-lg group">
                   <img
-                    src={imageUrl}
+                    src={finalImageUrl}
                     alt={product?.highlight_title || `${name} default`}
                     className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-110"
                   />
+
                   <div className="absolute inset-0 bg-black bg-opacity-10"></div>
                 </div>
 
