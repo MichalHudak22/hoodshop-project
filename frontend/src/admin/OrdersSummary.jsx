@@ -89,7 +89,7 @@ const [summaryRes, topProductsRes] = await Promise.all([
       {topProducts.length === 0 ? (
         <p className="text-sm text-gray-400 text-center">Žiadne dáta o predajoch.</p>
       ) : (
-        <ul className="space-y-1 text-base text-yellow-300">
+        <ul className="space-y-2 lg:space-y-3 text-base text-yellow-300">
           {topProducts.map((product, index) => (
             <li key={index} className="flex justify-between">
               <span className="font-medium text-white">{index + 1}. {product.name || 'Unknown'}</span>
