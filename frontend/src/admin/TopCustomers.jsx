@@ -5,20 +5,28 @@ export default function TopCustomers() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
   useEffect(() => {
     const fetchTopCustomers = async () => {
       try {
-        const res = await fetch("/api/orders/top-customers", {
+        const res = await fetch(`${API_BASE_URL}/api/orders/top-customers`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // ak používaš JWT
+            Authorization: `Bearer ${localStorage.getItem("token")}`, 
           },
         });
 
         if (!res.ok) {
-          throw new Error("Chyba pri načítaní top zákazníkov");
+          throw new Error(`Chyba pri načítaní: ${res.status}`);
         }
 
         const data = await res.json();
+
+        // Kontrola, či naozaj je pole
+        if (!Array.isArray(data)) {
+          throw new Error("Neočakávaná odpoveď zo servera");
+        }
+
         setCustomers(data);
       } catch (err) {
         console.error(err);
@@ -29,7 +37,7 @@ export default function TopCustomers() {
     };
 
     fetchTopCustomers();
-  }, []);
+  }, [API_BASE_URL]);
 
   if (loading) return <p className="text-gray-500">Načítavam top zákazníkov...</p>;
   if (error) return <p className="text-red-500">Chyba: {error}</p>;
