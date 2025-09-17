@@ -50,7 +50,7 @@ export default function TopCustomers() {
               key={c.user_id}
               className="flex justify-between items-center bg-gray-700 bg-opacity-50 p-3 rounded-md"
             >
-              <span className="font-semibold text-yellow-300 w-6">{index + 1}</span>
+              <span className="font-semibold text-yellow-300 w-6">{index + 1}.</span>
               <span className="flex-1 text-white">{c.full_name}</span>
               <span className="font-bold text-yellow-400 px-2 py-1 rounded-lg bg-gray-900">
                 {c.orders_count} orders

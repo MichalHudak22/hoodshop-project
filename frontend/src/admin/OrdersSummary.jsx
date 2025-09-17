@@ -91,7 +91,7 @@ const [summaryRes, topProductsRes] = await Promise.all([
       ) : (
         <ul className="space-y-2 lg:space-y-3 text-base text-yellow-300">
           {topProducts.map((product, index) => (
-            <li key={index} className="flex justify-between">
+            <li key={index} className="flex justify-between text-yellow-300 ">
               <span className="font-medium text-white">{index + 1}. {product.name || 'Unknown'}</span>
               <span>{product.quantity ?? 0} ks</span>
             </li>
