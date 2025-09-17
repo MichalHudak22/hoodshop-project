@@ -16,7 +16,6 @@ const FeaturedFootballHighlights = () => {
     const fetchProducts = async (type, setter) => {
       try {
         const res = await axios.get(`${apiBase}/products/football/${type}`);
-        console.log(`[DEBUG] Fetched ${type}:`, res.data);
         const highlighted = res.data.filter(p => p.highlight_title && p.description);
         setter(highlighted.slice(0, 2));
       } catch (err) {
@@ -58,26 +57,7 @@ const FeaturedFootballHighlights = () => {
 
         <div className="w-full xl:w-[90%] 2xl:max-w-[90%] mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
           {featuredItems.map(({ name, product }, index) => {
-            // --- Debug logy ---
-            console.log(`[DEBUG] Product ${index}:`, product);
-            console.log(`[DEBUG] Raw image URL:`, product?.image);
-
-            let imageUrl = product?.image || '';
-
-            // 1️⃣ Oprava chybného https//
-            if (imageUrl.startsWith('https//')) {
-              console.warn(`[WARN] Fixing malformed URL for product ${product?.name}`);
-              imageUrl = imageUrl.replace('https//', 'https://');
-            }
-
-            // 2️⃣ Pridáme apiBase len ak imageUrl **skutočne nezačína http/https**
-            if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
-              imageUrl = `${apiBase}${imageUrl}`;
-            }
-
-            console.log(`[DEBUG] Final imageUrl:`, imageUrl);
-
-
+            const imageUrl = product?.image || ''; // 🔹 len Cloudinary URL
 
             return (
               <Link
