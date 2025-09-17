@@ -20,29 +20,29 @@ const FeaturedFootballHighlights = () => {
   useEffect(() => {
     setErrorMessage('');
 
-const fetchProducts = async (type, setter) => {
-  try {
-    const res = await axios.get(`${apiBase}/products/football/${type}`);
+    const fetchProducts = async (type, setter) => {
+      try {
+        const res = await axios.get(`${apiBase}/products/football/${type}`);
 
-    // 1️⃣ Dáta priamo z backendu
-    console.log(`[FETCHED ${type}] RAW:`, res.data.map(p => p.image));
+        // 1️⃣ Dáta priamo z backendu
+        console.log(`[FETCHED ${type}] RAW:`, res.data.map(p => p.image));
 
-    const highlighted = res.data
-      .filter((p) => p.highlight_title && p.description)
-      .map((p) => ({
-        ...p,
-        image: fixCloudinaryUrl(p.image),
-      }));
+        const highlighted = res.data
+          .filter((p) => p.highlight_title && p.description)
+          .map((p) => ({
+            ...p,
+            image: fixCloudinaryUrl(p.image),
+          }));
 
-    // 2️⃣ Dáta po fixCloudinaryUrl
-    console.log(`[FETCHED ${type}] FIXED:`, highlighted.map(p => p.image));
+        // 2️⃣ Dáta po fixCloudinaryUrl
+        console.log(`[FETCHED ${type}] FIXED:`, highlighted.map(p => p.image));
 
-    setter(highlighted.slice(0, 2));
-  } catch (err) {
-    console.error(`[ERROR] Fetch ${type} failed:`, err);
-    setErrorMessage(`Nepodarilo sa načítať football ${type}.`);
-  }
-};
+        setter(highlighted.slice(0, 2));
+      } catch (err) {
+        console.error(`[ERROR] Fetch ${type} failed:`, err);
+        setErrorMessage(`Nepodarilo sa načítať football ${type}.`);
+      }
+    };
 
 
     fetchProducts('ball', setFeaturedBalls);
@@ -88,13 +88,15 @@ const fetchProducts = async (type, setter) => {
               </h3>
 
               <div className="relative h-64 overflow-hidden shadow-lg group">
+                {console.log("🖼️ Rendering IMG:", product.image)}
                 <img
                   src={product.image}
                   alt={product?.highlight_title || `${name} default`}
+                  className="w-full h-full object-contain"
                 />
-
                 <div className="absolute inset-0 bg-black bg-opacity-10"></div>
               </div>
+
 
               <div className="bg-black bg-opacity-90 text-white text-sm p-4 flex-1">
                 {product?.description || `Explore top products from ${name}.`}
