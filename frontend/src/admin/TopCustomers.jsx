@@ -52,7 +52,7 @@ export default function TopCustomers() {
             >
               <span className="font-semibold text-yellow-300 w-6">{index + 1}.</span>
               <span className="flex-1 text-white">{c.full_name}</span>
-              <span className="font-bold text-yellow-400 px-2 py-1 pr-2 rounded-lg bg-gray-900">
+              <span className="font-bold text-yellow-400 px-2 py-1 mr-2 rounded-lg bg-gray-900">
                 {c.orders_count} orders
               </span>
               <span className="font-bold text-green-400 px-2 py-1 rounded-lg bg-gray-900">
