@@ -8,34 +8,24 @@ const FeaturedFootballHighlights = () => {
   const [featuredCleats, setFeaturedCleats] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const apiBase = import.meta.env.VITE_API_BASE_URL; // dynamická URL backendu
+  const apiBase = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
     setErrorMessage('');
 
-    // Lopty
-    axios.get(`${apiBase}/products/football/ball`)
-      .then(res => {
+    const fetchProducts = async (type, setter) => {
+      try {
+        const res = await axios.get(`${apiBase}/products/football/${type}`);
         const highlighted = res.data.filter(p => p.highlight_title && p.description);
-        setFeaturedBalls(highlighted.slice(0, 2));
-      })
-      .catch(() => setErrorMessage('Nepodarilo sa načítať football lôpt.'));
+        setter(highlighted.slice(0, 2));
+      } catch (err) {
+        setErrorMessage(`Nepodarilo sa načítať football ${type}.`);
+      }
+    };
 
-    // Dresy
-    axios.get(`${apiBase}/products/football/jersey`)
-      .then(res => {
-        const highlighted = res.data.filter(p => p.highlight_title && p.description);
-        setFeaturedJerseys(highlighted.slice(0, 2));
-      })
-      .catch(() => setErrorMessage('Nepodarilo sa načítať football dresov.'));
-
-    // Kopačky
-    axios.get(`${apiBase}/products/football/cleats`)
-      .then(res => {
-        const highlighted = res.data.filter(p => p.highlight_title && p.description);
-        setFeaturedCleats(highlighted.slice(0, 2));
-      })
-      .catch(() => setErrorMessage('Nepodarilo sa načítať football kopačiek.'));
+    fetchProducts('ball', setFeaturedBalls);
+    fetchProducts('jersey', setFeaturedJerseys);
+    fetchProducts('cleats', setFeaturedCleats);
   }, []);
 
   // Spojíme všetky produkty do jedného poľa
@@ -67,33 +57,38 @@ const FeaturedFootballHighlights = () => {
         )}
 
         <div className="w-full xl:w-[90%] 2xl:max-w-[90%] mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-          {featuredItems.map(({ name, product }, index) => (
-            <Link
-              key={`${name}-${index}`}
-              to={`/product/${product?.slug || ''}`}
-              className="flex flex-col h-full bg-white rounded-lg overflow-hidden shadow-lg hover:brightness-125 transition"
-            >
-              {/* Nadpis */}
-              <h3 className="py-4 px-3 text-[14px] md:min-h-[80px] font-bold bg-black text-white text-center">
-                {product?.highlight_title || `${name} Featured Product`}
-              </h3>
+          {featuredItems.map(({ name, product }, index) => {
+            // ✅ použiť priamo image z DB, či už je Cloudinary alebo full URL
+            const imageUrl = product?.image || '';
 
-              {/* Obrázok */}
-              <div className="relative h-64 overflow-hidden shadow-lg group">
-                <img
-                  src={product?.image} // ✅ Cloudinary URL priamo
-                  alt={product?.highlight_title || `${name} default`}
-                  className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-10"></div>
-              </div>
+            return (
+              <Link
+                key={`${name}-${index}`}
+                to={`/product/${product?.slug || ''}`}
+                className="flex flex-col h-full bg-white rounded-lg overflow-hidden shadow-lg hover:brightness-125 transition"
+              >
+                {/* Nadpis */}
+                <h3 className="py-4 px-3 text-[14px] md:min-h-[80px] font-bold bg-black text-white text-center">
+                  {product?.highlight_title || `${name} Featured Product`}
+                </h3>
 
-              {/* Popis */}
-              <div className="bg-black bg-opacity-90 text-white text-sm p-4 flex-1">
-                {product?.description || `Explore top products from ${name}.`}
-              </div>
-            </Link>
-          ))}
+                {/* Obrázok */}
+                <div className="relative h-64 overflow-hidden shadow-lg group">
+                  <img
+                    src={imageUrl}
+                    alt={product?.highlight_title || `${name} default`}
+                    className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-10"></div>
+                </div>
+
+                {/* Popis */}
+                <div className="bg-black bg-opacity-90 text-white text-sm p-4 flex-1">
+                  {product?.description || `Explore top products from ${name}.`}
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </section>
