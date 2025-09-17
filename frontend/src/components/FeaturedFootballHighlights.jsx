@@ -64,18 +64,19 @@ const FeaturedFootballHighlights = () => {
 
             let imageUrl = product?.image || '';
 
-            // Oprava chybného https//
+            // 1️⃣ Oprava chybného https//
             if (imageUrl.startsWith('https//')) {
               console.warn(`[WARN] Fixing malformed URL for product ${product?.name}`);
               imageUrl = imageUrl.replace('https//', 'https://');
             }
 
-            // Teraz pridáme apiBase len ak image URL **nie je platná https URL**
-            if (!imageUrl.startsWith('http')) {
+            // 2️⃣ Pridáme apiBase len ak imageUrl **skutočne nezačína http/https**
+            if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
               imageUrl = `${apiBase}${imageUrl}`;
             }
 
             console.log(`[DEBUG] Final imageUrl:`, imageUrl);
+
 
 
             return (
