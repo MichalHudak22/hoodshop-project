@@ -3,48 +3,48 @@ const db = require('../database');          // tvoje existujúce db.js
 const fs = require('fs');
 const path = require('path');
 
-async function uploadAllProducts() {
-const baseDir = path.join(__dirname, '..', 'src', 'img', 'products'); // správna cesta vzhľadom na cloudinary
+async function uploadFootballJerseys() {
+  try {
+    // cesta k priečinku s obrázkami football/jerseys
+    const baseDir = path.join(__dirname, '..', 'src', 'img', 'products', 'football', 'jerseys');
 
-  const categories = fs.readdirSync(baseDir); // football, hockey, cycling ...
+    if (!fs.existsSync(baseDir) || !fs.statSync(baseDir).isDirectory()) {
+      console.error('❌ Cesta k priečinku neexistuje alebo nie je priečinok:', baseDir);
+      return;
+    }
 
-  for (const category of categories) {
-    const categoryPath = path.join(baseDir, category);
-    if (!fs.statSync(categoryPath).isDirectory()) continue;
+    const files = fs.readdirSync(baseDir);
 
-    const types = fs.readdirSync(categoryPath); // balls, cleats, jerseys ...
+    for (const file of files) {
+      const filePath = path.join(baseDir, file);
+      const slug = path.parse(file).name; // napr. 'jersey1.jpg' -> 'jersey1'
 
-    for (const type of types) {
-      const typePath = path.join(categoryPath, type);
-      if (!fs.statSync(typePath).isDirectory()) continue;
+      try {
+        // Upload na Cloudinary
+        const result = await cloudinary.uploader.upload(filePath, {
+          folder: `products/football/jerseys`,
+        });
 
-      const files = fs.readdirSync(typePath);
+        console.log(`✅ ${file} uploaded: ${result.secure_url}`);
 
-      for (const file of files) {
-        const filePath = path.join(typePath, file);
-        const slug = path.parse(file).name; // napr. ball2.jpg -> 'ball2'
+        // Aktualizácia stĺpca 'image' v DB podľa slugu
+        await db.query(
+          'UPDATE products SET image = ? WHERE slug = ?',
+          [result.secure_url, slug]
+        );
 
-        try {
-          // Upload do Cloudinary
-          const result = await cloudinary.uploader.upload(filePath, {
-            folder: `products/${category}/${type}`,
-          });
-
-          console.log(`${file} uploaded: ${result.secure_url}`);
-
-          // Aktualizácia databázy podľa slugu
-          await db.query(
-            'UPDATE products SET image = ? WHERE slug = ?',
-            [result.secure_url, slug]
-          );
-        } catch (err) {
-          console.error(`Chyba pri uploadovaní ${file}:`, err.message);
-        }
+      } catch (err) {
+        console.error(`❌ Chyba pri uploadovaní ${file}:`, err);
       }
     }
-  }
 
-  console.log('✅ Upload všetkých produktov dokončený!');
+    console.log('🎉 Upload football/jerseys dokončený!');
+  } catch (err) {
+    console.error('❌ Chyba pri spracovaní priečinku:', err);
+  } finally {
+    db.end(); // uzavrieme pool pripojení
+  }
 }
 
-uploadAllProducts();
+// Spustenie skriptu
+uploadFootballJerseys();
