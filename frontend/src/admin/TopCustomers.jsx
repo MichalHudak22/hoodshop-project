@@ -37,9 +37,9 @@ export default function TopCustomers() {
 
   return (
     <section className="p-6 bg-gray-800 bg-opacity-70 rounded-2xl shadow-lg max-w-3xl mx-auto">
-      <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center text-blue-200">
+      <h3 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-5 text-center text-blue-200">
         🏆 Top 5 zákazníkov
-      </h2>
+      </h3>
 
       {customers.length === 0 ? (
         <p className="text-center text-gray-400">Žiadne dáta k dispozícii.</p>

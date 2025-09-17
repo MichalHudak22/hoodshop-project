@@ -203,7 +203,7 @@ const getTopCustomers = async (req, res) => {
       WHERE o.user_id IS NOT NULL
       GROUP BY o.user_id, o.full_name
       ORDER BY total_spent DESC
-      LIMIT 5
+      LIMIT 10
     `);
 
     res.json(customers);
