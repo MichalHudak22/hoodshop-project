@@ -58,14 +58,15 @@ const FootballJerseys = () => {
     setTimeout(() => setMessage(''), 3000);
   };
 
-  const slides = Array.isArray(jerseys) ? jerseys.map(product => ({
-    id: product.id,
-    name: product.name,
-    brand: product.brand,
-    price: product.price,
-    image: product.image?.trim(), // iba URL z databázy / Cloudinary
-    slug: product.slug,
-  })) : [];
+const slides = Array.isArray(jerseys) ? jerseys.map(product => ({
+  id: product.id,
+  name: product.name,
+  brand: product.brand,
+  price: product.price,
+  image: product.image?.trim(), // ✅ iba URL z databázy (Cloudinary)
+  slug: product.slug,
+})) : [];
+
 
   const highlightedJerseys = Array.isArray(jerseys)
     ? jerseys.filter(jersey => jersey.highlight_title && jersey.description)
