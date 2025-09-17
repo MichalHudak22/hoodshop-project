@@ -31,12 +31,12 @@ function AdminPage() {
         {/* GRID LAYOUT: Summary, Users */}
         <div className="grid gap-5 grid-cols-1 lg:grid-cols-2 xl:grid-cols-6">
           {/* OrdersSummary */}
-          <div className="lg:col-span-1 xl:col-span-3 bg-black bg-opacity-70 md:rounded-xl md:px-20 xl:px-0 p-5 shadow-lg border border-gray-700">
+          <div className="lg:col-span-1 xl:col-span-3 bg-black bg-opacity-70 md:rounded-xl md:px-20 lg:px-0 p-5 shadow-lg border border-gray-700">
             <OrdersSummary />
           </div>
 
           {/* TopCustomers */}
-          <div className="lg:col-span-1 xl:col-span-3 bg-black bg-opacity-70 md:rounded-xl md:px-20 xl:px-0 p-5 shadow-lg border border-gray-700">
+          <div className="lg:col-span-1 xl:col-span-3 bg-black bg-opacity-70 md:rounded-xl md:px-20 lg:px-0 p-5 shadow-lg border border-gray-700">
             <TopCustomers />
           </div>
 
