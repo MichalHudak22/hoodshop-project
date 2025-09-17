@@ -11,7 +11,7 @@ const FeaturedFootballHighlights = () => {
   const baseURL = import.meta.env.VITE_API_BASE_URL; // iba pre API
 
   useEffect(() => {
-    setErrorMessage(''); // Vyčistí chybu pred načítaním
+    setErrorMessage('');
 
     // Lopty
     axios.get(`${baseURL}/products/football/ball`)
@@ -19,9 +19,7 @@ const FeaturedFootballHighlights = () => {
         const highlightedBalls = response.data.filter(ball => ball.highlight_title && ball.description);
         setFeaturedBalls(highlightedBalls.slice(0, 2));
       })
-      .catch(() => {
-        setErrorMessage('Nepodarilo sa načítať football lôpt.');
-      });
+      .catch(() => setErrorMessage('Nepodarilo sa načítať football lôpt.'));
 
     // Dresy
     axios.get(`${baseURL}/products/football/jersey`)
@@ -29,9 +27,7 @@ const FeaturedFootballHighlights = () => {
         const highlightedJerseys = response.data.filter(jersey => jersey.highlight_title && jersey.description);
         setFeaturedJerseys(highlightedJerseys.slice(0, 2));
       })
-      .catch(() => {
-        setErrorMessage('Nepodarilo sa načítať football dresov.');
-      });
+      .catch(() => setErrorMessage('Nepodarilo sa načítať football dresov.'));
 
     // Kopačky
     axios.get(`${baseURL}/products/football/cleats`)
@@ -39,37 +35,31 @@ const FeaturedFootballHighlights = () => {
         const highlightedCleats = response.data.filter(cleat => cleat.highlight_title && cleat.description);
         setFeaturedCleats(highlightedCleats.slice(0, 2));
       })
-      .catch(() => {
-        setErrorMessage('Nepodarilo sa načítať football kopačiek.');
-      });
+      .catch(() => setErrorMessage('Nepodarilo sa načítať football kopačiek.'));
   }, []);
 
   // Spojenie všetkých produktov do jedného poľa
   const featuredItems = [];
-
   for (let i = 0; i < 2; i++) {
     if (featuredJerseys[i]) {
-      featuredItems.push({
-        name: "Nike",
-        product: featuredJerseys[i],
-        defaultBg: "/img/nike-jersey.jpg",
-      });
+      featuredItems.push({ name: "Nike", product: featuredJerseys[i], defaultBg: "/img/nike-jersey.jpg" });
     }
     if (featuredCleats[i]) {
-      featuredItems.push({
-        name: "Puma",
-        product: featuredCleats[i],
-        defaultBg: "/img/puma-cleats.jpg",
-      });
+      featuredItems.push({ name: "Puma", product: featuredCleats[i], defaultBg: "/img/puma-cleats.jpg" });
     }
     if (featuredBalls[i]) {
-      featuredItems.push({
-        name: "Adidas",
-        product: featuredBalls[i],
-        defaultBg: "/img/adidas-ball.jpg",
-      });
+      featuredItems.push({ name: "Adidas", product: featuredBalls[i], defaultBg: "/img/adidas-ball.jpg" });
     }
   }
+
+  // Funkcia pre správne Cloudinary URL
+  const getImageUrl = (image, defaultBg) => {
+    if (!image) return defaultBg;
+    const trimmed = image.trim();
+    if (trimmed.startsWith('http')) return trimmed;        // úplná URL
+    if (trimmed.startsWith('//')) return `https:${trimmed}`; // //cloudinary -> https://cloudinary
+    return defaultBg; // fallback
+  };
 
   return (
     <section
@@ -102,11 +92,7 @@ const FeaturedFootballHighlights = () => {
               {/* Obrázok s efektom priblíženia */}
               <div className="relative h-64 overflow-hidden shadow-lg group">
                 <img
-                  src={product 
-                        ? product.image.trim().startsWith('http')
-                            ? product.image.trim()  // Cloudinary URL
-                            : `${baseURL}${product.image.trim()}` // iba ak nie je HTTP (lokálne)
-                        : defaultBg} // fallback
+                  src={getImageUrl(product?.image, defaultBg)}
                   alt={product?.highlight_title || `${name} default`}
                   className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-110"
                 />
