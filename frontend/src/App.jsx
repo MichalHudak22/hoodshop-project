@@ -80,7 +80,7 @@ function App() {
               <Route path="/sports/hockey/skates" element={<HockeySkates />} />
               <Route path="/sports/hockey/helmets" element={<HockeyHelmets />} />
               <Route path="/sports/cycling" element={<CyclingPage />} />
-              <Route path="/sports/cycling/bike" element={<CyklingBikes />} />
+              <Route path="/sports/cycling/bikes" element={<CyklingBikes />} />
               <Route path="/sports/cycling/gloves" element={<CyclingGloves />} />
               <Route path="/sports/cycling/helmets" element={<CyclingHelmets />} />
               <Route path="/sports/cycling/clothes" element={<CyclingClothes />} />

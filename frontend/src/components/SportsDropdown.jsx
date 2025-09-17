@@ -94,7 +94,7 @@ const SportsDropdown = () => {
             <div className="relative z-10 flex flex-col items-center space-y-2 py-10">
               <Link to="/sports/cycling" className="text-[#dce5ff] text-3xl mb-2 border-b font-bold">Cycling</Link>
               <Link to="/sports/cycling/clothes" className="hover:text-[#dce5ff] text-2xl">Clothing</Link>
-              <Link to="/sports/cycling/bike" className="hover:text-[#dce5ff] text-2xl">Bikes</Link>
+              <Link to="/sports/cycling/bikes" className="hover:text-[#dce5ff] text-2xl">Bikes</Link>
               <Link to="/sports/cycling/helmets" className="hover:text-[#dce5ff] text-2xl">Helmets</Link>
               <Link to="/sports/cycling/gloves" className="hover:text-[#dce5ff] text-2xl">Gloves</Link>
             </div>
