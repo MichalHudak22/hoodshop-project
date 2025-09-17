@@ -7,6 +7,8 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
+const baseURL = import.meta.env.VITE_API_BASE_URL || '';
+
 const ProductsCarousel = ({ slides, handleAddToCart }) => {
   const [loadingIds, setLoadingIds] = useState([]);
 
@@ -35,7 +37,7 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
         navigation
         pagination={{
           clickable: true,
-          el: '.custom-pagination',
+          el: '.custom-pagination', // 👈 vlastný container
         }}
         spaceBetween={20}
         breakpoints={{
@@ -52,49 +54,59 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
           const productSlug = slide.slug;
           const isLoading = loadingIds.includes(slide.id);
 
-          // Použijeme iba URL z databázy (Cloudinary)
-          const imageUrl = slide.image.trim();
+          const imageUrl = slide.image.startsWith('http')
+            ? slide.image
+            : `${baseURL}${slide.image}`;
 
           return (
-            <SwiperSlide key={index}>
-              <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-start p-4 text-center hover:shadow-xl transition relative">
-                <h2 className="h-[42px] text-lg font-bold mb-1 text-black">
-                  <Link
-                    to={`/product/${productSlug}`}
-                    className="hover:underline"
-                  >
-                    {slide.name}
-                  </Link>
-                </h2>
+          <SwiperSlide key={index}>
+  <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-start p-4 text-center hover:shadow-xl transition relative">
+    
+    {/* Názov s odkazom */}
+    <h2 className="h-[42px] text-lg font-bold mb-1 text-black">
+      <Link 
+        to={`/product/${productSlug}`} 
+        className="hover:underline"
+      >
+        {slide.name}
+      </Link>
+    </h2>
 
-                <p className="text-sm text-gray-600 my-2">{slide.brand}</p>
+    {/* Značka */}
+    <p className="text-sm text-gray-600 my-2">{slide.brand}</p>
 
-                <Link to={`/product/${productSlug}`} className="block">
-                  <img
-                    src={imageUrl}
-                    alt={slide.name}
-                    className="h-[180px] mb-2 transition duration-300 hover:brightness-110"
-                  />
-                </Link>
+    {/* Obrázok ako odkaz */}
+    <Link to={`/product/${productSlug}`} className="block">
+      <img
+        src={imageUrl}
+        alt={slide.name}
+        className="h-[180px] mb-2 transition duration-300 hover:brightness-110"
+      />
+    </Link>
 
-                <p className="text-green-600 text-xl font-semibold mb-1">
-                  {slide.price} €
-                </p>
+    {/* Cena */}
+    <p className="text-green-600 text-xl font-semibold mb-1">
+      {slide.price} €
+    </p>
 
-                <button
-                  onClick={() => handleClick(slide)}
-                  disabled={isLoading}
-                  className={`mt-2 w-full py-2 rounded-xl bg-blue-700 text-white font-semibold hover:bg-blue-600 transition ${isLoading ? 'opacity-50 cursor-not-allowed' : ''
-                    }`}
-                >
-                  {isLoading ? 'Pridávam...' : 'Add to Cart'}
-                </button>
-              </div>
-            </SwiperSlide>
+    {/* Add to Cart tlačidlo */}
+    <button
+      onClick={() => handleClick(slide)}
+      disabled={isLoading}
+      className={`mt-2 w-full py-2 rounded-xl bg-blue-700 text-white font-semibold hover:bg-blue-600 transition ${
+        isLoading ? 'opacity-50 cursor-not-allowed' : ''
+      }`}
+    >
+      {isLoading ? 'Pridávam...' : 'Add to Cart'}
+    </button>
+  </div>
+</SwiperSlide>
+
           );
         })}
       </Swiper>
 
+      {/* 👇 vlastný pagination container pod sliderom */}
       <div className="custom-pagination flex justify-center mt-4"></div>
 
       <style>{`

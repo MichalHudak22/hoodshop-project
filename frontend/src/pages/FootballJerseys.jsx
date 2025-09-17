@@ -13,17 +13,19 @@ const FootballJerseys = () => {
 
   const baseURL = 'https://hoodshop-project.onrender.com';
 
-  useEffect(() => {
-    axios.get(`${baseURL}/products/football/jersey`)
-      .then(response => {
-        console.log('Response from backend:', response.data);
-        setJerseys(Array.isArray(response.data) ? response.data : response.data.products || []);
-      })
-      .catch(error => {
-        console.error('Chyba pri načítavaní football dresov:', error);
-        setJerseys([]);
-      });
-  }, []);
+
+useEffect(() => {
+  axios.get(`${baseURL}/products/football/jersey`)
+    .then(response => {
+      console.log('Response from backend:', response.data); // <-- tu vidíš, čo je
+      setJerseys(Array.isArray(response.data) ? response.data : response.data.products || []);
+    })
+    .catch(error => {
+      console.error('Chyba pri načítavaní football dresov:', error);
+      setJerseys([]);
+    });
+}, []);
+
 
   const handleAddToCart = async (jersey) => {
     const sessionId = localStorage.getItem("sessionId");
@@ -47,15 +49,16 @@ const FootballJerseys = () => {
       if (response.ok) {
         setMessage("Product added to cart!");
         refreshCartCount();
+        setTimeout(() => setMessage(''), 3000);
       } else {
         setMessage("Failed to add to cart: " + data.message);
+        setTimeout(() => setMessage(''), 3000);
       }
     } catch (error) {
       console.error("Error adding to cart:", error);
       setMessage("Error adding to cart");
+      setTimeout(() => setMessage(''), 3000);
     }
-
-    setTimeout(() => setMessage(''), 3000);
   };
 
 const slides = Array.isArray(jerseys) ? jerseys.map(product => ({
@@ -63,14 +66,13 @@ const slides = Array.isArray(jerseys) ? jerseys.map(product => ({
   name: product.name,
   brand: product.brand,
   price: product.price,
-  image: product.image?.trim(), // ✅ iba URL z databázy (Cloudinary)
+  image: `${baseURL}${product.image}`,
   slug: product.slug,
 })) : [];
 
-
-  const highlightedJerseys = Array.isArray(jerseys)
-    ? jerseys.filter(jersey => jersey.highlight_title && jersey.description)
-    : [];
+const highlightedJerseys = Array.isArray(jerseys)
+  ? jerseys.filter(jersey => jersey.highlight_title && jersey.description)
+  : [];
 
   const featuredJersey = highlightedJerseys[0];
   const featuredJersey2 = highlightedJerseys[1];

@@ -1,10 +1,11 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // nezabudni na import
 
 const FeaturedProductReversed = ({ product, handleAddToCart, backgroundImage }) => {
   if (!product) return null;
 
   const productSlug = product.name.toLowerCase().replace(/\s+/g, '-');
+  const baseURL = 'https://hoodshop-project.onrender.com'; // produkčný backend
 
   return (
     <section className="relative py-10 md:py-16 px-6 mb-10 bg-black overflow-hidden border-b-4 border-black">
@@ -25,10 +26,10 @@ const FeaturedProductReversed = ({ product, handleAddToCart, backgroundImage }) 
         </h1>
         <div className="flex flex-col md:flex-row-reverse items-center justify-center gap-8">
           
-          {/* Obrázok načítaný priamo z Cloudinary */}
+          {/* OBÁLENIE obrázku do Link komponentu */}
           <Link to={`/product/${productSlug}`}>
             <img
-              src={product.image.trim()}
+              src={`${baseURL}${product.image}`} // <-- tu je zmena
               alt={product.name}
               className="w-[70%] mx-auto md:max-w-sm rounded-lg shadow-xl object-contain hover:brightness-110"
             />
