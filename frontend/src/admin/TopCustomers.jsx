@@ -12,20 +12,13 @@ export default function TopCustomers() {
       try {
         const res = await fetch(`${API_BASE_URL}/api/orders/top-customers`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, 
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
 
-        if (!res.ok) {
-          throw new Error(`Chyba pri načítaní: ${res.status}`);
-        }
-
+        if (!res.ok) throw new Error(`Chyba pri načítaní: ${res.status}`);
         const data = await res.json();
-
-        // Kontrola, či naozaj je pole
-        if (!Array.isArray(data)) {
-          throw new Error("Neočakávaná odpoveď zo servera");
-        }
+        if (!Array.isArray(data)) throw new Error("Neočakávaná odpoveď zo servera");
 
         setCustomers(data);
       } catch (err) {
@@ -39,32 +32,36 @@ export default function TopCustomers() {
     fetchTopCustomers();
   }, [API_BASE_URL]);
 
-  if (loading) return <p className="text-gray-500">Načítavam top zákazníkov...</p>;
-  if (error) return <p className="text-red-500">Chyba: {error}</p>;
+  if (loading) return <p className="text-center text-blue-400">Načítavam top zákazníkov...</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
-    <section className="p-6 bg-white rounded-2xl shadow-md">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">🏆 Top 5 zákazníkov</h2>
-      <table className="min-w-full border border-gray-200 rounded-lg">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="p-2 border">#</th>
-            <th className="p-2 border">Meno</th>
-            <th className="p-2 border">Počet objednávok</th>
-            <th className="p-2 border">Spolu zaplatené (€)</th>
-          </tr>
-        </thead>
-        <tbody>
+    <section className="p-6 bg-gray-800 bg-opacity-70 rounded-2xl shadow-lg max-w-3xl mx-auto">
+      <h2 className="text-2xl md:text-3xl font-bold mb-6 text-center text-blue-200">
+        🏆 Top 5 zákazníkov
+      </h2>
+
+      {customers.length === 0 ? (
+        <p className="text-center text-gray-400">Žiadne dáta k dispozícii.</p>
+      ) : (
+        <div className="flex flex-col space-y-3">
           {customers.map((c, index) => (
-            <tr key={c.user_id} className="text-center">
-              <td className="p-2 border font-semibold">{index + 1}</td>
-              <td className="p-2 border">{c.full_name}</td>
-              <td className="p-2 border">{c.orders_count}</td>
-              <td className="p-2 border">{Number(c.total_spent).toFixed(2)}</td>
-            </tr>
+            <div
+              key={c.user_id}
+              className="flex justify-between items-center bg-gray-700 bg-opacity-50 p-3 rounded-md"
+            >
+              <span className="font-semibold text-yellow-300 w-6">{index + 1}</span>
+              <span className="flex-1 text-white">{c.full_name}</span>
+              <span className="font-bold text-yellow-400 px-2 py-1 rounded-lg bg-gray-900">
+                {c.orders_count} objednávok
+              </span>
+              <span className="font-bold text-green-400 px-2 py-1 rounded-lg bg-gray-900">
+                {Number(c.total_spent).toFixed(2)} €
+              </span>
+            </div>
           ))}
-        </tbody>
-      </table>
+        </div>
+      )}
     </section>
   );
 }
