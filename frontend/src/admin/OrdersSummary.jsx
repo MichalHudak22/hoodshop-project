@@ -50,7 +50,7 @@ function OrdersSummary() {
   const pointsToEuro = (points) => (points / 10).toFixed(2);
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="lg:p-6 space-y-4">
       <h3 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-5 text-center text-blue-200">
         Orders Summary
       </h3>
