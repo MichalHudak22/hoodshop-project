@@ -36,9 +36,9 @@ export default function TopCustomers() {
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
-    <section className="p-6 bg-gray-800 bg-opacity-70 rounded-2xl shadow-lg max-w-3xl mx-auto">
+    <section className="p-6 max-w-3xl mx-auto">
       <h3 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-5 text-center text-blue-200">
-        🏆 Top 5 zákazníkov
+        Top 5 zákazníkov
       </h3>
 
       {customers.length === 0 ? (
