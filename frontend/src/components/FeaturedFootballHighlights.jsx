@@ -13,9 +13,14 @@ const FeaturedFootballHighlights = () => {
   // Funkcia na opravu Cloudinary URL
   const fixCloudinaryUrl = (url) => {
     if (!url) return '';
-    if (url.startsWith('https//')) return url.replace('https//', 'https://'); // opraví chýbajúcu dvojbodku
-    return url;
+    // ak tam chýba dvojbodka po https
+    if (url.startsWith('https//')) return url.replace('https//', 'https://');
+    // ak URL začína normalne https, nechaj tak
+    if (url.startsWith('http')) return url;
+    // ak je to relatívna cesta /img/..., pridaj baseURL pre Render
+    return `${apiBase}${url}`;
   };
+
 
   useEffect(() => {
     setErrorMessage('');
@@ -89,11 +94,8 @@ const FeaturedFootballHighlights = () => {
 
               <div className="relative h-64 overflow-hidden shadow-lg group">
                 {console.log("🖼️ Rendering IMG:", product.image)}
-                <img
-                  src={product.image}
-                  alt={product?.highlight_title || `${name} default`}
-                  className="w-full h-full object-contain"
-                />
+                <img src={fixCloudinaryUrl(product.image)} alt={product.highlight_title} />
+
                 <div className="absolute inset-0 bg-black bg-opacity-10"></div>
               </div>
 
