@@ -86,12 +86,23 @@ const getProductsByCategoryAndType = async (req, res) => {
 
   try {
     const [rows] = await db.query(sql, [category, type]);
-    res.json(rows);
+
+    // 🔧 tu upravíme URL
+    const fixedRows = rows.map(p => {
+      let image = p.image;
+      if (image && image.startsWith('https//')) {
+        image = image.replace('https//', 'https://');
+      }
+      return { ...p, image };
+    });
+
+    res.json(fixedRows);
   } catch (err) {
     console.error("DB error getProductsByCategoryAndType:", err);
     res.status(500).json({ error: "Chyba servera" });
   }
 };
+
 
 
 // GET search products by name (q= query param)

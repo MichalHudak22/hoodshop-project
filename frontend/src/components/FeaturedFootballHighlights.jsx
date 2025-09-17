@@ -80,10 +80,10 @@ const FeaturedFootballHighlights = () => {
 
               <div className="relative h-64 overflow-hidden shadow-lg group">
                 <img
-                  src={fixCloudinaryUrl(product.image)} // ✅ vždy iba Cloudinary URL
+                  src={product.image}
                   alt={product?.highlight_title || `${name} default`}
-                  className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-110"
                 />
+
                 <div className="absolute inset-0 bg-black bg-opacity-10"></div>
               </div>
 
