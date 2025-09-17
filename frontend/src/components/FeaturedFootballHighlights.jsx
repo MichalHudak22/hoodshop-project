@@ -38,7 +38,6 @@ const FeaturedFootballHighlights = () => {
       .catch(() => setErrorMessage('Nepodarilo sa načítať football kopačiek.'));
   }, []);
 
-  // Spojenie všetkých produktov do jedného poľa
   const featuredItems = [];
   for (let i = 0; i < 2; i++) {
     if (featuredJerseys[i]) featuredItems.push({ name: "Nike", product: featuredJerseys[i] });
