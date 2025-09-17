@@ -50,7 +50,7 @@ const [summaryRes, topProductsRes] = await Promise.all([
   const pointsToEuro = (points) => (points / 10).toFixed(2);
 
   return (
-   <div className="p-6 bg-gray-800 bg-opacity-50 rounded-md space-y-4">
+   <div className="p-6 space-y-4">
   <h3 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-5 text-center text-blue-200">
     Orders Summary
   </h3>
