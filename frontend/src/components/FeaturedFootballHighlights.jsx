@@ -10,13 +10,22 @@ const FeaturedFootballHighlights = () => {
 
   const apiBase = import.meta.env.VITE_API_BASE_URL;
 
+  // Funkcia na opravu Cloudinary URL
+  const fixCloudinaryUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('https//')) return url.replace('https//', 'https://');
+    return url;
+  };
+
   useEffect(() => {
     setErrorMessage('');
 
     const fetchProducts = async (type, setter) => {
       try {
         const res = await axios.get(`${apiBase}/products/football/${type}`);
-        const highlighted = res.data.filter(p => p.highlight_title && p.description);
+        const highlighted = res.data
+          .filter(p => p.highlight_title && p.description)
+          .map(p => ({ ...p, image: fixCloudinaryUrl(p.image) })); // ✅ oprava URL
         setter(highlighted.slice(0, 2));
       } catch (err) {
         console.error(`[ERROR] Fetch ${type} failed:`, err);
@@ -29,7 +38,7 @@ const FeaturedFootballHighlights = () => {
     fetchProducts('cleats', setFeaturedCleats);
   }, []);
 
-  // Spojíme všetky produkty do jedného poľa
+  // Spojíme produkty do jedného poľa
   const featuredItems = [];
   for (let i = 0; i < 2; i++) {
     if (featuredJerseys[i]) featuredItems.push({ name: 'Nike', product: featuredJerseys[i] });
@@ -56,41 +65,30 @@ const FeaturedFootballHighlights = () => {
         {errorMessage && <p className="text-red-500 text-center mb-4">{errorMessage}</p>}
 
         <div className="w-full xl:w-[90%] 2xl:max-w-[90%] mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-          {featuredItems.map(({ name, product }, index) => {
-            const imageUrl = product?.image || ''; // 🔹 len Cloudinary URL
+          {featuredItems.map(({ name, product }, index) => (
+            <Link
+              key={`${name}-${index}`}
+              to={`/product/${product?.slug || ''}`}
+              className="flex flex-col h-full bg-white rounded-lg overflow-hidden shadow-lg hover:brightness-125 transition"
+            >
+              <h3 className="py-4 px-3 text-[14px] md:min-h-[80px] font-bold bg-black text-white text-center">
+                {product?.highlight_title || `${name} Featured Product`}
+              </h3>
 
-            // ✅ Pridáme apiBase len ak URL nie je absolútna
-            const finalImageUrl = imageUrl.startsWith('http://') || imageUrl.startsWith('https://')
-              ? imageUrl
-              : `${apiBase}${imageUrl}`;
+              <div className="relative h-64 overflow-hidden shadow-lg group">
+                <img
+                  src={product.image} // ✅ len Cloudinary URL
+                  alt={product?.highlight_title || `${name} default`}
+                  className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-10"></div>
+              </div>
 
-
-            return (
-              <Link
-                key={`${name}-${index}`}
-                to={`/product/${product?.slug || ''}`}
-                className="flex flex-col h-full bg-white rounded-lg overflow-hidden shadow-lg hover:brightness-125 transition"
-              >
-                <h3 className="py-4 px-3 text-[14px] md:min-h-[80px] font-bold bg-black text-white text-center">
-                  {product?.highlight_title || `${name} Featured Product`}
-                </h3>
-
-                <div className="relative h-64 overflow-hidden shadow-lg group">
-                  <img
-                    src={finalImageUrl}
-                    alt={product?.highlight_title || `${name} default`}
-                    className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-110"
-                  />
-
-                  <div className="absolute inset-0 bg-black bg-opacity-10"></div>
-                </div>
-
-                <div className="bg-black bg-opacity-90 text-white text-sm p-4 flex-1">
-                  {product?.description || `Explore top products from ${name}.`}
-                </div>
-              </Link>
-            );
-          })}
+              <div className="bg-black bg-opacity-90 text-white text-sm p-4 flex-1">
+                {product?.description || `Explore top products from ${name}.`}
+              </div>
+            </Link>
+          ))}
         </div>
       </div>
     </section>
