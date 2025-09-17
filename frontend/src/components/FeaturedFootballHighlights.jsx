@@ -58,10 +58,9 @@ const FeaturedFootballHighlights = () => {
 
         <div className="w-full xl:w-[90%] 2xl:max-w-[90%] mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
           {featuredItems.map(({ name, product }, index) => {
-            // ✅ použiť priamo image z DB, či už je Cloudinary alebo full URL
-            const imageUrl = product?.image || '';
-
-
+            // ✅ Ak image začína "http", použije sa priamo Cloudinary URL
+            // ✅ Inak pridá apiBase pred lokálnu cestu
+            const imageUrl = product?.image?.startsWith('http') ? product.image : `${apiBase}${product.image}`;
 
             return (
               <Link
