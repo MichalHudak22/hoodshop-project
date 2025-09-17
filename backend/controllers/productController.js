@@ -84,7 +84,6 @@ const getProductsByCategoryAndType = async (req, res) => {
   const { category, type } = req.params;
   const sql = "SELECT * FROM products WHERE category = ? AND type = ? AND is_active = 1";
 
-
   try {
     const [rows] = await db.query(sql, [category, type]);
     res.json(rows);
@@ -166,13 +165,16 @@ const addProduct = async (req, res) => {
   const {
     name, category, brand, price,
     type, description, slug,
-    highlight_title, carousel_group,
-    image // <-- tu očakávame plný Cloudinary URL
+    highlight_title, carousel_group
   } = req.body;
 
-  if (!name || !category || !brand || !price || !type || !description || !slug || !image) {
-    return res.status(400).json({ error: 'Chýbajú povinné polia alebo obrázok (Cloudinary URL)' });
+  if (!name || !category || !brand || !price || !type || !description || !slug || !req.file) {
+    return res.status(400).json({ error: 'Chýbajú povinné polia alebo obrázok' });
   }
+
+  // Pridáme prefix cesty k obrázku
+  const imagePath = `/img/${category}/${type}/${req.file.filename}`;
+
 
   const sql = `
     INSERT INTO products
@@ -182,14 +184,7 @@ const addProduct = async (req, res) => {
 
   try {
     const [result] = await db.query(sql, [
-      name,
-      category,
-      brand,
-      price,
-      image, // <-- uložíme priamo Cloudinary URL
-      type,
-      description,
-      slug,
+      name, category, brand, price, imagePath, type, description, slug,
       highlight_title || null,
       carousel_group || null
     ]);
@@ -197,7 +192,7 @@ const addProduct = async (req, res) => {
     res.status(201).json({
       message: 'Product was successfully added.',
       productId: result.insertId,
-      imageUrl: image,
+      imagePath,
     });
   } catch (err) {
     console.error('DB error addProduct:', err);

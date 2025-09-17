@@ -13,7 +13,7 @@ const FeaturedFootballHighlights = () => {
   // Funkcia na opravu Cloudinary URL
   const fixCloudinaryUrl = (url) => {
     if (!url) return '';
-    if (url.startsWith('https//')) return url.replace('https//', 'https://');
+    if (url.startsWith('https//')) return url.replace('https//', 'https://'); // opraví chýbajúcu dvojbodku
     return url;
   };
 
@@ -24,8 +24,11 @@ const FeaturedFootballHighlights = () => {
       try {
         const res = await axios.get(`${apiBase}/products/football/${type}`);
         const highlighted = res.data
-          .filter(p => p.highlight_title && p.description)
-          .map(p => ({ ...p, image: fixCloudinaryUrl(p.image) })); // ✅ oprava URL
+          .filter((p) => p.highlight_title && p.description)
+          .map((p) => ({
+            ...p,
+            image: fixCloudinaryUrl(p.image), // ✅ tu už obrázok zostane čisto Cloudinary
+          }));
         setter(highlighted.slice(0, 2));
       } catch (err) {
         console.error(`[ERROR] Fetch ${type} failed:`, err);
@@ -36,7 +39,7 @@ const FeaturedFootballHighlights = () => {
     fetchProducts('ball', setFeaturedBalls);
     fetchProducts('jersey', setFeaturedJerseys);
     fetchProducts('cleats', setFeaturedCleats);
-  }, []);
+  }, [apiBase]);
 
   // Spojíme produkty do jedného poľa
   const featuredItems = [];
@@ -77,7 +80,7 @@ const FeaturedFootballHighlights = () => {
 
               <div className="relative h-64 overflow-hidden shadow-lg group">
                 <img
-                  src={product.image} // ✅ len Cloudinary URL
+                  src={fixCloudinaryUrl(product.image)} // ✅ vždy iba Cloudinary URL
                   alt={product?.highlight_title || `${name} default`}
                   className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-110"
                 />
