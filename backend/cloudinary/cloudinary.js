@@ -1,3 +1,6 @@
+// cloudinary.js
+require('dotenv').config(); // načítanie .env súboru
+
 const cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
