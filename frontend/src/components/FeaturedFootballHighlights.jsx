@@ -16,10 +16,11 @@ const FeaturedFootballHighlights = () => {
     const fetchProducts = async (type, setter) => {
       try {
         const res = await axios.get(`${apiBase}/products/football/${type}`);
+        console.log(`[DEBUG] Fetched ${type}:`, res.data);
         const highlighted = res.data.filter(p => p.highlight_title && p.description);
         setter(highlighted.slice(0, 2));
       } catch (err) {
-        console.error(err);
+        console.error(`[ERROR] Fetch ${type} failed:`, err);
         setErrorMessage(`Nepodarilo sa načítať football ${type}.`);
       }
     };
@@ -53,24 +54,23 @@ const FeaturedFootballHighlights = () => {
           Discover More You May Enjoy
         </h2>
 
-        {errorMessage && (
-          <p className="text-red-500 text-center mb-4">{errorMessage}</p>
-        )}
+        {errorMessage && <p className="text-red-500 text-center mb-4">{errorMessage}</p>}
 
         <div className="w-full xl:w-[90%] 2xl:max-w-[90%] mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
           {featuredItems.map(({ name, product }, index) => {
-            // --- LOGY na diagnostiku ---
+            // --- Debug logy ---
             console.log(`[DEBUG] Product ${index}:`, product);
             console.log(`[DEBUG] Raw image URL:`, product?.image);
 
-            // --- Oprava chybného https//
             let imageUrl = product?.image || '';
+
+            // --- Fix malformed URL (https// -> https://)
             if (imageUrl.startsWith('https//')) {
               console.warn(`[WARN] Fixing malformed URL for product ${product?.name}`);
               imageUrl = imageUrl.replace('https//', 'https://');
             }
 
-            // --- Ak nie je Cloudinary, pridáme apiBase pred lokálnu cestu ---
+            // --- Ak URL nie je https, pridáme apiBase
             if (!imageUrl.startsWith('http')) {
               imageUrl = `${apiBase}${imageUrl}`;
             }
@@ -83,12 +83,10 @@ const FeaturedFootballHighlights = () => {
                 to={`/product/${product?.slug || ''}`}
                 className="flex flex-col h-full bg-white rounded-lg overflow-hidden shadow-lg hover:brightness-125 transition"
               >
-                {/* Nadpis */}
                 <h3 className="py-4 px-3 text-[14px] md:min-h-[80px] font-bold bg-black text-white text-center">
                   {product?.highlight_title || `${name} Featured Product`}
                 </h3>
 
-                {/* Obrázok */}
                 <div className="relative h-64 overflow-hidden shadow-lg group">
                   <img
                     src={imageUrl}
@@ -98,7 +96,6 @@ const FeaturedFootballHighlights = () => {
                   <div className="absolute inset-0 bg-black bg-opacity-10"></div>
                 </div>
 
-                {/* Popis */}
                 <div className="bg-black bg-opacity-90 text-white text-sm p-4 flex-1">
                   {product?.description || `Explore top products from ${name}.`}
                 </div>
