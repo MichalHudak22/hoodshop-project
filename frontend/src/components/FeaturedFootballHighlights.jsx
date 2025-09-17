@@ -8,7 +8,7 @@ const FeaturedFootballHighlights = () => {
   const [featuredCleats, setFeaturedCleats] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
 
-  const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ dynamická URL
+  const baseURL = import.meta.env.VITE_API_BASE_URL; // môžeš si nechať pre API, ale nepoužívame ho na obrázky
 
   useEffect(() => {
     setErrorMessage(''); // Vyčistí chybu pred načítaním
@@ -102,7 +102,7 @@ const FeaturedFootballHighlights = () => {
               {/* Obrázok s efektom priblíženia */}
               <div className="relative h-64 overflow-hidden shadow-lg group">
                 <img
-                  src={product ? `${baseURL}${product.image}` : defaultBg} // ✅ dynamická URL
+                  src={product ? product.image.trim() : defaultBg} // ✅ iba Cloudinary URL
                   alt={product?.highlight_title || `${name} default`}
                   className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-110"
                 />
