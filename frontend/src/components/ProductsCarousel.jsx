@@ -7,8 +7,6 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
-const baseURL = import.meta.env.VITE_API_BASE_URL || '';
-
 const ProductsCarousel = ({ slides, handleAddToCart }) => {
   const [loadingIds, setLoadingIds] = useState([]);
 
@@ -37,7 +35,7 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
         navigation
         pagination={{
           clickable: true,
-          el: '.custom-pagination', // 👈 vlastný container
+          el: '.custom-pagination',
         }}
         spaceBetween={20}
         breakpoints={{
@@ -54,16 +52,12 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
           const productSlug = slide.slug;
           const isLoading = loadingIds.includes(slide.id);
 
-          const imageUrl = slide.image.trim().startsWith('http')
-            ? slide.image.trim()
-            : `${baseURL}${slide.image.trim()}`;
-
+          // Použijeme iba URL z databázy (Cloudinary)
+          const imageUrl = slide.image.trim();
 
           return (
             <SwiperSlide key={index}>
               <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-start p-4 text-center hover:shadow-xl transition relative">
-
-                {/* Názov s odkazom */}
                 <h2 className="h-[42px] text-lg font-bold mb-1 text-black">
                   <Link
                     to={`/product/${productSlug}`}
@@ -73,10 +67,8 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
                   </Link>
                 </h2>
 
-                {/* Značka */}
                 <p className="text-sm text-gray-600 my-2">{slide.brand}</p>
 
-                {/* Obrázok ako odkaz */}
                 <Link to={`/product/${productSlug}`} className="block">
                   <img
                     src={imageUrl}
@@ -85,12 +77,10 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
                   />
                 </Link>
 
-                {/* Cena */}
                 <p className="text-green-600 text-xl font-semibold mb-1">
                   {slide.price} €
                 </p>
 
-                {/* Add to Cart tlačidlo */}
                 <button
                   onClick={() => handleClick(slide)}
                   disabled={isLoading}
@@ -101,12 +91,10 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
                 </button>
               </div>
             </SwiperSlide>
-
           );
         })}
       </Swiper>
 
-      {/* 👇 vlastný pagination container pod sliderom */}
       <div className="custom-pagination flex justify-center mt-4"></div>
 
       <style>{`
