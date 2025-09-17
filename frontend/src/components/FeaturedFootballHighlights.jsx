@@ -41,25 +41,10 @@ const FeaturedFootballHighlights = () => {
   // Spojenie všetkých produktov do jedného poľa
   const featuredItems = [];
   for (let i = 0; i < 2; i++) {
-    if (featuredJerseys[i]) {
-      featuredItems.push({ name: "Nike", product: featuredJerseys[i], defaultBg: "/img/nike-jersey.jpg" });
-    }
-    if (featuredCleats[i]) {
-      featuredItems.push({ name: "Puma", product: featuredCleats[i], defaultBg: "/img/puma-cleats.jpg" });
-    }
-    if (featuredBalls[i]) {
-      featuredItems.push({ name: "Adidas", product: featuredBalls[i], defaultBg: "/img/adidas-ball.jpg" });
-    }
+    if (featuredJerseys[i]) featuredItems.push({ name: "Nike", product: featuredJerseys[i] });
+    if (featuredCleats[i]) featuredItems.push({ name: "Puma", product: featuredCleats[i] });
+    if (featuredBalls[i]) featuredItems.push({ name: "Adidas", product: featuredBalls[i] });
   }
-
-  // Funkcia pre správne Cloudinary URL
-  const getImageUrl = (image, defaultBg) => {
-    if (!image) return defaultBg;
-    const trimmed = image.trim();
-    if (trimmed.startsWith('http')) return trimmed;        // úplná URL
-    if (trimmed.startsWith('//')) return `https:${trimmed}`; // //cloudinary -> https://cloudinary
-    return defaultBg; // fallback
-  };
 
   return (
     <section
@@ -78,22 +63,22 @@ const FeaturedFootballHighlights = () => {
         </h2>
 
         <div className="w-full xl:w-[90%] 2xl:max-w-[90%] mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
-          {featuredItems.map(({ name, product, defaultBg }, index) => (
+          {featuredItems.map(({ name, product }, index) => (
             <Link
               key={`${name}-${index}`}
-              to={`/product/${product?.slug || ''}`}
+              to={`/product/${product.slug}`}
               className="flex flex-col h-full bg-white rounded-lg overflow-hidden shadow-lg hover:brightness-125 transition"
             >
               {/* Nadpis */}
               <h3 className="py-4 px-3 text-[14px] md:min-h-[80px] font-bold bg-black text-white text-center">
-                {product?.highlight_title || `${name} Featured Product`}
+                {product.highlight_title || `${name} Featured Product`}
               </h3>
 
-              {/* Obrázok s efektom priblíženia */}
+              {/* Obrázok */}
               <div className="relative h-64 overflow-hidden shadow-lg group">
                 <img
-                  src={getImageUrl(product?.image, defaultBg)}
-                  alt={product?.highlight_title || `${name} default`}
+                  src={product.image?.trim()}
+                  alt={product.highlight_title || `${name} default`}
                   className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-10"></div>
@@ -101,11 +86,15 @@ const FeaturedFootballHighlights = () => {
 
               {/* Popis */}
               <div className="bg-black bg-opacity-90 text-white text-sm p-4 flex-1">
-                {product?.description || `Explore top products from ${name}.`}
+                {product.description || `Explore top products from ${name}.`}
               </div>
             </Link>
           ))}
         </div>
+
+        {errorMessage && (
+          <p className="text-red-500 text-center mt-4">{errorMessage}</p>
+        )}
       </div>
     </section>
   );
