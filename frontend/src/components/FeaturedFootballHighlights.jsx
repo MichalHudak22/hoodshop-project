@@ -64,18 +64,19 @@ const FeaturedFootballHighlights = () => {
 
             let imageUrl = product?.image || '';
 
-            // --- Fix malformed URL (https// -> https://)
+            // Oprava chybného https//
             if (imageUrl.startsWith('https//')) {
               console.warn(`[WARN] Fixing malformed URL for product ${product?.name}`);
               imageUrl = imageUrl.replace('https//', 'https://');
             }
 
-            // --- Ak URL nie je https, pridáme apiBase
+            // Teraz pridáme apiBase len ak image URL **nie je platná https URL**
             if (!imageUrl.startsWith('http')) {
               imageUrl = `${apiBase}${imageUrl}`;
             }
 
             console.log(`[DEBUG] Final imageUrl:`, imageUrl);
+
 
             return (
               <Link
