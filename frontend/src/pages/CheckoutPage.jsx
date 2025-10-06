@@ -27,6 +27,15 @@ const CheckoutPage = () => {
     card_number: '', card_expiry: '', card_cvc: '',
   });
 
+  // Pridáme na začiatok komponentu CheckoutPage
+  const fixCloudinaryUrl = (url) => {
+    if (!url) return '';
+    // Ak URL už obsahuje https:// alebo http://, necháme tak
+    if (url.startsWith('https://') || url.startsWith('http://')) return url;
+    // Inak pridáme baseURL pre lokálne obrázky
+    return `${API_BASE_URL}${url}`;
+  };
+
 
   // DELIVERY pridaj stav na cenu doručenia
   const [deliveryMethod, setDeliveryMethod] = useState('DPD');
@@ -147,100 +156,100 @@ const CheckoutPage = () => {
 
   const [processing, setProcessing] = useState(false);
 
- const handlePayment = async () => {
-  const {
-    full_name,
-    profile_email,
-    mobile_number,
-    address,
-    city,
-    postal_code,
-    payment_method,
-    card_number,
-    card_expiry,
-    card_cvc
-  } = formData;
+  const handlePayment = async () => {
+    const {
+      full_name,
+      profile_email,
+      mobile_number,
+      address,
+      city,
+      postal_code,
+      payment_method,
+      card_number,
+      card_expiry,
+      card_cvc
+    } = formData;
 
-  // Kontrola prázdnych povinných polí
-  const requiredFields = [
-    { field: 'full_name', label: 'Full Name' },
-    { field: 'profile_email', label: 'Email' },
-    { field: 'mobile_number', label: 'Mobile Number' },
-    { field: 'address', label: 'Address' },
-    { field: 'city', label: 'City' },
-    { field: 'postal_code', label: 'Postal Code' },
-  ];
+    // Kontrola prázdnych povinných polí
+    const requiredFields = [
+      { field: 'full_name', label: 'Full Name' },
+      { field: 'profile_email', label: 'Email' },
+      { field: 'mobile_number', label: 'Mobile Number' },
+      { field: 'address', label: 'Address' },
+      { field: 'city', label: 'City' },
+      { field: 'postal_code', label: 'Postal Code' },
+    ];
 
-  const missingFields = requiredFields.filter(({ field }) => !formData[field]);
+    const missingFields = requiredFields.filter(({ field }) => !formData[field]);
 
-  if (missingFields.length > 0) {
-    const fieldNames = missingFields.map(f => f.label).join(', ');
-    return alert(`Please fill in all required fields: ${fieldNames}`);
-  }
-
-  // ✉️ Validácia emailu
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(profile_email)) {
-    return alert('Please enter a valid email address.');
-  }
-
-  // 📞 Validácia mobilného čísla (iba čísla, min. 9 číslic napr.)
-  const phoneRegex = /^\d{9,}$/;
-  if (!phoneRegex.test(mobile_number)) {
-    return alert('Please enter a valid mobile number (only digits, at least 9 numbers).');
-  }
-
-  // 🏤 Validácia PSČ (iba čísla, napr. 5 číslic)
-  const postalCodeRegex = /^\d+$/;
-  if (!postalCodeRegex.test(postal_code)) {
-    return alert('Please enter a valid postal code (only digits).');
-  }
-
-  // 💳 Ak je zvolená platba kartou, skontroluj aj kartu
-  if (payment_method === 'card') {
-    if (!card_number || !card_expiry || !card_cvc) {
-      return alert('Please fill in all card details.');
-    }
-  }
-
-  const headers = user?.token
-    ? { Authorization: `Bearer ${user.token}` }
-    : { 'x-session-id': sessionId };
-
-  const discount = usedPoints * 0.10;
-  const finalPrice = Math.max(total + deliveryCost - discount, 0);
-
-  setProcessing(true);
-
-  try {
-    await axios.post(`${API_BASE_URL}/api/orders`, {
-      ...formData,
-      delivery_method: deliveryMethod,
-      delivery_price: deliveryCost,
-      total_price: finalPrice,
-      cartItems,
-      usedPoints,
-    }, { headers });
-
-    setUsedPoints(0);
-
-    if (user?.token) {
-      const res = await axios.get(`${API_BASE_URL}/user/profile`, {
-        headers: { Authorization: `Bearer ${user.token}` }
-      });
-      setProfile(res.data);
+    if (missingFields.length > 0) {
+      const fieldNames = missingFields.map(f => f.label).join(', ');
+      return alert(`Please fill in all required fields: ${fieldNames}`);
     }
 
-    await axios.delete(`${API_BASE_URL}/api/cart`, { headers });
-    refreshCartCount();
-    navigate('/thank-you');
-  } catch (err) {
-    console.error('Payment error:', err);
-    alert('Payment failed. Try again.');
-  } finally {
-    setProcessing(false);
-  }
-};
+    // ✉️ Validácia emailu
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(profile_email)) {
+      return alert('Please enter a valid email address.');
+    }
+
+    // 📞 Validácia mobilného čísla (iba čísla, min. 9 číslic napr.)
+    const phoneRegex = /^\d{9,}$/;
+    if (!phoneRegex.test(mobile_number)) {
+      return alert('Please enter a valid mobile number (only digits, at least 9 numbers).');
+    }
+
+    // 🏤 Validácia PSČ (iba čísla, napr. 5 číslic)
+    const postalCodeRegex = /^\d+$/;
+    if (!postalCodeRegex.test(postal_code)) {
+      return alert('Please enter a valid postal code (only digits).');
+    }
+
+    // 💳 Ak je zvolená platba kartou, skontroluj aj kartu
+    if (payment_method === 'card') {
+      if (!card_number || !card_expiry || !card_cvc) {
+        return alert('Please fill in all card details.');
+      }
+    }
+
+    const headers = user?.token
+      ? { Authorization: `Bearer ${user.token}` }
+      : { 'x-session-id': sessionId };
+
+    const discount = usedPoints * 0.10;
+    const finalPrice = Math.max(total + deliveryCost - discount, 0);
+
+    setProcessing(true);
+
+    try {
+      await axios.post(`${API_BASE_URL}/api/orders`, {
+        ...formData,
+        delivery_method: deliveryMethod,
+        delivery_price: deliveryCost,
+        total_price: finalPrice,
+        cartItems,
+        usedPoints,
+      }, { headers });
+
+      setUsedPoints(0);
+
+      if (user?.token) {
+        const res = await axios.get(`${API_BASE_URL}/user/profile`, {
+          headers: { Authorization: `Bearer ${user.token}` }
+        });
+        setProfile(res.data);
+      }
+
+      await axios.delete(`${API_BASE_URL}/api/cart`, { headers });
+      refreshCartCount();
+      navigate('/thank-you');
+    } catch (err) {
+      console.error('Payment error:', err);
+      alert('Payment failed. Try again.');
+    } finally {
+      setProcessing(false);
+    }
+  };
 
 
   const discount = usedPoints * 0.10;
@@ -433,7 +442,11 @@ const CheckoutPage = () => {
           {cartItems.map(item => (
             <li key={item.id} className="flex justify-between bg-white p-4 shadow rounded">
               <div className="flex items-center space-x-4">
-                <img src={`${API_BASE_URL}${item.image}`} alt={item.name} className="w-20 h-20 object-contain rounded border" />
+                <img
+                  src={fixCloudinaryUrl(item.image)}
+                  alt={item.name}
+                  className="w-20 h-20 object-contain rounded border"
+                />
                 <div>
                   <h2 className="font-semibold">{item.name}</h2>
                   <p>Qty: {item.quantity}</p>
@@ -483,7 +496,7 @@ const CheckoutPage = () => {
                     setUsedPoints(val);
                   }}
                   className="text-black px-2 py-2 my-2 rounded w-32 text-center border-none font-bold text-xl outline-none focus:outline-none"
-/>
+                />
 
                 <div className="text-sm text-green-300 mt-1">
                   That’s a discount of {(usedPoints * 0.10).toFixed(2)}€
