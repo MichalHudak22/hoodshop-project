@@ -179,7 +179,7 @@ const getAllProducts = async (req, res) => {
 
 
 // ADMIN - Add product
-const cloudinary = require("../cloudinary"); // import nastaveného cloudinary
+const cloudinary = require("../cloudinary/cloudinary"); // import nastaveného cloudinary
 const addProduct = async (req, res) => {
   const {
     name, category, brand, price,
