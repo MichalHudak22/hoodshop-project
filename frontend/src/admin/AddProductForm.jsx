@@ -94,15 +94,15 @@ const handleSubmit = async (e) => {
   setUploading(true);
 
   try {
-    // 1️⃣ Upload obrázku do Cloudinary cez tvoju funkciu
-    // Použijeme folder podľa category/type a public_id podľa slug
+    // 1️⃣ Upload obrázku do Cloudinary (signed)
     const formDataCloud = new FormData();
     formDataCloud.append('file', imageFile);
     formDataCloud.append('upload_preset', cloudinaryUploadPreset);
-
+    
+    // Folder podľa category/type
     if (category && type) {
       formDataCloud.append('folder', `products/${category}/${type}`);
-      formDataCloud.append('public_id', slug); // voliteľné, aby bol názov obrázku ako slug
+      formDataCloud.append('public_id', slug); // názov obrázku podľa slug
     } else {
       formDataCloud.append('folder', 'products');
     }
@@ -113,7 +113,7 @@ const handleSubmit = async (e) => {
 
     const imageURL = cloudRes.data.secure_url;
 
-    // 2️⃣ Odoslanie dát produktu na backend ako JSON
+    // 2️⃣ Odoslanie dát produktu na backend
     const token = localStorage.getItem('token');
     const productData = { ...formData, image: imageURL };
     if (!includeCarouselGroup) delete productData.carousel_group;
@@ -122,7 +122,6 @@ const handleSubmit = async (e) => {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    // Správa o úspechu
     setMessage(res.data.message);
     setError(null);
     setImageError(null);
@@ -142,6 +141,7 @@ const handleSubmit = async (e) => {
     setUploading(false);
   }
 };
+
 
 
   return (
