@@ -43,17 +43,26 @@ const FeaturedHockeyHighlights = () => {
     fetchProducts('sticks', setFeaturedSticks);
   }, [baseURL]);
 
-  // Spojíme všetky produkty do jedného poľa
+  // Spojíme všetky produkty do jedného poľa, max 6
   const featuredItems = [];
-  for (let i = 0; i < 2; i++) {
-    if (featuredJerseys[i]) {
-      featuredItems.push({ name: "Bauer", product: featuredJerseys[i], defaultBg: "/img/bauer-jersey.jpg" });
-    }
-    if (featuredSkates[i]) {
-      featuredItems.push({ name: "Reebok", product: featuredSkates[i], defaultBg: "/img/reebok-skates.jpg" });
-    }
-    if (featuredHelmets[i]) {
-      featuredItems.push({ name: "Warrior", product: featuredHelmets[i], defaultBg: "/img/warrior-helmet.jpg" });
+  const categories = [
+    { items: featuredJerseys, name: 'Bauer', defaultBg: '/img/bauer-jersey.jpg' },
+    { items: featuredSkates, name: 'Reebok', defaultBg: '/img/reebok-skates.jpg' },
+    { items: featuredHelmets, name: 'Warrior', defaultBg: '/img/warrior-helmet.jpg' },
+    { items: featuredSticks, name: 'CCM', defaultBg: '/img/ccm-stick.jpg' },
+  ];
+
+  let count = 0;
+  for (let i = 0; i < 2 && count < 6; i++) {
+    for (const cat of categories) {
+      if (cat.items[i] && count < 6) {
+        featuredItems.push({
+          name: cat.name,
+          product: cat.items[i],
+          defaultBg: cat.defaultBg,
+        });
+        count++;
+      }
     }
   }
 
@@ -88,7 +97,7 @@ const FeaturedHockeyHighlights = () => {
 
               <div className="relative h-64 overflow-hidden shadow-lg group">
                 <img
-                  src={product ? fixCloudinaryUrl(product.image) : defaultBg}
+                  src={product ? product.image : defaultBg}
                   alt={product?.highlight_title || `${name} default`}
                   className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-110"
                 />
