@@ -64,7 +64,7 @@ const CyclingGloves = () => {
     name: product.name,
     brand: product.brand,
     price: product.price,
-    image: `${baseURL}${product.image}`, // 🔹 obrázky z produkčného backendu
+    image: product.image,
     slug: product.slug,
   }));
 

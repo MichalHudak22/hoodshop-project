@@ -64,7 +64,7 @@ const CyclingClothesPage = () => {
     name: product.name,
     brand: product.brand,
     price: product.price,
-    image: `${baseURL}${product.image}`, // 🔹 produkčný backend URL
+    image: product.image,
     slug: product.slug,
   }));
 

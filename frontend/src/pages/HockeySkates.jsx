@@ -61,7 +61,7 @@ const HockeySkates = () => {
     name: product.name,
     brand: product.brand,
     price: product.price,
-    image: `${baseURL}${product.image}`,
+    image: product.image,
     slug: product.slug,
   })) : [];
 

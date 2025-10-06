@@ -58,7 +58,7 @@ const HockeyJerseys = () => {
     name: product.name,
     brand: product.brand,
     price: product.price,
-    image: `${baseURL}${product.image}`, // absolútna URL pre 
+    image: product.image,
     slug: product.slug,
   }));
 

@@ -58,7 +58,7 @@ const HockeySticks = () => {
     name: p.name,
     brand: p.brand,
     price: p.price,
-    image: `${baseURL}${p.image}`, // absolútna URL pre carousel
+    image: product.image,
     slug: p.slug, 
   }));
 
