@@ -49,9 +49,6 @@ const FeaturedHockeyHighlights = () => {
     if (featuredJerseys[i]) {
       featuredItems.push({ name: "Bauer", product: featuredJerseys[i], defaultBg: "/img/bauer-jersey.jpg" });
     }
-    if (featuredSticks[i]) {
-      featuredItems.push({ name: "CCM", product: featuredSticks[i], defaultBg: "/img/ccm-stick.jpg" });
-    }
     if (featuredSkates[i]) {
       featuredItems.push({ name: "Reebok", product: featuredSkates[i], defaultBg: "/img/reebok-skates.jpg" });
     }
