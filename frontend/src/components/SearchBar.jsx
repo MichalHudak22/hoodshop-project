@@ -3,12 +3,18 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 
 const SearchBar = ({ onResultClick }) => {
-  // Backend URL z .env
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const wrapperRef = useRef(null);
+
+  // Funkcia na opravu URL (Cloudinary vs lokálne)
+  const fixCloudinaryUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('https://') || url.startsWith('http://')) return url; // už je plná URL
+    return `${API_BASE_URL}${url}`; // lokálna cesta
+  };
 
   // Debounce vyhľadávanie
   useEffect(() => {
@@ -47,9 +53,7 @@ const SearchBar = ({ onResultClick }) => {
 
   const handleResultClick = () => {
     setResults([]);
-    if (onResultClick) {
-      onResultClick();
-    }
+    if (onResultClick) onResultClick();
   };
 
   return (
@@ -75,7 +79,7 @@ const SearchBar = ({ onResultClick }) => {
                 onClick={handleResultClick}
               >
                 <img
-                  src={`${API_BASE_URL}${product.image}`}
+                  src={fixCloudinaryUrl(product.image)}
                   alt={product.name}
                   className="w-10 h-10 object-cover rounded"
                 />
