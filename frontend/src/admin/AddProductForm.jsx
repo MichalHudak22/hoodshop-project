@@ -46,31 +46,6 @@ const AddProductForm = () => {
     setImageFile(e.target.files[0]);
   };
 
-  // Funkcia na upload do Cloudinary
-// 📦 Funkcia na upload do Cloudinary (UNSIGNED upload preset)
-const uploadToCloudinary = async (file, category, type) => {
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset', cloudinaryUploadPreset);
-
-  // pridáme cieľovú cestu — napr. products/football/jersey
-  if (category && type) {
-    formData.append('folder', `products/${category}/${type}`);
-  } else {
-    formData.append('folder', 'products');
-  }
-
-  try {
-    const response = await axios.post(cloudinaryUploadURL, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-    return response.data.secure_url;
-  } catch (error) {
-    console.error('❌ Cloudinary upload error:', error.response?.data || error.message);
-    throw new Error('Failed to upload image to Cloudinary');
-  }
-};
-
 
 const handleSubmit = async (e) => {
   e.preventDefault();
@@ -80,6 +55,7 @@ const handleSubmit = async (e) => {
 
   const { name, category, brand, price, type, description, slug } = formData;
 
+  // 1️⃣ Validácia
   if (!name || !category || !brand || !price || !type || !description || !slug) {
     setError('Please fill in all required fields.');
     return;
@@ -93,41 +69,53 @@ const handleSubmit = async (e) => {
   setUploading(true);
 
   try {
-    // Upload obrázku do Cloudinary (signed)
+    // 2️⃣ Získať signed params z backendu
+    const folder = `products/${category}/${type}`;
+    const public_id = slug;
+
+    const signRes = await axios.get(`${baseURL}/cloudinary/sign`, {
+      params: { folder, public_id },
+    });
+
+    const {
+      signature,
+      timestamp,
+      api_key,
+      folder: signedFolder,
+      public_id: signedPublicId,
+    } = signRes.data;
+
+    // 3️⃣ Upload obrázku do Cloudinary (signed)
     const formDataCloud = new FormData();
     formDataCloud.append('file', imageFile);
-    formDataCloud.append('upload_preset', cloudinaryUploadPreset);
+    formDataCloud.append('api_key', api_key);
+    formDataCloud.append('timestamp', timestamp);
+    formDataCloud.append('signature', signature);
+    formDataCloud.append('folder', signedFolder || folder);
+    formDataCloud.append('public_id', signedPublicId || public_id);
 
-    if (category && type) {
-      formDataCloud.append('folder', `products/${category}/${type}`);
-      formDataCloud.append('public_id', slug);
-    } else {
-      formDataCloud.append('folder', 'products');
-    }
-
-    const cloudRes = await axios.post(cloudinaryUploadURL, formDataCloud, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
+    const cloudRes = await axios.post(
+      `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`,
+      formDataCloud,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    );
 
     const imageURL = cloudRes.data.secure_url;
 
-    // Odoslanie dát na backend
+    // 4️⃣ Odoslanie produktu na backend
     const token = localStorage.getItem('token');
-    const productData = { ...formData, price: parseFloat(price), image: imageURL };
+    const productData = { ...formData, image: imageURL };
     if (!includeCarouselGroup) delete productData.carousel_group;
-
-    console.log('Sending productData:', productData);
 
     const res = await axios.post(`${baseURL}/products`, productData, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    const msg = typeof res.data.message === 'string' ? res.data.message : res.data.message?.message || 'Product created';
-    setMessage(msg);
+    // 5️⃣ Správa o úspechu + reset formulára
+    setMessage(res.data.message);
     setError(null);
     setImageError(null);
 
-    // Reset formulára
     setFormData({
       name: '', category: '', brand: '', price: '', type: '',
       description: '', slug: '', carousel_group: ''
@@ -142,6 +130,7 @@ const handleSubmit = async (e) => {
     setUploading(false);
   }
 };
+
 
 
 

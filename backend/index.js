@@ -13,6 +13,7 @@ const brandsRoutes = require('./routes/brandsRoutes');
 const uploadRoutes = require('./routes/uploadRoutes'); // 💥 Toto ti chýba!
 const adminConfigRoutes = require('./routes/adminConfigRoutes');
 
+
 const app = express();
 const PORT = 3001;
 
@@ -29,6 +30,9 @@ app.use('/img', express.static(path.join(__dirname, 'src/img')));
 app.use('/video', express.static(path.join(__dirname, 'src/video')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/user/upload', uploadRoutes);  // => /user/upload/photo
+
+const cloudinaryRoutes = require('./routes/cloudinaryRoutes');
+app.use('/cloudinary', cloudinaryRoutes);
 
 // Sprístupnenie vsetkych znaciek
 app.use('/api/brands', brandsRoutes);
