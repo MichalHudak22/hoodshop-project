@@ -80,7 +80,6 @@ const handleSubmit = async (e) => {
 
   const { name, category, brand, price, type, description, slug } = formData;
 
-  // Validácia
   if (!name || !category || !brand || !price || !type || !description || !slug) {
     setError('Please fill in all required fields.');
     return;
@@ -94,15 +93,14 @@ const handleSubmit = async (e) => {
   setUploading(true);
 
   try {
-    // 1️⃣ Upload obrázku do Cloudinary (signed)
+    // Upload obrázku do Cloudinary (signed)
     const formDataCloud = new FormData();
     formDataCloud.append('file', imageFile);
     formDataCloud.append('upload_preset', cloudinaryUploadPreset);
-    
-    // Folder podľa category/type
+
     if (category && type) {
       formDataCloud.append('folder', `products/${category}/${type}`);
-      formDataCloud.append('public_id', slug); // názov obrázku podľa slug
+      formDataCloud.append('public_id', slug);
     } else {
       formDataCloud.append('folder', 'products');
     }
@@ -113,16 +111,19 @@ const handleSubmit = async (e) => {
 
     const imageURL = cloudRes.data.secure_url;
 
-    // 2️⃣ Odoslanie dát produktu na backend
+    // Odoslanie dát na backend
     const token = localStorage.getItem('token');
-    const productData = { ...formData, image: imageURL };
+    const productData = { ...formData, price: parseFloat(price), image: imageURL };
     if (!includeCarouselGroup) delete productData.carousel_group;
+
+    console.log('Sending productData:', productData);
 
     const res = await axios.post(`${baseURL}/products`, productData, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
-    setMessage(res.data.message);
+    const msg = typeof res.data.message === 'string' ? res.data.message : res.data.message?.message || 'Product created';
+    setMessage(msg);
     setError(null);
     setImageError(null);
 
@@ -141,6 +142,7 @@ const handleSubmit = async (e) => {
     setUploading(false);
   }
 };
+
 
 
 
