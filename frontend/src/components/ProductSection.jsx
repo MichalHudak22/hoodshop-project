@@ -38,7 +38,7 @@ const ProductSection = ({ title, products, backgroundImage, onAddToCart }) => {
                 className="block"
               >
                 <img
-                  src={`${baseURL}${product.image}`} // <-- tu je zmena
+                  src={product.image}
                   alt={product.name}
                   className="w-full h-64 object-contain p-4 bg-gray-50"
                 />

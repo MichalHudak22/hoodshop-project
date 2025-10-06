@@ -28,7 +28,7 @@ const sports = [
     image: '/img/bg-cykling.jpg',
     categories: [
       { name: 'Clothing', link: '/sports/cycling/clothes' },
-      { name: 'Bikes', link: '/sports/cycling/bike' },
+      { name: 'Bikes', link: '/sports/cycling/bikes' },
       { name: 'Helmets', link: '/sports/cycling/helmets' },
       { name: 'Gloves', link: '/sports/cycling/gloves' },
     ],
