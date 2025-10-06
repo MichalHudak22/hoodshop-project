@@ -47,55 +47,69 @@ const AddProductForm = () => {
   };
 
   // Funkcia na upload do Cloudinary
-  const uploadToCloudinary = async (file) => {
-    const data = new FormData();
-    data.append('file', file);
-    data.append('upload_preset', cloudinaryUploadPreset);
+// 📦 Funkcia na upload do Cloudinary (UNSIGNED upload preset)
+const uploadToCloudinary = async (file, category, type) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', cloudinaryUploadPreset);
 
-    const res = await axios.post(cloudinaryUploadURL, data);
-    return res.data.secure_url; // vracia hotovú URL obrázka
-  };
+  // pridáme cieľovú cestu — napr. products/football/jersey
+  if (category && type) {
+    formData.append('folder', `products/${category}/${type}`);
+  } else {
+    formData.append('folder', 'products');
+  }
 
-  const handleSubmit = async (e) => {
+  try {
+    const response = await axios.post(cloudinaryUploadURL, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data.secure_url;
+  } catch (error) {
+    console.error('❌ Cloudinary upload error:', error.response?.data || error.message);
+    throw new Error('Failed to upload image to Cloudinary');
+  }
+};
+
+
+const handleSubmit = async (e) => {
   e.preventDefault();
   setImageError(null);
+  setError(null);
+  setMessage(null);
 
   const { name, category, brand, price, type, description, slug } = formData;
   if (!name || !category || !brand || !price || !type || !description || !slug) {
     setError('Please fill in all required fields.');
-    setMessage(null);
     return;
   }
 
   if (!imageFile) {
     setImageError('Please upload an image before saving the product.');
-    setMessage(null);
     return;
   }
 
   setUploading(true);
 
   try {
-    // 1️⃣ Upload obrázku priamo na Cloudinary (unsigned preset)
-    const data = new FormData();
-    data.append('file', imageFile);
-    data.append('upload_preset', cloudinaryUploadPreset);
+    // 1️⃣ Upload obrázku do Cloudinary cez tvoju funkciu
+    const imageURL = await uploadToCloudinary(imageFile, category, type);
 
-    const cloudRes = await axios.post(cloudinaryUploadURL, data);
-    const imageURL = cloudRes.data.secure_url;
-
-    // 2️⃣ Odoslanie dát produktu na backend ako JSON
+    // 2️⃣ Pripravíme JSON pre backend
     const token = localStorage.getItem('token');
     const productData = { ...formData, image: imageURL };
     if (!includeCarouselGroup) delete productData.carousel_group;
 
+    // 3️⃣ Odoslanie produktu do backendu
     const res = await axios.post(`${baseURL}/products`, productData, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     setMessage(res.data.message);
     setError(null);
     setImageError(null);
+
+    // Reset formulára
     setFormData({
       name: '', category: '', brand: '', price: '', type: '',
       description: '', slug: '', carousel_group: ''
@@ -104,9 +118,8 @@ const AddProductForm = () => {
     setIncludeCarouselGroup(false);
 
   } catch (err) {
-    console.error(err);
-    setError(err.response?.data?.error || 'An error occurred');
-    setMessage(null);
+    console.error('❌ Error during product creation:', err);
+    setError(err.response?.data?.error || err.message || 'An error occurred');
   } finally {
     setUploading(false);
   }
