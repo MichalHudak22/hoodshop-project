@@ -6,48 +6,43 @@ const FeaturedCyclingHighlights = () => {
   const [featuredBikes, setFeaturedBikes] = useState([]);
   const [featuredClothes, setFeaturedClothes] = useState([]);
   const [featuredHelmets, setFeaturedHelmets] = useState([]);
-
   const [errorMessage, setErrorMessage] = useState('');
 
-  const baseURL = import.meta.env.VITE_API_BASE_URL; // ✅ dynamická URL
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
 
-  // ...
+  // Funkcia na opravu URL (Cloudinary vs lokálne)
+  const fixCloudinaryUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('https')) return url; // už je plná URL
+    return `${baseURL}${url}`; // lokálna cesta
+  };
 
   useEffect(() => {
-    setErrorMessage(''); // vymažeme chybu pred novým fetchom
+    setErrorMessage('');
 
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/cycling/bikes`)
-      .then(response => {
-        const highlighted = response.data.filter(p => p.highlight_title && p.description);
-        setFeaturedBikes(highlighted.slice(0, 2));
-      })
-      .catch(() => {
-        setErrorMessage('Nepodarilo sa načítať cycling bikes.');
-      });
+    const fetchProducts = async (category, setter) => {
+      try {
+        const res = await axios.get(`${baseURL}/products/cycling/${category}`);
+        const highlighted = res.data
+          .filter((p) => p.highlight_title && p.description)
+          .map((p) => ({
+            ...p,
+            image: fixCloudinaryUrl(p.image),
+          }));
+        setter(highlighted.slice(0, 2));
+      } catch (err) {
+        console.error(`Nepodarilo sa načítať cycling ${category}:`, err);
+        setErrorMessage(`Nepodarilo sa načítať cycling ${category}.`);
+      }
+    };
 
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/cycling/clothes`)
-      .then(response => {
-        const highlighted = response.data.filter(p => p.highlight_title && p.description);
-        setFeaturedClothes(highlighted.slice(0, 2));
-      })
-      .catch(() => {
-        setErrorMessage('Nepodarilo sa načítať cycling clothes.');
-      });
+    fetchProducts('bikes', setFeaturedBikes);
+    fetchProducts('clothes', setFeaturedClothes);
+    fetchProducts('helmets', setFeaturedHelmets);
+  }, [baseURL]);
 
-    axios.get(`${import.meta.env.VITE_API_BASE_URL}/products/cycling/helmets`)
-      .then(response => {
-        const highlighted = response.data.filter(p => p.highlight_title && p.description);
-        setFeaturedHelmets(highlighted.slice(0, 2));
-      })
-      .catch(() => {
-        setErrorMessage('Nepodarilo sa načítať cycling helmets.');
-      });
-  }, []);
-
-
-
+  // Spojíme produkty do jedného poľa
   const featuredItems = [];
-
   for (let i = 0; i < 2; i++) {
     if (featuredClothes[i]) {
       featuredItems.push({
@@ -88,6 +83,8 @@ const FeaturedCyclingHighlights = () => {
           Discover More You May Enjoy
         </h2>
 
+        {errorMessage && <p className="text-red-500 text-center mb-4">{errorMessage}</p>}
+
         <div className="w-full xl:w-[90%] 2xl:max-w-[90%] mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
           {featuredItems.map(({ name, product, defaultBg }, index) => (
             <Link
@@ -98,14 +95,16 @@ const FeaturedCyclingHighlights = () => {
               <h3 className="py-4 px-3 text-[14px] md:min-h-[80px] font-bold bg-black text-white text-center">
                 {product?.highlight_title || `${name} Featured Product`}
               </h3>
+
               <div className="relative h-64 overflow-hidden shadow-lg group">
                 <img
-                  src={product ? `${baseURL}${product.image}` : defaultBg} // ✅ dynamická URL
+                  src={product ? fixCloudinaryUrl(product.image) : defaultBg}
                   alt={product?.highlight_title || `${name} default`}
                   className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-10"></div>
               </div>
+
               <div className="bg-black bg-opacity-90 text-white text-sm p-4 flex-1">
                 {product?.description || `Explore top products from ${name}.`}
               </div>

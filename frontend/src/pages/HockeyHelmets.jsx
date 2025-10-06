@@ -60,7 +60,7 @@ const HockeyHelmets = () => {
     name: p.name,
     brand: p.brand,
     price: p.price,
-    image: product.image,
+    image: p.image,
     slug: p.slug, 
   }));
 
