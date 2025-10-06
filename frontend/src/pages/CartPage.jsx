@@ -14,7 +14,14 @@ const CartPage = () => {
   const [total, setTotal] = useState(0);
   const [sessionId, setSessionId] = useState(null);
 
-const baseURL = 'https://hoodshop-project.onrender.com';
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+
+  // Funkcia na opravu URL (Cloudinary vs lokálne)
+  const fixCloudinaryUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('https://') || url.startsWith('http://')) return url; // už je plná URL
+    return `${API_BASE_URL}${url}`; // lokálna cesta
+  };
 
   // Pri mountnutí vygeneruj alebo načítaj sessionId
   useEffect(() => {
@@ -26,12 +33,40 @@ const baseURL = 'https://hoodshop-project.onrender.com';
     setSessionId(sId);
   }, []);
 
-// Fetch košíka pri zmene user/token alebo sessionId
-useEffect(() => {
-  if (!sessionId) return;
+  // Fetch košíka pri zmene user/token alebo sessionId
+  useEffect(() => {
+    if (!sessionId) return;
 
-  const fetchCart = async () => {
-    setLoading(true);
+    const fetchCart = async () => {
+      setLoading(true);
+      try {
+        const headers = {};
+        if (user && user.token) {
+          headers.Authorization = `Bearer ${user.token}`;
+        } else {
+          headers['x-session-id'] = sessionId;
+        }
+
+        const response = await axios.get(`${API_BASE_URL}/api/cart`, { headers });
+        setCartItems(response.data);
+        calculateTotal(response.data);
+        refreshCartCount();
+      } catch (err) {
+        console.error('Failed to load cart:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCart();
+  }, [user, sessionId, refreshCartCount, API_BASE_URL]);
+
+  const calculateTotal = (items) => {
+    const sum = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    setTotal(sum);
+  };
+
+  const handleRemove = async (itemId) => {
     try {
       const headers = {};
       if (user && user.token) {
@@ -40,74 +75,43 @@ useEffect(() => {
         headers['x-session-id'] = sessionId;
       }
 
-      const response = await axios.get(`${baseURL}/api/cart`, { headers });
-
-      setCartItems(response.data);
-      calculateTotal(response.data);
+      await axios.delete(`${API_BASE_URL}/api/cart/${itemId}`, { headers });
+      const updated = cartItems.filter(item => item.id !== itemId);
+      setCartItems(updated);
+      calculateTotal(updated);
       refreshCartCount();
     } catch (err) {
-      console.error('Failed to load cart:', err);
-    } finally {
-      setLoading(false);
+      console.error('Remove failed:', err);
     }
   };
-
-  fetchCart();
-}, [user, sessionId, refreshCartCount]);
-
-
-  const calculateTotal = (items) => {
-    const sum = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-    setTotal(sum);
-  };
-
-  const handleRemove = async (itemId) => {
-  try {
-    const headers = {};
-    if (user && user.token) {
-      headers.Authorization = `Bearer ${user.token}`;
-    } else {
-      headers['x-session-id'] = sessionId;
-    }
-
-    await axios.delete(`${baseURL}/api/cart/${itemId}`, { headers });
-
-    const updated = cartItems.filter(item => item.id !== itemId);
-    setCartItems(updated);
-    calculateTotal(updated);
-    refreshCartCount();
-  } catch (err) {
-    console.error('Remove failed:', err);
-  }
-};
 
   const handleQuantityChange = async (itemId, newQuantity) => {
-  if (newQuantity < 1) return;
+    if (newQuantity < 1) return;
 
-  try {
-    const headers = {};
-    if (user && user.token) {
-      headers.Authorization = `Bearer ${user.token}`;
-    } else {
-      headers['x-session-id'] = sessionId;
+    try {
+      const headers = {};
+      if (user && user.token) {
+        headers.Authorization = `Bearer ${user.token}`;
+      } else {
+        headers['x-session-id'] = sessionId;
+      }
+
+      await axios.patch(
+        `${API_BASE_URL}/api/cart/${itemId}`,
+        { quantity: newQuantity },
+        { headers }
+      );
+
+      const updated = cartItems.map(item =>
+        item.id === itemId ? { ...item, quantity: newQuantity } : item
+      );
+      setCartItems(updated);
+      calculateTotal(updated);
+      refreshCartCount();
+    } catch (err) {
+      console.error('Update failed:', err);
     }
-
-    await axios.patch(
-      `${baseURL}/api/cart/${itemId}`,
-      { quantity: newQuantity },
-      { headers }
-    );
-
-    const updated = cartItems.map(item =>
-      item.id === itemId ? { ...item, quantity: newQuantity } : item
-    );
-    setCartItems(updated);
-    calculateTotal(updated);
-    refreshCartCount();
-  } catch (err) {
-    console.error('Update failed:', err);
-  }
-};
+  };
 
   if (loading) return <p className="p-4">Loading cart...</p>;
   if (cartItems.length === 0) return <p className="p-4 pt-8 text-red-500 text-center text-xl">Your cart is empty.</p>;
@@ -128,6 +132,7 @@ useEffect(() => {
         <h1 className="text-2xl lg:text-3xl font-bold mb-4 text-center py-3 text-blue-200">
           Shopping Cart
         </h1>
+
         <ul className="space-y-4">
           {cartItems.map(item => (
             <li
@@ -137,7 +142,7 @@ useEffect(() => {
               {/* LEFT - image + name */}
               <div className="flex items-center space-x-4">
                 <img
-                  src={`${import.meta.env.VITE_API_BASE_URL}${item.image}`}
+                  src={fixCloudinaryUrl(item.image)}
                   alt={item.name}
                   className="w-16 h-16 object-cover rounded"
                 />
@@ -174,7 +179,6 @@ useEffect(() => {
                 </button>
               </div>
             </li>
-
           ))}
         </ul>
 
@@ -183,12 +187,13 @@ useEffect(() => {
             Total: <span className="text-green-500 text-2xl font-semibold">{total.toFixed(2)} €</span>
           </h2>
           <Link to="/checkout">
-            <button type="button" className="w-full md:w-[50%] lg:w-80 lg:text-xl bg-green-700 hover:bg-green-600 text-white font-semibold py-3 rounded-xl"
+            <button
+              type="button"
+              className="w-full md:w-[50%] lg:w-80 lg:text-xl bg-green-700 hover:bg-green-600 text-white font-semibold py-3 rounded-xl"
             >
               Proceed to Checkout
             </button>
           </Link>
-
         </div>
       </div>
     </div>
