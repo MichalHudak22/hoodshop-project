@@ -179,6 +179,7 @@ const getAllProducts = async (req, res) => {
 
 
 // ADMIN - Add product
+const cloudinary = require("../cloudinary"); // import nastaveného cloudinary
 const addProduct = async (req, res) => {
   const {
     name, category, brand, price,
@@ -190,31 +191,38 @@ const addProduct = async (req, res) => {
     return res.status(400).json({ error: 'Chýbajú povinné polia alebo obrázok' });
   }
 
-  // Pridáme prefix cesty k obrázku
-  const imagePath = `/img/${category}/${type}/${req.file.filename}`;
-
-
-  const sql = `
-    INSERT INTO products
-    (name, category, brand, price, image, type, description, slug, highlight_title, carousel_group)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `;
-
   try {
-    const [result] = await db.query(sql, [
-      name, category, brand, price, imagePath, type, description, slug,
+    // upload obrázku do Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: `products/${category}/${type}`,
+      use_filename: true,
+      unique_filename: false,
+      overwrite: true
+    });
+
+    const imageUrl = result.secure_url; // táto URL pôjde do DB
+
+    const sql = `
+      INSERT INTO products
+      (name, category, brand, price, image, type, description, slug, highlight_title, carousel_group)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    const [dbResult] = await db.query(sql, [
+      name, category, brand, price, imageUrl, type, description, slug,
       highlight_title || null,
       carousel_group || null
     ]);
 
     res.status(201).json({
       message: 'Product was successfully added.',
-      productId: result.insertId,
-      imagePath,
+      productId: dbResult.insertId,
+      imageUrl,
     });
+
   } catch (err) {
-    console.error('DB error addProduct:', err);
-    res.status(500).json({ error: 'Chyba servera pri vkladaní produktu' });
+    console.error('DB or Cloudinary error:', err);
+    res.status(500).json({ error: 'Chyba servera pri vkladaní produktu alebo upload obrázku' });
   }
 };
 

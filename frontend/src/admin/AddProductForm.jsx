@@ -7,7 +7,9 @@ const typeOptions = {
   cycling: ['clothes', 'bikes', 'helmets', 'gloves'],
 };
 
-  const baseURL = import.meta.env.VITE_API_BASE_URL;
+const baseURL = import.meta.env.VITE_API_BASE_URL;
+const cloudinaryUploadURL = 'https://api.cloudinary.com/v1_1/' + import.meta.env.VITE_CLOUDINARY_CLOUD_NAME + '/upload';
+const cloudinaryUploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
 const AddProductForm = () => {
   const [formData, setFormData] = useState({
@@ -19,13 +21,13 @@ const AddProductForm = () => {
   const [message, setMessage] = useState(null);
   const [error, setError] = useState(null);
   const [imageError, setImageError] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
   const generateSlug = (text) =>
     text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     const updatedForm = {
       ...formData,
       [name]: value,
@@ -33,7 +35,6 @@ const AddProductForm = () => {
       ...(name === 'category' ? { type: '' } : {}),
     };
 
-    // Ak máme aj category aj type, nastavíme carousel_group automaticky
     if ((name === 'category' || name === 'type') && (updatedForm.category && updatedForm.type)) {
       updatedForm.carousel_group = `${updatedForm.category}_${updatedForm.type}`;
     }
@@ -45,12 +46,21 @@ const AddProductForm = () => {
     setImageFile(e.target.files[0]);
   };
 
+  // Funkcia na upload do Cloudinary
+  const uploadToCloudinary = async (file) => {
+    const data = new FormData();
+    data.append('file', file);
+    data.append('upload_preset', cloudinaryUploadPreset);
+
+    const res = await axios.post(cloudinaryUploadURL, data);
+    return res.data.secure_url; // vracia hotovú URL obrázka
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setImageError(null); // resetuj predošlú chybu
+    setImageError(null);
 
     const { name, category, brand, price, type, description, slug } = formData;
-
     const missingFields = [];
     if (!name) missingFields.push('name');
     if (!category) missingFields.push('category');
@@ -67,28 +77,26 @@ const AddProductForm = () => {
     }
 
     if (!imageFile) {
-      setError(null); // resetuj hlavný error, aby sa zobrazil len imageError
+      setError(null);
       setImageError('Please upload an image before saving the product.');
       setMessage(null);
       return;
     }
 
-    const data = new FormData();
-    Object.entries(formData).forEach(([key, value]) => {
-      if (key === 'carousel_group' && !includeCarouselGroup) return;
-      data.append(key, value);
-    });
-    data.append('image', imageFile);
+    setUploading(true);
 
     try {
-      const token = localStorage.getItem('token');
-      const res = await axios.post(`${baseURL}/products`, data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      // 1️⃣ Upload obrázku do Cloudinary
+      const imageURL = await uploadToCloudinary(imageFile);
 
+      // 2️⃣ Odoslanie dát produktu na backend
+      const token = localStorage.getItem('token');
+      const productData = { ...formData, image: imageURL };
+      if (!includeCarouselGroup) delete productData.carousel_group;
+
+      const res = await axios.post(`${baseURL}/products`, productData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
       setMessage(res.data.message);
       setError(null);
@@ -100,41 +108,29 @@ const AddProductForm = () => {
       setImageFile(null);
       setIncludeCarouselGroup(false);
     } catch (err) {
+      console.error(err);
       setError(err.response?.data?.error || 'An error occurred');
       setMessage(null);
+    } finally {
+      setUploading(false);
     }
   };
 
   return (
-    <div className="bg-black bg-opacity-70  md:rounded-xl py-10 px-4 text-white border border-gray-700">
+    <div className="bg-black bg-opacity-70 md:rounded-xl py-10 px-4 text-white border border-gray-700">
       <h3 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-8 text-center text-blue-200">Add New Product</h3>
 
       <ul className="text-sm lg:text-[16px] text-gray-100 mb-6 space-y-2 mx-auto lg:max-w-3xl px-2 pb-3">
-        <li>
-          <strong className="text-blue-200">Name:</strong> Enter the full product name.
-        </li>
-        <li>
-          <strong className="text-blue-200">Brand:</strong> Must exactly match an existing brand. This ensures the product appears correctly in brand sections.
-        </li>
-        <li>
-          <strong className="text-blue-200">Price:</strong> Enter the price (e.g., <code>49.90</code>).
-        </li>
-        <li>
-          <strong className="text-blue-200">Description:</strong> Provide detailed information about the product (features, materials, etc.).
-        </li>
-        <li>
-          <strong className="text-blue-200">Category & Type:</strong> Select the sport category (football, hockey, cycling) and then the appropriate product type (ball, jersey, helmet). These two fields determine where the product will appear on the site and how it will be filtered in different sections.
-        </li>
-        <li>
-          <strong className="text-blue-200">Carousel Group:</strong> Optional. If checked, the product will appear in the main carousel of its sport category. It uses both <code>category</code> and <code>type</code> to determine placement.
-        </li>
-        <li>
-          <strong className="text-blue-200">Upload Image:</strong> Upload a product image from your local drive. Recommended: clear, front-facing image.
-        </li>
+        <li><strong className="text-blue-200">Name:</strong> Enter the full product name.</li>
+        <li><strong className="text-blue-200">Brand:</strong> Must exactly match an existing brand.</li>
+        <li><strong className="text-blue-200">Price:</strong> Enter the price (e.g., <code>49.90</code>).</li>
+        <li><strong className="text-blue-200">Description:</strong> Detailed information about the product.</li>
+        <li><strong className="text-blue-200">Category & Type:</strong> Determines where the product appears.</li>
+        <li><strong className="text-blue-200">Carousel Group:</strong> Optional. Include in main carousel if checked.</li>
+        <li><strong className="text-blue-200">Upload Image:</strong> Upload a front-facing product image.</li>
       </ul>
 
-
-      <form onSubmit={handleSubmit} className="max-w-4xl mx-auto bg-gray-800 xl:border-2 border-gray-500 bg-opacity-50 p-8 rounded-lg shadow-md" encType="multipart/form-data">
+      <form onSubmit={handleSubmit} className="max-w-4xl mx-auto bg-gray-800 xl:border-2 border-gray-500 bg-opacity-50 p-8 rounded-lg shadow-md">
 
         {/* Grid layout for inputs */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -162,15 +158,9 @@ const AddProductForm = () => {
                   onChange={handleChange}
                   min={field === 'price' ? '0' : undefined}
                   step={field === 'price' ? '0.01' : undefined}
-                  placeholder={
-                    field === 'name'
-                      ? 'Enter product name'
-                      : field === 'brand'
-                        ? 'Enter brand'
-                        : field === 'price'
-                          ? 'Enter price in €'
-                          : ''
-                  }
+                  placeholder={field === 'name' ? 'Enter product name' :
+                               field === 'brand' ? 'Enter brand' :
+                               field === 'price' ? 'Enter price in €' : ''}
                   className="w-full p-2 bg-blue-100 text-black border border-blue-800 rounded outline-none"
                   required
                 />
@@ -182,9 +172,7 @@ const AddProductForm = () => {
         {/* Category & Type */}
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block font-semibold mb-1">
-              Category<span className="text-red-400">*</span>
-            </label>
+            <label className="block font-semibold mb-1">Category<span className="text-red-400">*</span></label>
             <select
               name="category"
               value={formData.category}
@@ -199,9 +187,7 @@ const AddProductForm = () => {
             </select>
           </div>
           <div>
-            <label className="block font-semibold mb-1">
-              Type<span className="text-red-400">*</span>
-            </label>
+            <label className="block font-semibold mb-1">Type<span className="text-red-400">*</span></label>
             <select
               name="type"
               value={formData.type}
@@ -211,16 +197,15 @@ const AddProductForm = () => {
               disabled={!formData.category}
             >
               <option value="">-- Select Type --</option>
-              {formData.category &&
-                typeOptions[formData.category].map((t) => (
-                  <option key={t} value={t}>{t}</option>
-                ))}
+              {formData.category && typeOptions[formData.category].map((t) => (
+                <option key={t} value={t}>{t}</option>
+              ))}
             </select>
           </div>
         </div>
+
         {/* Carousel & Image container */}
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6 mt-6">
-          {/* Carousel group field (readonly with checkbox) */}
           <div className="md:w-1/2 px-2">
             <label className="block font-semibold mb-1">Carousel Group</label>
             <input
@@ -245,14 +230,11 @@ const AddProductForm = () => {
             </div>
           </div>
 
-          {/* Image input */}
           <div className="md:w-1/2 min-h-56 md:min-h-36 px-2 bg-gray-700 p-3 bg-opacity-70 rounded-lg">
             <label className="block font-semibold mb-1 text-center md:text-left">
               Image<span className="text-red-400 ml-1">*</span>
             </label>
-
             <div className="flex flex-col md:flex-row md:items-center gap-4 text-center md:text-left">
-              {/* Upload button + file name */}
               <div className="flex flex-col items-center md:items-start">
                 <label
                   htmlFor="file-upload"
@@ -260,12 +242,8 @@ const AddProductForm = () => {
                 >
                   Upload Image
                 </label>
-                {imageFile && (
-                  <span className="text-sm text-green-200 mt-2 md:mt-1">{imageFile.name}</span>
-                )}
+                {imageFile && <span className="text-sm text-green-200 mt-2 md:mt-1">{imageFile.name}</span>}
               </div>
-
-              {/* Image preview */}
               {imageFile && (
                 <img
                   src={URL.createObjectURL(imageFile)}
@@ -274,7 +252,6 @@ const AddProductForm = () => {
                 />
               )}
             </div>
-
             <input
               id="file-upload"
               type="file"
@@ -285,15 +262,14 @@ const AddProductForm = () => {
           </div>
         </div>
 
-
-
         {/* Submit button */}
         <div className="flex justify-center mt-8">
           <button
             type="submit"
             className="w-[190px] bg-green-700 hover:bg-green-600 text-white py-2 px-4 text-sm md:text-lg rounded-lg transition"
+            disabled={uploading}
           >
-            Add Product
+            {uploading ? 'Uploading...' : 'Add Product'}
           </button>
         </div>
 
@@ -305,7 +281,6 @@ const AddProductForm = () => {
         </div>
 
       </form>
-
     </div>
   );
 };
