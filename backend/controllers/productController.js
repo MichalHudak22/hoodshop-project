@@ -179,7 +179,10 @@ const getAllProducts = async (req, res) => {
 
 
 // ADMIN - Add product
-const cloudinary = require("../cloudinary/cloudinary"); // import nastaveného cloudinary
+// controllers/addProduct.js
+const cloudinary = require('../cloudinary/cloudinary'); // správny import Cloudinary
+
+// upload.single('image')
 const addProduct = async (req, res) => {
   const {
     name, category, brand, price,
@@ -192,7 +195,7 @@ const addProduct = async (req, res) => {
   }
 
   try {
-    // upload obrázku do Cloudinary
+    // Upload na Cloudinary
     const result = await cloudinary.uploader.upload(req.file.path, {
       folder: `products/${category}/${type}`,
       use_filename: true,
@@ -200,7 +203,12 @@ const addProduct = async (req, res) => {
       overwrite: true
     });
 
-    const imageUrl = result.secure_url; // táto URL pôjde do DB
+    // Po úspešnom upload-e vymažeme lokálny súbor
+    fs.unlink(req.file.path, (err) => {
+      if (err) console.warn('Nepodarilo sa vymazať lokálny súbor:', err);
+    });
+
+    const imageUrl = result.secure_url;
 
     const sql = `
       INSERT INTO products
