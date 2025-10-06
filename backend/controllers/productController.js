@@ -177,39 +177,20 @@ const getAllProducts = async (req, res) => {
 };
 
 
-
 // ADMIN - Add product
-// controllers/addProduct.js
-const cloudinary = require('../cloudinary/cloudinary'); // správny import Cloudinary
-
-// upload.single('image')
 const addProduct = async (req, res) => {
   const {
     name, category, brand, price,
     type, description, slug,
-    highlight_title, carousel_group
+    highlight_title, carousel_group,
+    image // teraz očakávame URL
   } = req.body;
 
-  if (!name || !category || !brand || !price || !type || !description || !slug || !req.file) {
+  if (!name || !category || !brand || !price || !type || !description || !slug || !image) {
     return res.status(400).json({ error: 'Chýbajú povinné polia alebo obrázok' });
   }
 
   try {
-    // Upload na Cloudinary
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: `products/${category}/${type}`,
-      use_filename: true,
-      unique_filename: false,
-      overwrite: true
-    });
-
-    // Po úspešnom upload-e vymažeme lokálny súbor
-    fs.unlink(req.file.path, (err) => {
-      if (err) console.warn('Nepodarilo sa vymazať lokálny súbor:', err);
-    });
-
-    const imageUrl = result.secure_url;
-
     const sql = `
       INSERT INTO products
       (name, category, brand, price, image, type, description, slug, highlight_title, carousel_group)
@@ -217,7 +198,7 @@ const addProduct = async (req, res) => {
     `;
 
     const [dbResult] = await db.query(sql, [
-      name, category, brand, price, imageUrl, type, description, slug,
+      name, category, brand, price, image, type, description, slug,
       highlight_title || null,
       carousel_group || null
     ]);
@@ -225,14 +206,15 @@ const addProduct = async (req, res) => {
     res.status(201).json({
       message: 'Product was successfully added.',
       productId: dbResult.insertId,
-      imageUrl,
+      imageUrl: image,
     });
-
   } catch (err) {
-    console.error('DB or Cloudinary error:', err);
-    res.status(500).json({ error: 'Chyba servera pri vkladaní produktu alebo upload obrázku' });
+    console.error('DB error:', err);
+    res.status(500).json({ error: 'Chyba servera pri vkladaní produktu' });
   }
 };
+
+module.exports = { addProduct };
 
 
 

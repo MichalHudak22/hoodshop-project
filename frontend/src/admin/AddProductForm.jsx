@@ -57,64 +57,61 @@ const AddProductForm = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
+  setImageError(null);
+
+  const { name, category, brand, price, type, description, slug } = formData;
+  if (!name || !category || !brand || !price || !type || !description || !slug) {
+    setError('Please fill in all required fields.');
+    setMessage(null);
+    return;
+  }
+
+  if (!imageFile) {
+    setImageError('Please upload an image before saving the product.');
+    setMessage(null);
+    return;
+  }
+
+  setUploading(true);
+
+  try {
+    // 1️⃣ Upload obrázku priamo na Cloudinary (unsigned preset)
+    const data = new FormData();
+    data.append('file', imageFile);
+    data.append('upload_preset', cloudinaryUploadPreset);
+
+    const cloudRes = await axios.post(cloudinaryUploadURL, data);
+    const imageURL = cloudRes.data.secure_url;
+
+    // 2️⃣ Odoslanie dát produktu na backend ako JSON
+    const token = localStorage.getItem('token');
+    const productData = { ...formData, image: imageURL };
+    if (!includeCarouselGroup) delete productData.carousel_group;
+
+    const res = await axios.post(`${baseURL}/products`, productData, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    setMessage(res.data.message);
+    setError(null);
     setImageError(null);
+    setFormData({
+      name: '', category: '', brand: '', price: '', type: '',
+      description: '', slug: '', carousel_group: ''
+    });
+    setImageFile(null);
+    setIncludeCarouselGroup(false);
 
-    const { name, category, brand, price, type, description, slug } = formData;
-    const missingFields = [];
-    if (!name) missingFields.push('name');
-    if (!category) missingFields.push('category');
-    if (!brand) missingFields.push('brand');
-    if (!price) missingFields.push('price');
-    if (!type) missingFields.push('type');
-    if (!description) missingFields.push('description');
-    if (!slug) missingFields.push('slug');
+  } catch (err) {
+    console.error(err);
+    setError(err.response?.data?.error || 'An error occurred');
+    setMessage(null);
+  } finally {
+    setUploading(false);
+  }
+};
 
-    if (missingFields.length > 0) {
-      setError('Please fill in all required fields.');
-      setMessage(null);
-      return;
-    }
-
-    if (!imageFile) {
-      setError(null);
-      setImageError('Please upload an image before saving the product.');
-      setMessage(null);
-      return;
-    }
-
-    setUploading(true);
-
-    try {
-      // 1️⃣ Upload obrázku do Cloudinary
-      const imageURL = await uploadToCloudinary(imageFile);
-
-      // 2️⃣ Odoslanie dát produktu na backend
-      const token = localStorage.getItem('token');
-      const productData = { ...formData, image: imageURL };
-      if (!includeCarouselGroup) delete productData.carousel_group;
-
-      const res = await axios.post(`${baseURL}/products`, productData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      setMessage(res.data.message);
-      setError(null);
-      setImageError(null);
-      setFormData({
-        name: '', category: '', brand: '', price: '', type: '',
-        description: '', slug: '', carousel_group: ''
-      });
-      setImageFile(null);
-      setIncludeCarouselGroup(false);
-    } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.error || 'An error occurred');
-      setMessage(null);
-    } finally {
-      setUploading(false);
-    }
-  };
 
   return (
     <div className="bg-black bg-opacity-70 md:rounded-xl py-10 px-4 text-white border border-gray-700">
