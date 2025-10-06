@@ -49,7 +49,6 @@ const FeaturedHockeyHighlights = () => {
     { items: featuredJerseys, name: 'Bauer', defaultBg: '/img/bauer-jersey.jpg' },
     { items: featuredSkates, name: 'Reebok', defaultBg: '/img/reebok-skates.jpg' },
     { items: featuredHelmets, name: 'Warrior', defaultBg: '/img/warrior-helmet.jpg' },
-    { items: featuredSticks, name: 'CCM', defaultBg: '/img/ccm-stick.jpg' },
   ];
 
   let count = 0;
