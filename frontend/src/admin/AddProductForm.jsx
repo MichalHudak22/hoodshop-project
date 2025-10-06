@@ -79,6 +79,8 @@ const handleSubmit = async (e) => {
   setMessage(null);
 
   const { name, category, brand, price, type, description, slug } = formData;
+
+  // Validácia
   if (!name || !category || !brand || !price || !type || !description || !slug) {
     setError('Please fill in all required fields.');
     return;
@@ -93,18 +95,34 @@ const handleSubmit = async (e) => {
 
   try {
     // 1️⃣ Upload obrázku do Cloudinary cez tvoju funkciu
-    const imageURL = await uploadToCloudinary(imageFile, category, type);
+    // Použijeme folder podľa category/type a public_id podľa slug
+    const formDataCloud = new FormData();
+    formDataCloud.append('file', imageFile);
+    formDataCloud.append('upload_preset', cloudinaryUploadPreset);
 
-    // 2️⃣ Pripravíme JSON pre backend
+    if (category && type) {
+      formDataCloud.append('folder', `products/${category}/${type}`);
+      formDataCloud.append('public_id', slug); // voliteľné, aby bol názov obrázku ako slug
+    } else {
+      formDataCloud.append('folder', 'products');
+    }
+
+    const cloudRes = await axios.post(cloudinaryUploadURL, formDataCloud, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+
+    const imageURL = cloudRes.data.secure_url;
+
+    // 2️⃣ Odoslanie dát produktu na backend ako JSON
     const token = localStorage.getItem('token');
     const productData = { ...formData, image: imageURL };
     if (!includeCarouselGroup) delete productData.carousel_group;
 
-    // 3️⃣ Odoslanie produktu do backendu
     const res = await axios.post(`${baseURL}/products`, productData, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
+    // Správa o úspechu
     setMessage(res.data.message);
     setError(null);
     setImageError(null);
