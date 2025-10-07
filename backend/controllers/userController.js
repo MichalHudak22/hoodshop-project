@@ -18,18 +18,14 @@ const getUsers = async (req, res) => {
 
 
 // Funkcia pre vytvorenie nového používateľa registracia 
-// Konfigurácia emailu
-require('dotenv').config();
-
 console.log('EMAIL_USER:', process.env.EMAIL_USER);
 console.log('EMAIL_PASS:', process.env.EMAIL_PASS);
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.EMAIL_USER, // napr. tvojemail@gmail.com
-    pass: process.env.EMAIL_PASS, // alebo App Password
-
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
@@ -38,63 +34,69 @@ const createUser = async (req, res) => {
   const defaultAvatarUrl = 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1755594977/default-avatar_z3c30l.jpg';
 
   try {
+    console.log('📌 Registrácia používateľa začala pre email:', email);
+
     // 1️⃣ Overenie, či už email existuje
-// 1️⃣ Overenie existencie emailu
-const [existingUsers] = await db.query('SELECT * FROM user WHERE email = ?', [email]);
-if (existingUsers.length > 0) {
-  return res.status(400).json({ error: 'Email je už zaregistrovaný.' });
-}
+    const [existingUsers] = await db.query('SELECT * FROM user WHERE email = ?', [email]);
+    if (existingUsers.length > 0) {
+      console.log('⚠️ Email už existuje:', email);
+      return res.status(400).json({ error: 'Email je už zaregistrovaný.' });
+    }
+    console.log('✅ Email nie je obsadený, pokračujem v registrácii.');
 
-// 2️⃣ Hashovanie hesla
-const hashedPassword = await bcrypt.hash(password, 10);
+    // 2️⃣ Hashovanie hesla
+    const hashedPassword = await bcrypt.hash(password, 10);
+    console.log('🔒 Heslo zašifrované.');
 
-// 3️⃣ Vloženie používateľa
-const [insertResult] = await db.query(
-  'INSERT INTO user (name, email, password, is_verified, user_photo, user_photo_public_id) VALUES (?, ?, ?, false, ?, NULL)',
-  [name, email, hashedPassword, defaultAvatarUrl]
-);
+    // 3️⃣ Vloženie používateľa do DB
+    const [insertResult] = await db.query(
+      'INSERT INTO user (name, email, password, is_verified, user_photo, user_photo_public_id) VALUES (?, ?, ?, false, ?, NULL)',
+      [name, email, hashedPassword, defaultAvatarUrl]
+    );
+    const userId = insertResult.insertId;
+    console.log('📝 Používateľ vložený do DB s ID:', userId);
 
-const userId = insertResult.insertId;
+    // 4️⃣ Vytvorenie tokenu pre overenie emailu
+    const token = uuidv4();
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const expiresAtFormatted = expiresAt.toISOString().slice(0, 19).replace('T', ' ');
 
-// 4️⃣ Vytvorenie tokenu
-const token = uuidv4();
-const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-const expiresAtFormatted = expiresAt.toISOString().slice(0, 19).replace('T', ' ');
+    await db.query(
+      'INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
+      [userId, token, expiresAtFormatted]
+    );
+    console.log('🔑 Token pre overenie emailu vytvorený a uložený do DB:', token);
 
-await db.query(
-  'INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
-  [userId, token, expiresAtFormatted]
-);
+    const frontendURL = process.env.FRONTEND_URL;
+    const verificationLink = `${frontendURL}/verify-email?token=${token}`;
 
-const frontendURL = process.env.FRONTEND_URL;
-const verificationLink = `${frontendURL}/verify-email?token=${token}`;
+    // 5️⃣ Odoslanie overovacieho emailu
+    try {
+      await transporter.sendMail({
+        to: email,
+        subject: 'Overenie emailu - HoodShop',
+        html: `
+          <p>Ahoj ${name},</p>
+          <p>Prosím, over svoj účet kliknutím na odkaz nižšie:</p>
+          <a href="${verificationLink}">${verificationLink}</a>
+          <p>Ak si sa neregistroval, ignoruj tento email.</p>
+        `,
+      });
+      console.log(`✅ Overovací email odoslaný na: ${email}`);
+    } catch (emailErr) {
+      console.error('❌ Chyba pri odosielaní overovacieho emailu:', emailErr);
+      console.log('ℹ️ Registrácia prebehla, používateľ je uložený, email nebol odoslaný.');
+    }
 
-// 5️⃣ Odoslanie overovacieho emailu
-try {
-  await transporter.sendMail({
-    to: email,
-    subject: 'Overenie emailu - HoodShop',
-    html: `
-      <p>Ahoj ${name},</p>
-      <p>Prosím, over svoj účet kliknutím na odkaz nižšie:</p>
-      <a href="${verificationLink}">${verificationLink}</a>
-      <p>Ak si sa neregistroval, ignoruj tento email.</p>
-    `,
-  });
-  console.log(`✅ Overovací email odoslaný na: ${email}`);
-} catch (emailErr) {
-  console.error('❌ Chyba pri odosielaní overovacieho emailu:', emailErr);
-  // Registrácia pokračuje aj keď email neprejde
-}
-
-// 6️⃣ Úspešná odpoveď klientovi
-res.status(201).json({
-  message: 'Registrácia úspešná. Skontroluj email pre overenie účtu.',
-  userId,
-});
+    // 6️⃣ Úspešná odpoveď klientovi
+    res.status(201).json({
+      message: 'Registrácia úspešná. Skontroluj email pre overenie účtu.',
+      userId,
+    });
+    console.log('🎉 Registrácia úspešne dokončená pre email:', email);
 
   } catch (err) {
-    console.error('Chyba pri registrácii používateľa:', err);
+    console.error('❌ Chyba pri registrácii používateľa:', err);
     res.status(500).json({ error: 'Interná chyba servera' });
   }
 };
