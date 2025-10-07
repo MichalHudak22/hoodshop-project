@@ -65,29 +65,39 @@ const createUser = async (req, res) => {
       [userId, token, expiresAtFormatted]
     );
 
-    // 5️⃣ Odoslanie overovacieho emailu s FRONTEND_URL z env
+    // 5️⃣ Odoslanie overovacieho emailu (v samostatnom try/catch)
     const frontendURL = process.env.FRONTEND_URL;
     const verificationLink = `${frontendURL}/verify-email?token=${token}`;
 
-    await transporter.sendMail({
-      to: email,
-      subject: 'Overenie emailu',
-      html: `
-        <p>Ahoj ${name},</p>
-        <p>Prosím, over svoj účet kliknutím na odkaz nižšie:</p>
-        <a href="${verificationLink}">${verificationLink}</a>
-        <p>Ak si sa neregistroval, ignoruj tento email.</p>
-      `,
-    });
+    try {
+      await transporter.sendMail({
+        to: email,
+        subject: 'Overenie emailu',
+        html: `
+          <p>Ahoj ${name},</p>
+          <p>Prosím, over svoj účet kliknutím na odkaz nižšie:</p>
+          <a href="${verificationLink}">${verificationLink}</a>
+          <p>Ak si sa neregistroval, ignoruj tento email.</p>
+        `,
+      });
+      console.log(`Overovací email odoslaný na: ${email}`);
+    } catch (emailErr) {
+      console.error('Chyba pri odosielaní overovacieho emailu:', emailErr);
+      // Nezastaví registráciu, iba loguje chybu
+    }
 
-    // 6️⃣ Úspešná odpoveď
-    res.status(201).json({ message: 'Registrácia úspešná. Skontroluj email pre overenie účtu.' });
+    // 6️⃣ Úspešná odpoveď klientovi
+    res.status(201).json({
+      message: 'Registrácia úspešná. Skontroluj email pre overenie účtu.',
+      userId,
+    });
 
   } catch (err) {
     console.error('Chyba pri registrácii používateľa:', err);
     res.status(500).json({ error: 'Interná chyba servera' });
   }
 };
+
 
 
 // Funkcia pre overenie registracie pomocou emailu
