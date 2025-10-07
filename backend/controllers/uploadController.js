@@ -1,5 +1,5 @@
 const db = require('../database');
-const uploadSingle = require('../cloudinary/upload'); // multer-storage-cloudinary
+const uploadSingle = require('../cloudinary/uploadAvatar');
 const cloudinary = require('../cloudinary/cloudinary');
 
 // Upload / replace profile photo
