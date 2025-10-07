@@ -1,9 +1,11 @@
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
-const nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail');
 const bcrypt = require('bcrypt');
 const db = require('../database');
 
+// Nastavenie SendGrid API kľúča
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // Funkcia pre získanie všetkých používateľov
 const getUsers = async (req, res) => {
@@ -16,19 +18,7 @@ const getUsers = async (req, res) => {
   }
 };
 
-
-// Funkcia pre vytvorenie nového používateľa registracia 
-console.log('EMAIL_USER:', process.env.EMAIL_USER);
-console.log('EMAIL_PASS:', process.env.EMAIL_PASS);
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-
+// Funkcia pre vytvorenie nového používateľa registrácia
 const createUser = async (req, res) => {
   const { name, email, password } = req.body;
   const defaultAvatarUrl = 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1755594977/default-avatar_z3c30l.jpg';
@@ -70,10 +60,11 @@ const createUser = async (req, res) => {
     const frontendURL = process.env.FRONTEND_URL;
     const verificationLink = `${frontendURL}/verify-email?token=${token}`;
 
-    // 5️⃣ Odoslanie overovacieho emailu
+    // 5️⃣ Odoslanie overovacieho emailu cez SendGrid
     try {
-      await transporter.sendMail({
+      await sgMail.send({
         to: email,
+        from: process.env.EMAIL_USER, // musí byť overený v SendGrid
         subject: 'Overenie emailu - HoodShop',
         html: `
           <p>Ahoj ${name},</p>
@@ -101,9 +92,7 @@ const createUser = async (req, res) => {
   }
 };
 
-
-
-// Funkcia pre overenie registracie pomocou emailu
+// Funkcia pre overenie registrácie pomocou emailu
 const verifyEmail = async (req, res) => {
   const token = req.query.token;
   if (!token) {
