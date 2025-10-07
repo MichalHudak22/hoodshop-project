@@ -62,6 +62,7 @@ const getTopCarouselProducts = async (req, res) => {
            WHERE category = ${db.escape(category)} 
              AND type = ${db.escape(type)} 
              AND is_active = 1
+             AND carousel_group = 1
            ORDER BY id DESC LIMIT 1)`;
     });
 
