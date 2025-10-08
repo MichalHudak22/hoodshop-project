@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 
 const baseURL = 'https://hoodshop-project.onrender.com'; // produkčné URL
@@ -7,11 +7,11 @@ const baseURL = 'https://hoodshop-project.onrender.com'; // produkčné URL
 function UserDetailPage() {
   const { id } = useParams();
   const token = localStorage.getItem('token');
-  const navigate = useNavigate(); // 👈 hook pre navigáciu
 
   const [user, setUser] = useState(null);
   const [orders, setOrders] = useState([]);
   const [shippingOptions, setShippingOptions] = useState([]);
+  const [error, setError] = useState(null);
   const [ordersError, setOrdersError] = useState(null);
 
   // 1) Načítanie cien dopravy z DB
@@ -31,33 +31,23 @@ function UserDetailPage() {
   // 2) Načítanie používateľa
   useEffect(() => {
     if (!token) {
-      navigate('/login'); // 👈 presmerovanie, ak nie je token
+      setError('Missing token – you are not logged in');
       return;
     }
-
     fetch(`${baseURL}/user/admin/user/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => {
-        if (!res.ok) {
-          navigate('/login'); // 👈 presmerovanie, ak odpoveď nie je OK
-          return null;
-        }
+        if (!res.ok) throw new Error('Failed to load user data');
         return res.json();
       })
-      .then(data => {
-        if (data) setUser(data);
-      })
-      .catch(err => {
-        console.error(err);
-        navigate('/login'); // 👈 presmerovanie pri akejkoľvek chybe
-      });
-  }, [id, token, navigate]);
+      .then(setUser)
+      .catch(err => setError(err.message));
+  }, [id, token]);
 
   // 3) Načítanie histórie objednávok
   useEffect(() => {
     if (!token) return;
-
     fetch(`${baseURL}/api/order-history/history/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
@@ -69,7 +59,10 @@ function UserDetailPage() {
       .catch(err => setOrdersError(err.message));
   }, [id, token]);
 
-  if (!user) return <p className="text-white text-center">Loading user data...</p>;
+  if (error)
+    return <p className="text-red-500 text-center">{error}</p>;
+  if (!user)
+    return <p className="text-white text-center">Loading user data...</p>;
 
   const ordersCount = orders.length;
   const totalSpent = orders.reduce(
