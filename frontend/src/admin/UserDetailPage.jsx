@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 
 const baseURL = 'https://hoodshop-project.onrender.com'; // produkčné URL
 
 function UserDetailPage() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const token = localStorage.getItem('token');
 
   const [user, setUser] = useState(null);
@@ -14,84 +13,51 @@ function UserDetailPage() {
   const [shippingOptions, setShippingOptions] = useState([]);
   const [error, setError] = useState(null);
   const [ordersError, setOrdersError] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(null);
 
-  // ✅ 1) Overenie role ADMIN
-  useEffect(() => {
-    if (!token) {
-      setIsAdmin(false);
-      return;
-    }
-
-    axios
-      .get(`${baseURL}/user/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
-        if (res.data.role === 'admin') {
-          setIsAdmin(true);
-        } else {
-          setIsAdmin(false);
-        }
-      })
-      .catch(() => setIsAdmin(false));
-  }, [token]);
-
-  // ⛔️ Ak nie je admin – zobrazíme správu alebo presmerujeme
-  useEffect(() => {
-    if (isAdmin === false) {
-      navigate('/'); // presmerovanie na hlavnú stránku
-    }
-  }, [isAdmin, navigate]);
-
-  // 2) Načítanie cien dopravy
+  // 1) Načítanie cien dopravy z DB
   useEffect(() => {
     axios
       .get(`${baseURL}/api/config/shipping-prices`)
-      .then((res) => {
-        const opts = (res.data || []).map((o) => ({
+      .then(res => {
+        const opts = (res.data || []).map(o => ({
           name: o.name,
           price: parseFloat(o.price),
         }));
         setShippingOptions(opts);
       })
-      .catch((err) => console.error('Chyba pri načítaní cien dopravy:', err));
+      .catch(err => console.error('Chyba pri načítaní cien dopravy:', err));
   }, []);
 
-  // 3) Načítanie používateľa
+  // 2) Načítanie používateľa
   useEffect(() => {
-    if (!token || !isAdmin) return;
-
+    if (!token) {
+      setError('Missing token – you are not logged in');
+      return;
+    }
     fetch(`${baseURL}/user/admin/user/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((res) => {
+      .then(res => {
         if (!res.ok) throw new Error('Failed to load user data');
         return res.json();
       })
       .then(setUser)
-      .catch((err) => setError(err.message));
-  }, [id, token, isAdmin]);
+      .catch(err => setError(err.message));
+  }, [id, token]);
 
-  // 4) Načítanie histórie objednávok
+  // 3) Načítanie histórie objednávok
   useEffect(() => {
-    if (!token || !isAdmin) return;
-
+    if (!token) return;
     fetch(`${baseURL}/api/order-history/history/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then((res) => {
+      .then(res => {
         if (!res.ok) throw new Error('Failed to load orders');
         return res.json();
       })
       .then(setOrders)
-      .catch((err) => setOrdersError(err.message));
-  }, [id, token, isAdmin]);
-
-  // Načítavanie – kým sa kontroluje admin status
-  if (isAdmin === null) {
-    return <p className="text-white text-center mt-10">Checking access...</p>;
-  }
+      .catch(err => setOrdersError(err.message));
+  }, [id, token]);
 
   if (error)
     return <p className="text-red-500 text-center">{error}</p>;
@@ -179,12 +145,13 @@ function UserDetailPage() {
               This user has no orders.
             </p>
           ) : (
-            orders.map((order) => (
+            orders.map(order => (
+
               <div
                 key={order.id}
                 className="border-2 border-gray-600 rounded-lg p-6 bg-gray-900 shadow-md hover:shadow-blue-600 transition-shadow duration-300 mb-12"
               >
-                {/* Order info */}
+                {/* rop section - order info */}
                 <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-8 gap-5">
                   <div className="text-sm md:text-base font-semibold text-blue-300 whitespace-nowrap">
                     {new Date(order.created_at).toLocaleDateString('sk-SK')}{' '}
@@ -201,7 +168,11 @@ function UserDetailPage() {
                       </span>
                     </div>
 
-                    <div className="w-full flex flex-col md:flex-row justify-center items-start md:items-center md:space-x-12 space-y-4 md:space-y-0 px-4">
+                    <div
+                      className="
+                        w-full flex flex-col md:flex-row justify-center items-start md:items-center md:space-x-12 space-y-4 md:space-y-0 px-4"
+                    >
+                      {/* Prvá skupina: Full Name, Email, Mobile Number */}
                       <div className="flex flex-col space-y-2 text-left w-full md:w-auto">
                         {[
                           ['Full Name', order.full_name],
@@ -214,6 +185,7 @@ function UserDetailPage() {
                         ))}
                       </div>
 
+                      {/* Druhá skupina: Address, City, Postal Code */}
                       <div className="flex flex-col space-y-2 text-left w-full md:w-auto">
                         {[
                           ['Address', order.address],
@@ -226,6 +198,8 @@ function UserDetailPage() {
                         ))}
                       </div>
                     </div>
+
+
                   </div>
                 </div>
 
@@ -234,9 +208,15 @@ function UserDetailPage() {
                   <table className="hidden md:table w-full text-sm text-left text-gray-200 border border-gray-700 rounded-md mb-6">
                     <thead className="bg-gray-800 text-blue-400 uppercase text-xs sm:text-sm tracking-wide">
                       <tr>
-                        <th className="px-4 py-3 border border-gray-600">Product</th>
-                        <th className="px-4 py-3 border border-gray-600 text-center">Quantity</th>
-                        <th className="px-4 py-3 border border-gray-600 text-right">Price</th>
+                        <th className="px-4 py-3 border border-gray-600">
+                          Product
+                        </th>
+                        <th className="px-4 py-3 border border-gray-600 text-center">
+                          Quantity
+                        </th>
+                        <th className="px-4 py-3 border border-gray-600 text-right">
+                          Price
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -267,13 +247,21 @@ function UserDetailPage() {
                         key={idx}
                         className="bg-gray-800 rounded-lg p-4 shadow-inner border border-gray-700"
                       >
-                        <div className="text-blue-400 font-semibold mb-2">Product</div>
+                        <div className="text-blue-400 font-semibold mb-2">
+                          Product
+                        </div>
                         <div className="mb-3 text-gray-200 truncate">
                           {item.product_name} - {item.price} €
                         </div>
-                        <div className="text-blue-400 font-semibold mb-2">Quantity</div>
-                        <div className="mb-3 text-gray-200">{item.quantity}</div>
-                        <div className="text-blue-400 font-semibold mb-2">Price</div>
+                        <div className="text-blue-400 font-semibold mb-2">
+                          Quantity
+                        </div>
+                        <div className="mb-3 text-gray-200">
+                          {item.quantity}
+                        </div>
+                        <div className="text-blue-400 font-semibold mb-2">
+                          Price
+                        </div>
                         <div className="text-gray-200">
                           {(item.price * item.quantity).toFixed(2)} €
                         </div>
@@ -293,6 +281,8 @@ function UserDetailPage() {
                       <span className="text-green-500 font-bold">
                         {(parseFloat(order.delivery_price) || 0).toFixed(2)} €
                       </span>
+
+
                     </div>
 
                     <div>
@@ -300,10 +290,10 @@ function UserDetailPage() {
                         Used Points:
                       </span>{' '}
                       {order.used_points ?? 0}
-                      <span className="text-red-700 md:text-lg lg:text-xl font-semibold">
-                        {' '}
-                        -{((order.used_points ?? 0) / 10).toFixed(2)} €
+                      <span className="text-red-700 md:text-lg lg:text-xl font-semibold"> -
+                        {((order.used_points ?? 0) / 10).toFixed(2)} €
                       </span>
+
                     </div>
                   </div>
 
@@ -311,10 +301,12 @@ function UserDetailPage() {
                     Total: {order.total_price} €
                   </div>
                 </div>
+
               </div>
             ))
           )}
         </div>
+
       </div>
     </div>
   );
