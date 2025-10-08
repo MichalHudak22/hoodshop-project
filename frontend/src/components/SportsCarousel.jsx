@@ -20,7 +20,7 @@ const CustomCarousel = ({ slides }) => {
       speed={1000}
       navigation
       pagination={false}
-      className="w-full h-[500px] border-b-8 border-black"
+      className="w-full h-[400px] lg:h-[500px] border-b-8 border-black"
     >
       {slides.map((slide, index) => (
         <SwiperSlide key={index}>
