@@ -58,7 +58,7 @@ function Home() {
     <div className="bg-black text-white min-h-screen flex flex-col">
       <HeroVideoCarousel />
 
-      <div className="relative mt-16">
+      <div className="relative mt-5 md:mt-16">
         <div
           className="absolute inset-0 bg-black opacity-60"
           style={{
