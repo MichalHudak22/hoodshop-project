@@ -18,7 +18,7 @@ const CyclingCategories = () => {
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-x-4 gap-y-4 md:gap-x-12 md:gap-y-12">
           {[
             { to: "clothes", bg: "/img/bg-cyclingclothes.jpg", label: "Clothes" },
-            { to: "bike", bg: "/img/bg-cyclingbikes.jpg", label: "Bikes" },
+            { to: "bikes", bg: "/img/bg-cyclingbikes.jpg", label: "Bikes" },
             { to: "helmets", bg: "/img/bg-cyclinghelmets.jpg", label: "Helmets" },
             { to: "gloves", bg: "/img/bg-cyclinggloves.jpg", label: "Gloves" },
           ].map(({ to, bg, label }) => (
