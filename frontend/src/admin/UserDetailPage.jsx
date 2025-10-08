@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 
 const baseURL = 'https://hoodshop-project.onrender.com'; // produkčné URL
@@ -7,7 +7,6 @@ const baseURL = 'https://hoodshop-project.onrender.com'; // produkčné URL
 function UserDetailPage() {
   const { id } = useParams();
   const token = localStorage.getItem('token');
-  const navigate = useNavigate(); // 👈 pridáme hook na navigáciu
 
   const [user, setUser] = useState(null);
   const [orders, setOrders] = useState([]);
@@ -30,33 +29,35 @@ function UserDetailPage() {
   }, []);
 
   // 2) Načítanie používateľa
-  // 2) Načítanie používateľa
   useEffect(() => {
     if (!token) {
-      // 👇 ak nie je token, presmeruj na hlavnu
-      navigate('/');
+      setError('Missing token – you are not logged in');
       return;
     }
-
     fetch(`${baseURL}/user/admin/user/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => {
-        if (!res.ok) {
-          // 👇 ak odpoveď nie je OK, presmeruj na /
-          navigate('/');
-          throw new Error('Failed to load user data');
-        }
+        if (!res.ok) throw new Error('Failed to load user data');
         return res.json();
       })
       .then(setUser)
-      .catch(err => {
-        console.error(err);
-        setError(err.message);
-        // 👇 aj v prípade chyby (napr. token expiroval), presmeruj
-        navigate('/');
-      });
-  }, [id, token, navigate]);
+      .catch(err => setError(err.message));
+  }, [id, token]);
+
+  // 3) Načítanie histórie objednávok
+  useEffect(() => {
+    if (!token) return;
+    fetch(`${baseURL}/api/order-history/history/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to load orders');
+        return res.json();
+      })
+      .then(setOrders)
+      .catch(err => setOrdersError(err.message));
+  }, [id, token]);
 
   if (error)
     return <p className="text-red-500 text-center">{error}</p>;
