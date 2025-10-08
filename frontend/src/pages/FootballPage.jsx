@@ -109,9 +109,15 @@ const handleAddToCart = async (jersey) => {
   return (
     <div>
       {/* HEAD TITLE */}
-     <section
-  className="relative text-center py-10 px-4 bg-gradient-to-br from-green-600 via-black to-green-700 text-white overflow-hidden border-b-4 border-black"
->
+  <section className="relative text-center py-10 px-4 text-white overflow-hidden border-b-4 border-black">
+  {/* Pozadie s opacity */}
+  <div className="absolute inset-0 bg-gradient-to-br from-green-600 via-black to-green-700 opacity-60 -z-10"></div>
+
+  {/* Obsah sekcie */}
+  <h2 className="text-3xl font-bold">Tvoj nadpis</h2>
+  <p className="mt-4">Tvoj text</p>
+
+
   <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
   <div className="relative z-10 max-w-4xl mx-auto">
     <h1 className="text-xl md:text-3xl lg:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">

@@ -24,18 +24,18 @@ const CustomCarousel = ({ slides }) => {
     >
       {slides.map((slide, index) => (
         <SwiperSlide key={index}>
-        <div
-          className="w-full h-full bg-cover bg-center flex items-end justify-start xl:items-center xl:pl-12"
-          style={{ backgroundImage: `url(${slide.image})` }}
-        >
-          <div className="bg-black bg-opacity-40 p-5 text-white max-w-lg text-left ml-0 xl:max-w-3xl xl:rounded-2xl xl:p-10">
-            <h2 className="text-3xl font-luckiest font-bold tracking-widest text-outline mb-4 xl:text-[45px]">{slide.title}</h2>
-            <p className="mb-4 xl:text-[24px]">{slide.description}</p>
-             <Link to={slide.link}>
-  <button className="bg-blue-700 hover:bg-blue-600 px-6 py-2 w-[210px] text-[22px] rounded-full text-white font-semibold transition duration-300">
-    {slide.buttonText}
-  </button>
-</Link>
+          <div
+            className="w-full h-full bg-cover bg-center flex items-end justify-start xl:items-center xl:pl-12"
+            style={{ backgroundImage: `url(${slide.image})` }}
+          >
+            <div className="bg-black bg-opacity-40 p-5 text-white max-w-lg text-left ml-0 xl:max-w-3xl xl:rounded-2xl xl:p-10">
+              <h2 className="text-3xl font-luckiest font-bold tracking-widest text-outline mb-4 xl:text-[45px]">{slide.title}</h2>
+              <p className="mb-4 xl:text-[24px]">{slide.description}</p>
+              <Link to={slide.link}>
+                <button className="bg-blue-700 hover:bg-blue-600 px-6 py-2 w-[210px] text-[22px] rounded-full text-white font-semibold transition duration-300">
+                  {slide.buttonText}
+                </button>
+              </Link>
             </div>
           </div>
         </SwiperSlide>
