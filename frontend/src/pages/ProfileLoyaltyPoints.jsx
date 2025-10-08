@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ProfileNavigation from '../components/ProfileNavigation';
 import { AuthContext } from '../context/AuthContext';
@@ -7,8 +8,16 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function ProfileLoyaltyPoints() {
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate(); // hook na presmerovanie
   const [profile, setProfile] = useState(null);
   const [displayPoints, setDisplayPoints] = useState(0);
+
+  // ✅ Presmerovanie neprihlásených
+  useEffect(() => {
+    if (!user?.token) {
+      navigate('/login'); // ak nie je prihlásený, presmeruj na login
+    }
+  }, [user, navigate]);
 
   // Načítanie profilu
   useEffect(() => {
@@ -16,7 +25,7 @@ function ProfileLoyaltyPoints() {
 
     axios
       .get(`${API_BASE_URL}/user/profile`, {
-        headers: { Authorization: `Bearer ${user.token}` }
+        headers: { Authorization: `Bearer ${user.token}` },
       })
       .then((res) => setProfile(res.data))
       .catch((err) => console.error('Chyba pri načítaní profilu:', err));
@@ -25,9 +34,10 @@ function ProfileLoyaltyPoints() {
   // Animácia bodov
   useEffect(() => {
     if (!profile) return;
-    const totalPoints = profile.loyalty_points;
-    const duration = 3500; // 5 sekúnd
-    const intervalTime = 20; // ms medzi krokmi
+
+    const totalPoints = profile.loyalty_points || 0;
+    const duration = 3500; // ms
+    const intervalTime = 20; // ms
     const steps = duration / intervalTime;
     const increment = totalPoints / steps;
 
@@ -43,6 +53,9 @@ function ProfileLoyaltyPoints() {
 
     return () => clearInterval(interval);
   }, [profile]);
+
+  // Zabránime renderu, kým prebieha presmerovanie
+  if (!user?.token) return null;
 
   return (
     <div
@@ -62,7 +75,7 @@ function ProfileLoyaltyPoints() {
         <div className="w-full lg:max-w-2xl">
           <ProfileNavigation />
 
-          {profile && (
+          {profile ? (
             <div className="mt-6 bg-black bg-opacity-50 md:bg-opacity-70 p-6 lg:rounded-xl shadow-md text-center lg:border-2 border-gray-600">
               <h3 className="text-2xl font-semibold text-blue-100 mb-2">
                 Welcome, {profile.name}!
@@ -70,7 +83,8 @@ function ProfileLoyaltyPoints() {
               <p className="text-lg text-white">
                 You currently have{' '}
                 <span className="font-bold text-5xl p-3 text-yellow-400">
-                  <br className='md:hidden' />{displayPoints}
+                  <br className="md:hidden" />
+                  {displayPoints}
                 </span>{' '}
                 loyalty points.
               </p>
@@ -82,36 +96,56 @@ function ProfileLoyaltyPoints() {
                 in discounts!
               </p>
             </div>
-          )}
-
-          {!profile && (
-            <div className="mt-6 text-center text-gray-300">Loading your profile...</div>
+          ) : (
+            <div className="mt-6 text-center text-gray-300">
+              Loading your profile...
+            </div>
           )}
         </div>
 
-        {/* Info o vernostnych bodoch */}
+        {/* Info o vernostných bodoch */}
         <div className="max-w-5xl mx-auto bg-black bg-opacity-50 md:bg-opacity-70 shadow-md lg:rounded-2xl p-6 mt-10 text-gray-800 lg:border-2 border-gray-600">
           <h2 className="text-2xl text-blue-100 font-bold mb-4 text-center">
             🎁 Loyalty Points – Your Reward for Every Purchase
           </h2>
           <p className="mb-4 text-white">
-            We truly value every customer, and that’s why we’ve introduced a <strong>loyalty program</strong> that rewards you for shopping with us.
+            We truly value every customer, and that’s why we’ve introduced a{' '}
+            <strong>loyalty program</strong> that rewards you for shopping with
+            us.
           </p>
           <p className="mb-4 text-white">
-            With every purchase, you automatically earn <strong>loyalty points</strong>. The amount you receive equals <strong>5% of your total order value</strong>. These points are added to your account immediately after checkout and can be used as a discount on your next purchase.
+            With every purchase, you automatically earn{' '}
+            <strong>loyalty points</strong>. The amount you receive equals{' '}
+            <strong>5% of your total order value</strong>. These points are
+            added to your account immediately after checkout and can be used as
+            a discount on your next purchase.
           </p>
-          <h3 className="text-2xl text-blue-100 font-semibold mt-6 mb-2">🔍 How does it work?</h3>
+          <h3 className="text-2xl text-blue-100 font-semibold mt-6 mb-2">
+            🔍 How does it work?
+          </h3>
           <ul className="list-disc list-inside space-y-1 mb-4 text-white">
-            <li>💸 For every 100 € spent, you earn <strong>50 points</strong></li>
+            <li>
+              💸 For every 100 € spent, you earn <strong>50 points</strong>
+            </li>
             <li>🧾 <strong>10 points = 1 €</strong> discount</li>
-            <li>🛒 You can apply your points as a full or partial discount on your next order</li>
-            <li>🔐 Loyalty points are available only to <strong>registered and logged-in users</strong></li>
+            <li>
+              🛒 You can apply your points as a full or partial discount on
+              your next order
+            </li>
+            <li>
+              🔐 Loyalty points are available only to{' '}
+              <strong>registered and logged-in users</strong>
+            </li>
           </ul>
           <p className="mb-4 text-white">
-            <em>Example:</em> If you spend 60 €, you’ll earn 30 points, which gives you a 3 € discount on your next purchase. The more you shop, the more you save – it’s that simple.
+            <em>Example:</em> If you spend 60 €, you’ll earn 30 points, which
+            gives you a 3 € discount on your next purchase. The more you shop,
+            the more you save – it’s that simple.
           </p>
           <p className="font-medium text-center mt-6 text-white">
-            💡 Loyalty points are our way of saying <strong>thank you</strong> for your trust and continued support. Shop, earn, and enjoy the rewards you deserve!
+            💡 Loyalty points are our way of saying <strong>thank you</strong>{' '}
+            for your trust and continued support. Shop, earn, and enjoy the
+            rewards you deserve!
           </p>
         </div>
       </div>
