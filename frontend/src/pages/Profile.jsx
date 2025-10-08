@@ -123,30 +123,35 @@ function Profile() {
 
 
   // Formular
-  useEffect(() => {
-    const token = localStorage.getItem('token');
+useEffect(() => {
+  const token = localStorage.getItem('token');
 
-    if (!token) {
-      navigate('/login');
-      return;
-    }
+  if (!token) {
+    navigate('/login');
+    return;
+  }
 
-   fetch(`${baseURL}/user/profile`, {
-  method: 'GET',
-  headers: { Authorization: `Bearer ${token}` },
-})
-  .then((res) => res.json())
-  .then((data) => {
-    if (data.error) {
-      setError(data.error);
-    } else {
-      // 👉 update user v AuthContext
-      login({ ...data, token });
-    }
+  fetch(`${baseURL}/user/profile`, {
+    method: 'GET',
+    headers: { Authorization: `Bearer ${token}` },
   })
-  .catch(() => setError('Chyba pri načítaní údajov o používateľovi'));
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.error) {
+        setError(data.error);
+        logout(); // odstráni token z localStorage a user z contextu
+        navigate('/login');
+      } else {
+        login({ ...data, token });
+      }
+    })
+    .catch(() => {
+      setError('Chyba pri načítaní údajov o používateľovi');
+      logout();
+      navigate('/login');
+    });
+}, [navigate, login, logout]);
 
-  }, [navigate]);
 
   // Handler pre update stavov políčok
   const handleChange = (e) => {

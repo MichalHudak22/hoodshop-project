@@ -26,7 +26,7 @@ function ProfileLoyaltyPoints() {
   useEffect(() => {
     if (!profile) return;
     const totalPoints = profile.loyalty_points;
-    const duration = 5000; // 5 sekúnd
+    const duration = 3500; // 5 sekúnd
     const intervalTime = 20; // ms medzi krokmi
     const steps = duration / intervalTime;
     const increment = totalPoints / steps;
