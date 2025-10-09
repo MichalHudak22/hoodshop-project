@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 function ProfileNavigation() {
   return (
-<div className="w-full bg-black mb-4">
+<div className="w-full bg-black lg:mb-4">
   <div className="flex w-full max-w-5xl mx-auto h-[80px] sm:h-[70px] lg:max-w-full lg:justify-around">
     <Link
       to="/profile"
