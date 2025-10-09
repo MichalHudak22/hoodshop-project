@@ -13,7 +13,7 @@ const CyclingCategories = () => {
         backgroundAttachment: 'fixed',
       }}
     >
-      <div className="mx-auto px-4 lg:px-5 xl:px-8 py-14 lg:py-0 bg-black bg-opacity-40 lg:bg-opacity-50 lg:border-[7px] lg:border-black lg:rounded-lg max-w-5xl xl:max-w-[80%]">
+      <div className="mx-auto px-4 lg:px-5 xl:px-8 py-14 lg:py-6 bg-black bg-opacity-40 lg:bg-opacity-50 lg:border-[7px] lg:border-black lg:rounded-lg max-w-5xl xl:max-w-[80%]">
         <h2 className="text-xl lg:text-3xl font-bold mb-8 text-center text-white">Explore Cycling Categories</h2>
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-x-4 gap-y-4 md:gap-x-12 md:gap-y-12">
           {[
