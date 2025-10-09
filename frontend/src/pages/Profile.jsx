@@ -251,7 +251,7 @@ const handleSave = () => {
 
         {/* Admin Panel - zobrazí sa len adminovi */}
         {user.role === 'admin' && (
-          <div className=" pb-5 w-[220px] md:m-auto">
+          <div className="lg:pb-5 w-[220px] md:m-auto">
             <button
               onClick={() => navigate('/admin')}
               className="w-full px-3 py-3 bg-black text-white hover:text-blue-200 text-[12px] sm:text-[16px] lg:text-[20px] font-bold transition-all duration-300 border-2 border-gray-500 hover:border-blue-200"
