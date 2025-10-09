@@ -60,7 +60,7 @@ function Home() {
 
       <div className="relative mt-6 md:mt-14">
         <div
-          className="absolute inset-0 bg-black opacity-60"
+          className="absolute inset-0 bg-black opacity-60 bg-fixed"
           style={{
             backgroundImage: "url('/img/bg-sports.jpg')",
             backgroundSize: 'cover',
@@ -68,6 +68,7 @@ function Home() {
             backgroundAttachment: 'fixed',
           }}
         />
+
         <div className="relative z-10">
           <HomeCategories />
         </div>
@@ -92,12 +93,12 @@ function Home() {
           <HomeBrands />
         </div>
 
-         {/* ✅ MESSAGE NA STRED OBRAZOVKY */}
-      {message && (
-        <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
-          {message}
-        </div>
-      )}
+        {/* ✅ MESSAGE NA STRED OBRAZOVKY */}
+        {message && (
+          <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
+            {message}
+          </div>
+        )}
       </div>
     </div>
   );
