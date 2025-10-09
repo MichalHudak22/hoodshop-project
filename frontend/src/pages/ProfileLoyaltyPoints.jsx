@@ -104,7 +104,7 @@ function ProfileLoyaltyPoints() {
         </div>
 
         {/* Info o vernostných bodoch */}
-        <div className="max-w-5xl mx-auto bg-black bg-opacity-50 md:bg-opacity-70 shadow-md lg:rounded-2xl p-6 mt-10 text-gray-800 lg:border-2 border-gray-600">
+        <div className="max-w-5xl mx-auto bg-black bg-opacity-50 md:bg-opacity-70 shadow-md lg:rounded-2xl py-10 lg:py-0 p-6 lg:mt-10 text-gray-800 lg:border-2 border-gray-600">
           <h2 className="text-2xl text-blue-100 font-bold mb-4 text-center">
             🎁 Loyalty Points – Your Reward for Every Purchase
           </h2>
