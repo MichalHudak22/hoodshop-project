@@ -22,13 +22,13 @@ const HomeBrands = () => {
 
   return (
     <section
-      className="relative py-8 md:py-12 px-6 bg-black overflow-hidden"
+      className="relative py-8 md:py-12 px-6 bg-black overflow-hidden bg-fixed"
       style={{
         backgroundImage: `url(${bgImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'contain',
         backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed',
+        backgroundAttachment: 'fixed', // desktop
       }}
     >
       <div className="absolute inset-0 bg-black opacity-60 z-0"></div>
