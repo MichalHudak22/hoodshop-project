@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useRef, useState, useEffect, useContext } from 'react';
 import HeroVideoCarousel from '../components/HeroVideoCarousel';
 import HomeCategories from '../components/HomeCategories';
 import ProductsCarousel from '../components/ProductsCarousel';
@@ -9,15 +9,29 @@ function Home() {
   const [carouselSlides, setCarouselSlides] = useState([]);
   const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
-  const [offsetY, setOffsetY] = useState(0); // 🧠 parallax scroll hodnota
 
-  // sleduj scroll
+  // 🧠 Refs pre obe parallax sekcie
+  const section1Ref = useRef(null);
+  const section2Ref = useRef(null);
+  const [section1Offset, setSection1Offset] = useState(0);
+  const [section2Offset, setSection2Offset] = useState(0);
+
   useEffect(() => {
     const handleScroll = () => {
-      setOffsetY(window.scrollY);
+      const updateSectionOffset = (ref, setOffset) => {
+        if (!ref.current) return;
+        const rect = ref.current.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        const visible = Math.min(Math.max(windowHeight - rect.top, 0), rect.height);
+        setOffset(visible);
+      };
+
+      updateSectionOffset(section1Ref, setSection1Offset);
+      updateSectionOffset(section2Ref, setSection2Offset);
     };
 
     window.addEventListener('scroll', handleScroll);
+    handleScroll(); // init
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -66,15 +80,15 @@ function Home() {
     <div className="bg-black text-white min-h-screen flex flex-col">
       <HeroVideoCarousel />
 
-      {/* ✅ PARALLAX SEKCIa */}
-      <div className="relative mt-6 md:mt-14 overflow-hidden">
+      {/* ✅ PARALLAX SEKCIa 1 */}
+      <div ref={section1Ref} className="relative mt-6 md:mt-14 overflow-hidden">
         <div
-          className="absolute inset-0 bg-black opacity-60 will-change-transform"
+          className="absolute inset-0 bg-black opacity-60 will-change-transform transition-transform duration-75 ease-linear"
           style={{
             backgroundImage: "url('/img/bg-sports.jpg')",
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            transform: `translateY(${offsetY * 0.3}px)`, // 💫 efekt
+            transform: `translateY(${section1Offset * 0.15}px)`,
           }}
         />
         <div className="relative z-10">
@@ -90,15 +104,15 @@ function Home() {
         <ProductsCarousel slides={carouselSlides} handleAddToCart={handleAddToCart} />
       </div>
 
-      {/* ✅ Druhá sekcia s rovnakým efektom */}
-      <div className="relative mt-16 overflow-hidden">
+      {/* ✅ PARALLAX SEKCIa 2 */}
+      <div ref={section2Ref} className="relative mt-16 overflow-hidden">
         <div
-          className="absolute inset-0 bg-black opacity-60 will-change-transform"
+          className="absolute inset-0 bg-black opacity-60 will-change-transform transition-transform duration-75 ease-linear"
           style={{
             backgroundImage: "url('/img/bg-sports.jpg')",
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            transform: `translateY(${offsetY * 0.3}px)`,
+            transform: `translateY(${section2Offset * 0.15}px)`,
           }}
         />
         <div className="relative z-10">
