@@ -53,10 +53,10 @@ const FeaturedFootballHighlights = () => {
 
   return (
     <section
-      className={`py-12 w-full ${!isMobile ? 'bg-fixed' : ''}`}
+      className={`w-full ${!isMobile ? 'bg-fixed' : ''}`}
       style={{
         backgroundImage: 'url(/img/bg-football4.jpg)',
-        backgroundSize: 'cover',
+        backgroundSize: isMobile ? 'contain' : 'cover', // mobile - contain, desktop - cover
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
       }}
