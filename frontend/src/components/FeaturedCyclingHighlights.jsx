@@ -10,11 +10,10 @@ const FeaturedCyclingHighlights = () => {
 
   const baseURL = import.meta.env.VITE_API_BASE_URL;
 
-  // Funkcia na opravu URL (Cloudinary vs lokálne)
   const fixCloudinaryUrl = (url) => {
     if (!url) return '';
-    if (url.startsWith('https')) return url; // už je plná URL
-    return `${baseURL}${url}`; // lokálna cesta
+    if (url.startsWith('https')) return url;
+    return `${baseURL}${url}`;
   };
 
   useEffect(() => {
@@ -25,10 +24,7 @@ const FeaturedCyclingHighlights = () => {
         const res = await axios.get(`${baseURL}/products/cycling/${category}`);
         const highlighted = res.data
           .filter((p) => p.highlight_title && p.description)
-          .map((p) => ({
-            ...p,
-            image: fixCloudinaryUrl(p.image),
-          }));
+          .map((p) => ({ ...p, image: fixCloudinaryUrl(p.image) }));
         setter(highlighted.slice(0, 2));
       } catch (err) {
         console.error(`Nepodarilo sa načítať cycling ${category}:`, err);
@@ -41,7 +37,6 @@ const FeaturedCyclingHighlights = () => {
     fetchProducts('helmets', setFeaturedHelmets);
   }, [baseURL]);
 
-  // Spojíme produkty do jedného poľa
   const featuredItems = [];
   for (let i = 0; i < 2; i++) {
     if (featuredClothes[i]) {
@@ -69,14 +64,13 @@ const FeaturedCyclingHighlights = () => {
 
   return (
     <section
+      className="py-12 w-full bg-fixed"
       style={{
         backgroundImage: 'url(/img/bg-cycling3.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed',
       }}
-      className="py-12 w-full"
     >
       <div className="xl:w-[80%] 2xl:w-[65%] m-auto xl:bg-black xl:bg-opacity-50 xl:border-[7px] xl:border-black xl:pb-8 xl:rounded-xl">
         <h2 className="text-xl md:text-2xl lg:text-3xl text-white bg-black xl:bg-transparent py-4 font-bold text-center mb-5">

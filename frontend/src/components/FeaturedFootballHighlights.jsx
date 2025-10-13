@@ -10,17 +10,12 @@ const FeaturedFootballHighlights = () => {
 
   const apiBase = import.meta.env.VITE_API_BASE_URL;
 
-  // Funkcia na opravu Cloudinary URL
   const fixCloudinaryUrl = (url) => {
     if (!url) return '';
-    // ak tam chýba dvojbodka po https
     if (url.startsWith('https//')) return url.replace('https//', 'https://');
-    // ak URL začína normalne https, nechaj tak
     if (url.startsWith('http')) return url;
-    // ak je to relatívna cesta /img/..., pridaj baseURL pre Render
     return `${apiBase}${url}`;
   };
-
 
   useEffect(() => {
     setErrorMessage('');
@@ -28,20 +23,9 @@ const FeaturedFootballHighlights = () => {
     const fetchProducts = async (type, setter) => {
       try {
         const res = await axios.get(`${apiBase}/products/football/${type}`);
-
-        // 1️⃣ Dáta priamo z backendu
-        console.log(`[FETCHED ${type}] RAW:`, res.data.map(p => p.image));
-
         const highlighted = res.data
           .filter((p) => p.highlight_title && p.description)
-          .map((p) => ({
-            ...p,
-            image: fixCloudinaryUrl(p.image),
-          }));
-
-        // 2️⃣ Dáta po fixCloudinaryUrl
-        console.log(`[FETCHED ${type}] FIXED:`, highlighted.map(p => p.image));
-
+          .map((p) => ({ ...p, image: fixCloudinaryUrl(p.image) }));
         setter(highlighted.slice(0, 2));
       } catch (err) {
         console.error(`[ERROR] Fetch ${type} failed:`, err);
@@ -49,13 +33,11 @@ const FeaturedFootballHighlights = () => {
       }
     };
 
-
     fetchProducts('ball', setFeaturedBalls);
     fetchProducts('jersey', setFeaturedJerseys);
     fetchProducts('cleats', setFeaturedCleats);
   }, [apiBase]);
 
-  // Spojíme produkty do jedného poľa
   const featuredItems = [];
   for (let i = 0; i < 2; i++) {
     if (featuredJerseys[i]) featuredItems.push({ name: 'Nike', product: featuredJerseys[i] });
@@ -65,14 +47,13 @@ const FeaturedFootballHighlights = () => {
 
   return (
     <section
+      className="py-12 w-full bg-fixed"
       style={{
         backgroundImage: 'url(/img/bg-football4.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed',
       }}
-      className="py-12 w-full"
     >
       <div className="xl:w-[80%] 2xl:w-[65%] m-auto xl:bg-black xl:bg-opacity-50 xl:border-[7px] xl:border-black xl:pb-8 xl:rounded-xl">
         <h2 className="text-xl md:text-2xl lg:text-3xl text-white bg-black xl:bg-transparent py-4 font-bold text-center mb-5">
@@ -93,12 +74,9 @@ const FeaturedFootballHighlights = () => {
               </h3>
 
               <div className="relative h-64 overflow-hidden shadow-lg group">
-                {console.log("🖼️ Rendering IMG:", product.image)}
-                <img src={fixCloudinaryUrl(product.image)} alt={product.highlight_title} />
-
+                <img src={fixCloudinaryUrl(product.image)} alt={product.highlight_title} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black bg-opacity-10"></div>
               </div>
-
 
               <div className="bg-black bg-opacity-90 text-white text-sm p-4 flex-1">
                 {product?.description || `Explore top products from ${name}.`}
