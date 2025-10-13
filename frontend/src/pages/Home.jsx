@@ -9,10 +9,20 @@ function Home() {
   const [carouselSlides, setCarouselSlides] = useState([]);
   const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
+  const [offsetY, setOffsetY] = useState(0); // 🧠 parallax scroll hodnota
+
+  // sleduj scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      setOffsetY(window.scrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_BASE_URL}/products/carousel-top`)
-
       .then((res) => res.json())
       .then((data) => setCarouselSlides(data))
       .catch((e) => console.error('Chyba pri načítaní carousel produktov:', e));
@@ -40,8 +50,6 @@ function Home() {
       if (response.ok) {
         setMessage("Product added to cart!");
         refreshCartCount();
-
-        // automaticky zmizne po 3 sekundách
         setTimeout(() => setMessage(''), 3000);
       } else {
         setMessage("Failed to add to cart: " + data.message);
@@ -58,42 +66,46 @@ function Home() {
     <div className="bg-black text-white min-h-screen flex flex-col">
       <HeroVideoCarousel />
 
-      <div className="relative mt-6 md:mt-14">
+      {/* ✅ PARALLAX SEKCIa */}
+      <div className="relative mt-6 md:mt-14 overflow-hidden">
         <div
-          className="absolute inset-0 bg-black opacity-60 bg-fixed"
+          className="absolute inset-0 bg-black opacity-60 will-change-transform"
           style={{
             backgroundImage: "url('/img/bg-sports.jpg')",
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            backgroundAttachment: 'fixed',
+            transform: `translateY(${offsetY * 0.3}px)`, // 💫 efekt
           }}
         />
-
         <div className="relative z-10">
           <HomeCategories />
         </div>
       </div>
 
+      {/* ✅ Popular Products */}
       <div className="pt-5">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 text-center">Popular Products</h2>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 text-center">
+          Popular Products
+        </h2>
         <ProductsCarousel slides={carouselSlides} handleAddToCart={handleAddToCart} />
       </div>
 
-      <div className="relative mt-16">
+      {/* ✅ Druhá sekcia s rovnakým efektom */}
+      <div className="relative mt-16 overflow-hidden">
         <div
-          className="absolute inset-0 bg-black opacity-60"
+          className="absolute inset-0 bg-black opacity-60 will-change-transform"
           style={{
             backgroundImage: "url('/img/bg-sports.jpg')",
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            backgroundAttachment: 'fixed',
+            transform: `translateY(${offsetY * 0.3}px)`,
           }}
         />
         <div className="relative z-10">
           <HomeBrands />
         </div>
 
-        {/* ✅ MESSAGE NA STRED OBRAZOVKY */}
+        {/* ✅ Toast message */}
         {message && (
           <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
             {message}
