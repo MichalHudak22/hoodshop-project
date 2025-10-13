@@ -10,37 +10,30 @@ function Home() {
   const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
 
-  // refs pre parallax sekcie
+  // Parallax refs & offsets
   const section1Ref = useRef(null);
-  const section2Ref = useRef(null);
   const [section1Offset, setSection1Offset] = useState(0);
-  const [section2Offset, setSection2Offset] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
-      const updateSectionOffset = (ref, setOffset) => {
-        if (!ref.current) return;
-        const rect = ref.current.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-        const visible = Math.min(Math.max(windowHeight - rect.top, 0), rect.height);
-        setOffset(visible);
-      };
-
-      updateSectionOffset(section1Ref, setSection1Offset);
-      updateSectionOffset(section2Ref, setSection2Offset);
+      if (!section1Ref.current) return;
+      const rect = section1Ref.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const visible = Math.min(Math.max(windowHeight - rect.top, 0), rect.height);
+      setSection1Offset(visible);
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll(); // init
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // načítanie carousel produktov
+  // Carousel fetch
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_BASE_URL}/products/carousel-top`)
-      .then((res) => res.json())
-      .then((data) => setCarouselSlides(data))
-      .catch((e) => console.error('Chyba pri načítaní carousel produktov:', e));
+      .then(res => res.json())
+      .then(data => setCarouselSlides(data))
+      .catch(e => console.error('Chyba pri načítaní carousel produktov:', e));
   }, []);
 
   const handleAddToCart = async (jersey) => {
@@ -81,14 +74,14 @@ function Home() {
     <div className="bg-black text-white min-h-screen flex flex-col">
       <HeroVideoCarousel />
 
-      {/* ✅ PARALLAX SEKCIa 1 */}
+      {/* ✅ PARALLAX SEKCIA - HomeCategories */}
       <div ref={section1Ref} className="relative mt-6 md:mt-14 overflow-hidden min-h-screen">
         <div
-          className="absolute inset-0 opacity-70 will-change-transform transition-all duration-75 ease-linear"
+          className="absolute inset-0 opacity-70 will-change-transform transition-transform duration-75 ease-linear"
           style={{
             backgroundImage: "url('/img/bg-sports.jpg')",
             backgroundSize: 'cover',
-            backgroundPosition: `center ${section1Offset * 0.3}px`,
+            backgroundPosition: `center ${section1Offset * 0.4}px`, // 💫 rýchlejší efekt
           }}
         />
         <div className="relative z-10">
@@ -104,27 +97,15 @@ function Home() {
         <ProductsCarousel slides={carouselSlides} handleAddToCart={handleAddToCart} />
       </div>
 
-      {/* ✅ PARALLAX SEKCIa 2 */}
-      <div ref={section2Ref} className="relative mt-16 overflow-hidden min-h-screen">
-        <div
-          className="absolute inset-0 opacity-70 will-change-transform transition-all duration-75 ease-linear"
-          style={{
-            backgroundImage: "url('/img/bg-sports.jpg')",
-            backgroundSize: 'cover',
-            backgroundPosition: `center ${section2Offset * 0.3}px`,
-          }}
-        />
-        <div className="relative z-10">
-          <HomeBrands />
-        </div>
+      {/* ✅ HomeBrands - paralax sa rieši interne */}
+      <HomeBrands />
 
-        {/* ✅ Toast message */}
-        {message && (
-          <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
-            {message}
-          </div>
-        )}
-      </div>
+      {/* ✅ Toast message */}
+      {message && (
+        <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
+          {message}
+        </div>
+      )}
     </div>
   );
 }

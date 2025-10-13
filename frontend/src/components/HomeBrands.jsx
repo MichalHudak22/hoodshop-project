@@ -1,11 +1,29 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import bgImage from '../img/bg-brand.jpg';
 
 const HomeBrands = () => {
   const [brands, setBrands] = useState([]);
+  const [offsetY, setOffsetY] = useState(0);
+  const sectionRef = useRef(null);
 
+  // Scroll paralax
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!sectionRef.current) return;
+      const rect = sectionRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      const visible = Math.min(Math.max(windowHeight - rect.top, 0), rect.height);
+      setOffsetY(visible);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Fetch brands
   useEffect(() => {
     axios
       .get(`${import.meta.env.VITE_API_BASE_URL}/api/brands/selected`)
@@ -22,15 +40,18 @@ const HomeBrands = () => {
 
   return (
     <section
-      className="relative py-8 md:py-12 px-6 bg-black overflow-hidden bg-fixed"
-      style={{
-        backgroundImage: `url(${bgImage})`,
-        backgroundSize: 'cover',        // rovnaké ako HomeCategories
-        backgroundPosition: 'center',   // rovnaké
-        backgroundRepeat: 'no-repeat',  // explicitne
-        backgroundAttachment: 'fixed',  // desktop
-      }}
+      ref={sectionRef}
+      className="relative py-8 md:py-12 px-6 bg-black overflow-hidden min-h-screen"
     >
+      {/* Paralax pozadie */}
+      <div
+        className="absolute inset-0 opacity-70 will-change-transform transition-transform duration-75 ease-linear"
+        style={{
+          backgroundImage: `url(${bgImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: `center ${offsetY * 0.4}px`, // 💫 rovnaká rýchlosť ako HomeCategories
+        }}
+      />
 
       <div className="absolute inset-0 bg-black opacity-60 z-0"></div>
 
@@ -48,9 +69,7 @@ const HomeBrands = () => {
               >
                 <div
                   className="h-40 w-full bg-center bg-no-repeat bg-contain bg-white transition duration-300 group-hover:brightness-110"
-                  style={{
-                    backgroundImage: `url(${import.meta.env.VITE_API_BASE_URL}${brand.brand_image})`,
-                  }}
+                  style={{ backgroundImage: `url(${import.meta.env.VITE_API_BASE_URL}${brand.brand_image})` }}
                 ></div>
                 <div className="bg-black text-white text-center py-2">
                   <span className="text-lg font-semibold">
