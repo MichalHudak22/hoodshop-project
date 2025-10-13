@@ -84,22 +84,36 @@ function Home() {
       <HeroVideoCarousel />
 
       {/* ✅ PARALLAX HomeCategories */}
-      <div ref={sectionRef} className="relative mt-6 md:mt-14 overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-70 will-change-transform transition-transform duration-75 ease-linear"
-          style={{
-            backgroundImage: "url('/img/bg-sports.jpg')",
-            backgroundSize: 'cover',
-            backgroundPosition: isMobile
-              ? `center ${offset * 0.4}px` // JS paralax na mobile
-              : 'center',                // fixed na desktop
-            backgroundAttachment: isMobile ? 'scroll' : 'fixed',
-          }}
-        />
-        <div className="relative z-10">
-          <HomeCategories />
-        </div>
-      </div>
+   <div ref={sectionRef} className="relative mt-6 md:mt-14 overflow-hidden">
+  {isMobile ? (
+    // Mobile: JS paralax
+    <div
+      className="absolute inset-0 opacity-70 will-change-transform transition-transform duration-75 ease-linear"
+      style={{
+        backgroundImage: "url('/img/bg-sports.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: `center ${offset * 0.4}px`,
+        backgroundAttachment: 'scroll',
+      }}
+    />
+  ) : (
+    // Desktop: classic fixed paralax
+    <div
+      className="absolute inset-0 opacity-70"
+      style={{
+        backgroundImage: "url('/img/bg-sports.jpg')",
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
+      }}
+    />
+  )}
+
+  <div className="relative z-10">
+    <HomeCategories />
+  </div>
+</div>
+
 
       {/* ✅ Popular Products */}
       <div className="pt-5">
