@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import HeroVideoCarousel from '../components/HeroVideoCarousel';
 import HomeCategories from '../components/HomeCategories';
 import ProductsCarousel from '../components/ProductsCarousel';
@@ -9,32 +9,14 @@ function Home() {
   const [carouselSlides, setCarouselSlides] = useState([]);
   const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
-
-  const sectionRef = useRef(null);
-  const [offset, setOffset] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
 
-  // kontrola, či ide o mobil
+  // zisťuje, či ide o mobil
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    const handleResize = () => setIsMobile(window.innerWidth <= 1024);
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // paralax scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      const visible = Math.min(Math.max(windowHeight - rect.top, 0), rect.height);
-      setOffset(visible);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // init
-    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // načítanie carousel produktov
@@ -80,45 +62,24 @@ function Home() {
   };
 
   return (
-    <div className="bg-black text-white flex flex-col min-h-screen">
+    <div className="bg-black text-white min-h-screen flex flex-col">
       <HeroVideoCarousel />
 
-      {/* ✅ PARALLAX HomeCategories */}
-<div ref={sectionRef} className="relative mt-6 md:mt-14 overflow-hidden">
-  {/* pozadie */}
-  {isMobile ? (
-    // Mobile: JS paralax s transform
-    <div
-      className="absolute inset-0 opacity-70 will-change-transform transition-transform duration-75 ease-linear"
-      style={{
-        backgroundImage: "url('/img/bg-sports.jpg')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'scroll',
-        transform: `translateY(${offset * 0.2}px)`, // posun pozadia
-      }}
-    />
-  ) : (
-    // Desktop: fixed paralax
-    <div
-      className="absolute inset-0 opacity-70"
-      style={{
-        backgroundImage: "url('/img/bg-sports.jpg')",
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-      }}
-    />
-  )}
-
-  {/* obsah */}
-  <div className="relative z-10 flex flex-col justify-center items-center py-16 md:py-32">
-    <HomeCategories />
-  </div>
-</div>
-
-
-
+      {/* ✅ HomeCategories sekcia s adaptívnym paralaxom */}
+      <div className="relative mt-6 md:mt-14 overflow-hidden">
+        <div
+          className={`absolute inset-0 bg-black opacity-60 ${!isMobile ? 'bg-fixed' : ''}`}
+          style={{
+            backgroundImage: "url('/img/bg-sports.jpg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: isMobile ? 'scroll' : 'fixed',
+          }}
+        />
+        <div className="relative z-10">
+          <HomeCategories />
+        </div>
+      </div>
 
       {/* ✅ Popular Products */}
       <div className="pt-5">
@@ -128,14 +89,18 @@ function Home() {
         <ProductsCarousel slides={carouselSlides} handleAddToCart={handleAddToCart} />
       </div>
 
-      {/* ✅ HomeBrands */}
-      <HomeBrands />
-
-      {message && (
-        <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
-          {message}
+      {/* 🧹 HomeBrands už bez pozadia */}
+      <div className="relative mt-16">
+        <div className="relative z-10">
+          <HomeBrands />
         </div>
-      )}
+
+        {message && (
+          <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
+            {message}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
