@@ -7,6 +7,7 @@ const FeaturedFootballHighlights = () => {
   const [featuredJerseys, setFeaturedJerseys] = useState([]);
   const [featuredCleats, setFeaturedCleats] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
 
   const apiBase = import.meta.env.VITE_API_BASE_URL;
 
@@ -36,6 +37,11 @@ const FeaturedFootballHighlights = () => {
     fetchProducts('ball', setFeaturedBalls);
     fetchProducts('jersey', setFeaturedJerseys);
     fetchProducts('cleats', setFeaturedCleats);
+
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [apiBase]);
 
   const featuredItems = [];
@@ -47,7 +53,7 @@ const FeaturedFootballHighlights = () => {
 
   return (
     <section
-      className="py-12 w-full bg-fixed"
+      className={`py-12 w-full ${!isMobile ? 'bg-fixed' : ''}`}
       style={{
         backgroundImage: 'url(/img/bg-football4.jpg)',
         backgroundSize: 'cover',
@@ -55,7 +61,7 @@ const FeaturedFootballHighlights = () => {
         backgroundRepeat: 'no-repeat',
       }}
     >
-      <div className="xl:w-[80%] 2xl:w-[65%] m-auto xl:bg-black xl:bg-opacity-50 xl:border-[7px] xl:border-black xl:pb-8 xl:rounded-xl">
+      <div className="mx-auto px-4 lg:px-5 xl:px-8 py-14 lg:py-6 bg-black bg-opacity-50 lg:bg-opacity-50 lg:border-[7px] lg:border-black lg:rounded-lg max-w-5xl xl:max-w-[80%]">
         <h2 className="text-xl md:text-2xl lg:text-3xl text-white bg-black xl:bg-transparent py-4 font-bold text-center mb-5">
           Discover More You May Enjoy
         </h2>
@@ -74,7 +80,11 @@ const FeaturedFootballHighlights = () => {
               </h3>
 
               <div className="relative h-64 overflow-hidden shadow-lg group">
-                <img src={fixCloudinaryUrl(product.image)} alt={product.highlight_title} className="w-full h-full object-cover" />
+                <img
+                  src={fixCloudinaryUrl(product.image)}
+                  alt={product.highlight_title}
+                  className="w-full h-full object-cover"
+                />
                 <div className="absolute inset-0 bg-black bg-opacity-10"></div>
               </div>
 

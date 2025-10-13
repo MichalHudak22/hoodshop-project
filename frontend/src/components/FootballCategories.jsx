@@ -21,7 +21,7 @@ const FootballCategories = () => {
         backgroundRepeat: 'no-repeat',
       }}
     >
-      <div className="mx-auto px-4 lg:px-5 xl:px-8 py-14 lg:py-6 bg-black bg-opacity-40 lg:bg-opacity-50 lg:border-[7px] lg:border-black lg:rounded-lg max-w-5xl xl:max-w-[80%]">
+      <div className="mx-auto px-4 lg:px-5 xl:px-8 py-14 lg:py-6 bg-black bg-opacity-50 lg:bg-opacity-50 lg:border-[7px] lg:border-black lg:rounded-lg max-w-5xl xl:max-w-[80%]">
         <h2 className="text-xl lg:text-3xl font-bold mb-8 text-center text-white">
           Explore Football Categories
         </h2>
