@@ -63,12 +63,12 @@ const ProductDetail = () => {
 
   return (
     <div
-      className="relative bg-cover bg-center py-16 min-h-screen"
+      className="relative bg-cover bg-center bg-fixed py-16 min-h-screen overflow-hidden"
       style={{
         backgroundImage: "url('/img/bg-sports.jpg')",
-        backgroundAttachment: 'fixed',
       }}
     >
+
       {/* Overlay pre stmavenie */}
       <div className="absolute inset-0 bg-black opacity-60 z-0" />
 
