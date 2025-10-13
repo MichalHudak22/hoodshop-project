@@ -75,19 +75,24 @@ function Home() {
       <HeroVideoCarousel />
 
       {/* ✅ PARALLAX SEKCIA - HomeCategories */}
-      <div ref={section1Ref} className="relative mt-6 md:mt-14 overflow-hidden min-h-screen">
+      <div
+        ref={section1Ref}
+        className="relative mt-6 md:mt-14 flex flex-col justify-center overflow-hidden"
+        style={{ height: '40vh' }} // nastavíme vhodnú výšku, nie celú obrazovku
+      >
         <div
           className="absolute inset-0 opacity-70 will-change-transform transition-transform duration-75 ease-linear"
           style={{
             backgroundImage: "url('/img/bg-sports.jpg')",
             backgroundSize: 'cover',
-            backgroundPosition: `center ${section1Offset * 0.4}px`, // 💫 rýchlejší efekt
+            backgroundPosition: `center ${section1Offset * 0.4}px`,
           }}
         />
         <div className="relative z-10">
           <HomeCategories />
         </div>
       </div>
+
 
       {/* ✅ Popular Products */}
       <div className="pt-5">
