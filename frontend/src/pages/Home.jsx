@@ -84,16 +84,17 @@ function Home() {
       <HeroVideoCarousel />
 
       {/* ✅ PARALLAX HomeCategories */}
-   <div ref={sectionRef} className="relative mt-6 md:mt-14 overflow-hidden">
+<div ref={sectionRef} className="relative mt-6 md:mt-14 overflow-hidden">
   {isMobile ? (
-    // Mobile: JS paralax
+    // Mobile: JS paralax s transform, nie backgroundPosition
     <div
       className="absolute inset-0 opacity-70 will-change-transform transition-transform duration-75 ease-linear"
       style={{
         backgroundImage: "url('/img/bg-sports.jpg')",
         backgroundSize: 'cover',
-        backgroundPosition: `center ${offset * 0.4}px`,
+        backgroundPosition: 'center',
         backgroundAttachment: 'scroll',
+        transform: `translateY(${offset * 0.2}px)`, // posun pozadia
       }}
     />
   ) : (
@@ -113,6 +114,7 @@ function Home() {
     <HomeCategories />
   </div>
 </div>
+
 
 
       {/* ✅ Popular Products */}
