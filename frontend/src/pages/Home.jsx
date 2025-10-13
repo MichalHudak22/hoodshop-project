@@ -85,8 +85,9 @@ function Home() {
 
       {/* ✅ PARALLAX HomeCategories */}
 <div ref={sectionRef} className="relative mt-6 md:mt-14 overflow-hidden">
+  {/* pozadie */}
   {isMobile ? (
-    // Mobile: JS paralax s transform, nie backgroundPosition
+    // Mobile: JS paralax s transform
     <div
       className="absolute inset-0 opacity-70 will-change-transform transition-transform duration-75 ease-linear"
       style={{
@@ -98,7 +99,7 @@ function Home() {
       }}
     />
   ) : (
-    // Desktop: classic fixed paralax
+    // Desktop: fixed paralax
     <div
       className="absolute inset-0 opacity-70"
       style={{
@@ -110,10 +111,12 @@ function Home() {
     />
   )}
 
-  <div className="relative z-10">
+  {/* obsah */}
+  <div className="relative z-10 flex flex-col justify-center items-center py-16 md:py-32">
     <HomeCategories />
   </div>
 </div>
+
 
 
 
