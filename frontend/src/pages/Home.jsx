@@ -10,7 +10,7 @@ function Home() {
   const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
 
-  // 🧠 Refs pre obe parallax sekcie
+  // refs pre parallax sekcie
   const section1Ref = useRef(null);
   const section2Ref = useRef(null);
   const [section1Offset, setSection1Offset] = useState(0);
@@ -35,6 +35,7 @@ function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // načítanie carousel produktov
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_BASE_URL}/products/carousel-top`)
       .then((res) => res.json())
@@ -81,14 +82,13 @@ function Home() {
       <HeroVideoCarousel />
 
       {/* ✅ PARALLAX SEKCIa 1 */}
-      <div ref={section1Ref} className="relative mt-6 md:mt-14 overflow-hidden">
+      <div ref={section1Ref} className="relative mt-6 md:mt-14 overflow-hidden min-h-screen">
         <div
-          className="absolute inset-0 bg-black opacity-60 will-change-transform transition-transform duration-75 ease-linear"
+          className="absolute inset-0 opacity-70 will-change-transform transition-all duration-75 ease-linear"
           style={{
             backgroundImage: "url('/img/bg-sports.jpg')",
             backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            transform: `translateY(${section1Offset * 0.15}px)`,
+            backgroundPosition: `center ${section1Offset * 0.3}px`,
           }}
         />
         <div className="relative z-10">
@@ -105,14 +105,13 @@ function Home() {
       </div>
 
       {/* ✅ PARALLAX SEKCIa 2 */}
-      <div ref={section2Ref} className="relative mt-16 overflow-hidden">
+      <div ref={section2Ref} className="relative mt-16 overflow-hidden min-h-screen">
         <div
-          className="absolute inset-0 bg-black opacity-60 will-change-transform transition-transform duration-75 ease-linear"
+          className="absolute inset-0 opacity-70 will-change-transform transition-all duration-75 ease-linear"
           style={{
             backgroundImage: "url('/img/bg-sports.jpg')",
             backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            transform: `translateY(${section2Offset * 0.15}px)`,
+            backgroundPosition: `center ${section2Offset * 0.3}px`,
           }}
         />
         <div className="relative z-10">
