@@ -77,8 +77,7 @@ function Home() {
       {/* ✅ PARALLAX SEKCIA - HomeCategories */}
       <div
         ref={section1Ref}
-        className="relative mt-6 md:mt-14 flex flex-col justify-center overflow-hidden"
-        style={{ height: '40vh' }} // nastavíme vhodnú výšku, nie celú obrazovku
+        className="relative mt-6 md:mt-14 flex flex-col justify-center overflow-hidden min-h-[50vh] md:min-h-[60vh] lg:min-h-[70vh] py-16"
       >
         <div
           className="absolute inset-0 opacity-70 will-change-transform transition-transform duration-75 ease-linear"
