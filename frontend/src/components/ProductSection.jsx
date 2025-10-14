@@ -53,7 +53,7 @@ const ProductSection = ({ title, products, backgroundImage, onAddToCart }) => {
                   className="w-full h-64 object-contain p-2 md:p-4 bg-gray-50"
                 />
                 <div className="p-2 md:p-4 text-center">
-                  <h3 className="text-lg md:text-xl font-semibold text-gray-800 mb-2">
+                  <h3 className="min-h-[56px] text-lg md:text-xl font-semibold text-gray-800 mb-2">
                     {product.name}
                   </h3>
                   <p className="text-gray-600 mb-1">
