@@ -78,7 +78,7 @@ const FeaturedHockeyHighlights = () => {
 
         {errorMessage && <p className="text-red-500 text-center mb-4">{errorMessage}</p>}
 
-        <div className="w-full xl:w-[90%] 2xl:max-w-[90%] mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+        <div className="w-full xl:w-[90%] 2xl:max-w-[90%] mx-auto px-4 grid grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
           {featuredItems.map(({ name, product, defaultBg }, index) => (
             <Link
               key={`${name}-${index}`}
