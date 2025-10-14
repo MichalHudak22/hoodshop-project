@@ -39,20 +39,18 @@ const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
           {/* Obrázok produktu */}
           <Link to={`/product/${productSlug}`}>
             <img
-              src={
-                product.image.startsWith("http")
-                  ? product.image
-                  : `${baseURL}${product.image}`
-              }
+              src={product.image.startsWith("http") ? product.image : `${baseURL}${product.image}`}
               alt={product.name}
               className="
-    w-full       /* mobil */
-    sm:w-4/5     /* 640px+ */
-    md:w-1/2     /* 768px+ */
-    lg:w-1/2     /* 1024px+ */
-    xl:w-1/2     /* 1280px+ */
-    mx-auto rounded-lg shadow-xl object-contain hover:brightness-110 transition"
+    w-full          /* mobil */
+    sm:w-4/5        /* 640px+ */
+    md:w-3/5        /* 768px+ */
+    lg:w-1/2        /* 1024px+ */
+    xl:w-1/2        /* 1280px+ */
+    max-w-md md:max-w-lg lg:max-w-xl
+    mx-auto rounded-lg shadow-xl object-cover hover:brightness-110 transition"
             />
+
 
           </Link>
 
