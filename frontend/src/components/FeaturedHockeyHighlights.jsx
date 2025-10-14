@@ -85,9 +85,10 @@ const FeaturedHockeyHighlights = () => {
               to={`/product/${product?.slug || ''}`}
               className="flex flex-col h-full bg-white rounded-lg overflow-hidden shadow-lg hover:brightness-125 transition"
             >
-              <h3 className="py-4 px-3 text-[14px] min-h-[80px] font-bold bg-black text-white text-center">
-                {product?.highlight_title || `${name} Featured Product`}
+              <h3 className="py-4 px-3 text-sm min-h-[80px] font-bold bg-black text-white text-center flex items-center justify-center">
+                Tvoj nadpis
               </h3>
+
 
               <div className="relative h-64 overflow-hidden shadow-lg group">
                 <img
@@ -98,7 +99,7 @@ const FeaturedHockeyHighlights = () => {
                 <div className="absolute inset-0 bg-black bg-opacity-10"></div>
               </div>
 
-              <div className="bg-black bg-opacity-90 text-white text-sm p-4 flex-1">
+              <div className="bg-black bg-opacity-90 text-white text-xs lg:text-sm p-4 flex-1">
                 {product?.description || `Explore top products from ${name}.`}
               </div>
             </Link>
