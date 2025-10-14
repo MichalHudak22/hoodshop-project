@@ -16,7 +16,7 @@ const ProductSection = ({ title, products, backgroundImage, onAddToCart }) => {
 
   return (
     <section
-      className={`relative py-12 px-6 bg-black overflow-hidden ${
+      className={`relative py-12 px-2 md:px-6 bg-black overflow-hidden ${
         !isMobile ? "bg-fixed" : ""
       }`}
       style={{
@@ -66,7 +66,7 @@ const ProductSection = ({ title, products, backgroundImage, onAddToCart }) => {
               </Link>
 
               {/* Tlačidlo mimo Link, aby sa dalo kliknúť bez navigácie */}
-              <div className="px-4 pb-4 text-center">
+              <div className="px-2 md:px-4 pb-4 text-center">
                 <button
                   onClick={(e) => {
                     e.preventDefault();
