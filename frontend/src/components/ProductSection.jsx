@@ -39,7 +39,7 @@ const ProductSection = ({ title, products, backgroundImage, onAddToCart }) => {
           {products.map((product) => (
             <div
               key={product.id}
-              className="bg-white bg-opacity-50 rounded-lg shadow-md overflow-hidden transition transform hover:-translate-y-1 hover:shadow-lg"
+              className="bg-white bg-opacity-80 rounded-lg shadow-md overflow-hidden transition transform hover:-translate-y-1 hover:shadow-lg"
             >
               {/* Link okolo obrázka a názvu, ale nie okolo tlačidla */}
               <Link to={`/product/${product.slug}`} className="block">
