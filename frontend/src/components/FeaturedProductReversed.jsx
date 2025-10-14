@@ -36,7 +36,7 @@ const FeaturedProductReversed = ({ product, handleAddToCart, backgroundImage }) 
           {product.highlight_title}
         </h1>
 
-        <div className="flex flex-col md:flex-row-reverse items-center justify-center gap-8">
+   <div className="flex flex-col md:flex-row items-center justify-center gap-4 lg:gap-8">
           {/* Obrázok produktu */}
           <Link to={`/product/${productSlug}`}>
             <img
@@ -71,7 +71,7 @@ const FeaturedProductReversed = ({ product, handleAddToCart, backgroundImage }) 
               </p>
             </div>
 
-            <p className="text-[16px] md:text-lg text-white p-3 rounded-xl text-center md:text-left">
+            <p className="text-[16px] md:text-lg text-white p-3 rounded-xl text-center md:text-right">
               {product.description}
             </p>
           </div>
