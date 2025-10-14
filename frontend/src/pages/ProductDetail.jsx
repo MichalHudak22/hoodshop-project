@@ -74,7 +74,7 @@ const ProductDetail = () => {
 
       {/* Obsah s priehľadným pozadím */}
       <div className="relative z-10 p-3 md:p-6">
-        <div className="p-8 mt-12 max-w-4xl mx-auto bg-white bg-opacity-95 rounded-lg shadow-lg border-4 border-black">
+        <div className="p-3 md:p-8 mt-12 max-w-4xl mx-auto bg-white bg-opacity-95 rounded-lg shadow-lg border-4 border-black">
           <h1 className="text-4xl font-extrabold mb-6 text-gray-900">{product.name}</h1>
 
           <Link
