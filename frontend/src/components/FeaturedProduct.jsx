@@ -46,7 +46,7 @@ const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
                   : `${baseURL}${product.image}`
               }
               alt={product.name}
-              className="w-[70%] mx-auto md:max-w-sm rounded-lg shadow-xl object-contain hover:brightness-110 transition"
+              className="w-full sm:w-3/4 md:w-1/2 lg:w-1/2 xl:w-1/2 mx-auto rounded-lg shadow-xl object-contain hover:brightness-110 transition"
             />
           </Link>
 
