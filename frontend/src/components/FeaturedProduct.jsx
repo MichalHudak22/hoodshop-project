@@ -18,9 +18,8 @@ const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
 
   return (
     <section
-      className={`relative py-10 md:py-16 px-6 bg-black overflow-hidden border-b-4 border-black ${
-        !isMobile ? "bg-fixed" : ""
-      }`}
+      className={`relative py-10 md:py-16 px-6 bg-black overflow-hidden border-b-4 border-black ${!isMobile ? "bg-fixed" : ""
+        }`}
       style={{
         backgroundImage: `url(${backgroundImage || "/img/bg-football3.jpg"})`,
         backgroundSize: "cover",
@@ -46,8 +45,15 @@ const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
                   : `${baseURL}${product.image}`
               }
               alt={product.name}
-              className="w-full sm:w-3/4 lg:w-1/2 xl:w-1/2 mx-auto rounded-lg shadow-xl object-contain hover:brightness-110 transition"
+              className="
+    w-full       /* mobil */
+    sm:w-4/5     /* 640px+ */
+    md:w-1/2     /* 768px+ */
+    lg:w-1/2     /* 1024px+ */
+    xl:w-1/2     /* 1280px+ */
+    mx-auto rounded-lg shadow-xl object-contain hover:brightness-110 transition"
             />
+
           </Link>
 
           {/* Info sekcia */}
