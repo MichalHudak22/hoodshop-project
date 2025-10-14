@@ -35,7 +35,7 @@ const ProductSection = ({ title, products, backgroundImage, onAddToCart }) => {
           {title}
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-screen-xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 max-w-screen-xl mx-auto">
           {products.map((product) => (
             <div
               key={product.id}
