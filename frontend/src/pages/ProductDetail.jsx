@@ -63,7 +63,7 @@ const ProductDetail = () => {
 
   return (
     <div
-      className="relative bg-cover bg-center bg-fixed py-16 min-h-screen overflow-hidden"
+      className="relative bg-cover bg-center bg-fixed md:py-16 min-h-screen overflow-hidden"
       style={{
         backgroundImage: "url('/img/bg-sports.jpg')",
       }}

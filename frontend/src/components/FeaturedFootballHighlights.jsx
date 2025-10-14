@@ -83,7 +83,7 @@ const FeaturedFootballHighlights = () => {
               to={`/product/${product?.slug || ''}`}
               className="flex flex-col h-full bg-white rounded-lg overflow-hidden shadow-lg hover:brightness-125 transition"
             >
-              <h3 className="py-4 px-3 text-sm min-h-[80px] font-bold bg-black text-white text-center flex items-center justify-center">
+              <h3 className="py-4 px-3 text-sm min-h-[92px] font-bold bg-black text-white text-center flex items-center justify-center">
                 {product?.highlight_title || `${name} Featured Product`}
               </h3>
 
