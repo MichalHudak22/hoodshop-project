@@ -78,14 +78,14 @@ const FeaturedHockeyHighlights = () => {
 
         {errorMessage && <p className="text-red-500 text-center mb-4">{errorMessage}</p>}
 
-        <div className="w-full xl:w-[90%] 2xl:max-w-[90%] mx-auto px-4 grid grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+        <div className="w-full xl:w-[90%] 2xl:max-w-[90%] mx-auto px-2 md:px-4 grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8 items-stretch">
           {featuredItems.map(({ name, product, defaultBg }, index) => (
             <Link
               key={`${name}-${index}`}
               to={`/product/${product?.slug || ''}`}
               className="flex flex-col h-full bg-white rounded-lg overflow-hidden shadow-lg hover:brightness-125 transition"
             >
-              <h3 className="py-4 px-3 text-[14px] md:min-h-[80px] font-bold bg-black text-white text-center">
+              <h3 className="py-4 px-3 text-[14px] min-h-[80px] font-bold bg-black text-white text-center">
                 {product?.highlight_title || `${name} Featured Product`}
               </h3>
 
