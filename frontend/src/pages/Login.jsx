@@ -60,7 +60,7 @@ function Login() {
 
   return (
     <div
-      className="relative flex flex-col items-center min-h-screen bg-black bg-fixed bg-cover bg-center pt-28 md:pt-32"
+      className="relative flex flex-col items-center min-h-screen bg-black bg-fixed bg-cover bg-center mt-12"
       style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}
     >
       {/* Overlay */}
