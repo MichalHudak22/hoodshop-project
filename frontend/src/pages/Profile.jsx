@@ -237,13 +237,6 @@ const handleSave = () => {
       <div className="relative z-10 w-full flex flex-col items-center">
         {error && <div className="text-red-500 mb-4">{error}</div>}
 
-        {/* Nadpis */}
-        <div className="py-8 text-center bg-black w-full">
-          <h1 className="text-2xl lg:text-4xl font-bold text-white">
-            Welcome <span className="text-blue-200">{user.name}</span>
-          </h1>
-        </div>
-
         {/* Profile Navigation */}
         <div className="w-full lg:max-w-2xl">
           <ProfileNavigation />
@@ -266,7 +259,7 @@ const handleSave = () => {
 
           {/* Sekcia na nahranie fotky */}
           <div className="py-6 rounded-lg shadow-lg w-full m-auto md:max-w-sm text-white">
-            <h1 className="text-2xl lg:text-3xl font-bold mb-2 text-center text-blue-200">User Photo</h1>
+            <h1 className="text-2xl lg:text-3xl font-bold mb-2 text-center text-blue-200">Welcome {user.name}</h1>
             <p className='text-center pb-5'>Upload a photo to use as your profile avatar.</p>
 
             <div className="flex flex-col items-center gap-5">
