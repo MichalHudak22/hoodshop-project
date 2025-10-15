@@ -61,7 +61,7 @@ const FeaturedFootballHighlights = () => {
 
   return (
     <section
-      className="py-12 w-full bg-fixed bg-black xl:bg-opacity-50 xl:bg-transparent"
+      className="py-12 w-full bg-fixed bg-black bg-opacity-50 xl:bg-transparent"
       style={{
         backgroundImage: 'url(/img/bg-football4.jpg)',
         backgroundSize: 'cover',
