@@ -67,7 +67,7 @@ function Login() {
       <div className="absolute inset-0 bg-black opacity-60 z-0" />
 
       {/* Form container */}
-      <div className="relative z-10 lg:bg-black bg-opacity-70 rounded-2xl shadow-xl w-full max-w-xl md:max-w-3xl mx-4 p-6 md:p-12 lg:p-16">
+      <div className="relative z-10 lg:bg-black lg:bg-opacity-70 rounded-2xl shadow-xl w-full max-w-xl md:max-w-3xl mx-4 p-6 md:p-12 lg:p-16">
         <h1 className="text-2xl lg:text-3xl font-bold text-center text-blue-200 mb-6">
           Sign In to Your Account
         </h1>
@@ -91,10 +91,11 @@ function Login() {
           />
           <button
             type="submit"
-            className="w-full lg:w-[250px] lg:mx-auto bg-blue-700 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition duration-200"
+            className="w-full lg:w-[200px] block mx-auto bg-blue-700 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition duration-200"
           >
             Log In
           </button>
+
         </form>
 
         <div className="mt-4 text-center h-8">
