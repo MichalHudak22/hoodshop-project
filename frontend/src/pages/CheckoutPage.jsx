@@ -251,6 +251,16 @@ const CheckoutPage = () => {
     }
   };
 
+    // 🟩 PRIDANÉ - zisťovanie či je mobil
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize(); // inicializuj hneď
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
 
   const discount = usedPoints * 0.10;
   const finalPrice = Math.max(total + deliveryCost - discount, 0);
@@ -260,8 +270,15 @@ const CheckoutPage = () => {
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div className="relative bg-cover bg-center md:py-16"
-      style={{ backgroundImage: "url('/img/bg-shop.jpg')", backgroundAttachment: 'fixed' }}>
+   <div
+  className="relative bg-cover bg-center md:py-16"
+  style={{
+    backgroundImage: "url('/img/bg-shop.jpg')",
+    backgroundAttachment: isMobile ? 'scroll' : 'fixed', // 🟩 dynamický efekt
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  }}
+>
 
       <div className="absolute inset-0 bg-black opacity-20 z-0" />
 
