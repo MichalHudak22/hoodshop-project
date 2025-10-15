@@ -142,14 +142,14 @@ const loginUser = async (req, res) => {
     const attemptData = getAttempts(email);
     if (attemptData.lockUntil && Date.now() < attemptData.lockUntil) {
       const minutesLeft = Math.ceil((attemptData.lockUntil - Date.now()) / 60000);
-      return res.status(429).json({ error: `Účet je dočasne zablokovaný. Skúste znova o ${minutesLeft} min.` });
+      return res.status(429).json({ error: `The account is temporarily locked. Please try again in ${minutesLeft} minutes.` });
     }
 
     // 2️⃣ Načítame používateľa podľa emailu
     const [users] = await db.query('SELECT * FROM user WHERE email = ?', [email]);
     if (users.length === 0) {
       registerFailedAttempt(email);
-      return res.status(404).json({ error: 'Používateľ s týmto emailom neexistuje.' });
+      return res.status(404).json({ error: 'The user with this email does not exist.' });
     }
 
     const user = users[0];
@@ -157,14 +157,14 @@ const loginUser = async (req, res) => {
     // 3️⃣ Skontrolujeme, či je email overený
     if (user.is_verified === 0) {
       registerFailedAttempt(email);
-      return res.status(403).json({ error: 'Email nie je overený. Skontroluj svoj email.' });
+      return res.status(403).json({ error: 'The email is not verified. Please check your inbox.' });
     }
 
     // 4️⃣ Porovnanie hesla
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       registerFailedAttempt(email);
-      return res.status(400).json({ error: 'Nesprávne heslo.' });
+      return res.status(400).json({ error: 'Incorrect password.' });
     }
 
     // 5️⃣ Reset pokusov po úspešnom prihlásení
@@ -179,7 +179,7 @@ const loginUser = async (req, res) => {
 
     // 7️⃣ Odpoveď klientovi
     res.status(200).json({
-      message: 'Prihlásenie úspešné',
+      message: 'Login successful',
       token,
       email: user.email,
       name: user.name,
@@ -205,7 +205,7 @@ const getUserProfile = async (req, res) => {
     `, [userId]);
 
     if (results.length === 0) {
-      return res.status(404).json({ error: 'Používateľ neexistuje' });
+      return res.status(404).json({ error: 'User does not exist' });
     }
 
     res.status(200).json(results[0]);

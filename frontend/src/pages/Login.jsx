@@ -110,28 +110,28 @@ function Login() {
         </div>
 
         <div className="mt-8 text-center">
-          <p className="text-blue-200 text-xl lg:Text-2xl">
+          <p className="text-blue-200 text-lg lg:Text-xl">
             New to HoodShop? Create your account and unlock exclusive benefits!
           </p>
           <Link
             to="/registration"
-            className="inline-block mt-2 bg-blue-700 hover:bg-blue-600 text-white px-7 py-3 rounded-lg transition duration-200"
+            className="inline-block my-3 bg-blue-700 hover:bg-blue-600 text-white px-7 py-3 rounded-lg transition duration-200"
           >
             Create Account
           </Link>
 
           <div className="mb-8 text-white flex flex-col gap-3">
 
-            <p className="mb-3 text-lg lg:text-xl text-center">
+            <p className="mb-3 text-sm lg:text-xl text-center">
               By signing in, you unlock all the benefits of our store focused on football, hockey, and cycling.
             </p>
-            <ul className="list-disc list-inside space-y-1 text-white text-lg lg:text-xl mb-4">
+            <ul className="list-disc list-inside space-y-1 text-white text-sm lg:text-xl mb-4">
               <li>Earn loyalty points with every purchase.</li>
               <li>Get up to 5% off your next order using your points.</li>
               <li>Manage your profile and update your avatar.</li>
               <li>Access exclusive member-only offers.</li>
             </ul>
-            <p className="text-blue-200 text-lg lg:text-2xl text-center">
+            <p className="text-blue-200 text-sm lg:text-2xl text-center">
               Enter your credentials and enjoy the best of HoodShop!
             </p>
           </div>
