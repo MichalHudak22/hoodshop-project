@@ -80,7 +80,7 @@ const Registration = () => {
           <h2 className="text-3xl font-bold mb-4 text-blue-200 text-center">Welcome to HoodShop Registration!</h2>
 
 
-          <form onSubmit={handleSubmit} className="space-y-4 max-w-md m-auto">
+          <form onSubmit={handleSubmit} className="space-y-4 max-w-sm mx-auto">
             <input
               name="name"
               type="text"

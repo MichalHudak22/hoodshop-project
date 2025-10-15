@@ -75,7 +75,7 @@ function Login() {
               Enter your credentials and enjoy the best of HoodShop!
             </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4 max-w-[450px]">
+        <form onSubmit={handleSubmit} className="space-y-4 max-w-sm mx-auto">
           <input
             type="email"
             placeholder="Email"
