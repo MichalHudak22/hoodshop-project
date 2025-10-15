@@ -71,6 +71,9 @@ function Login() {
         <h1 className="text-2xl lg:text-3xl font-bold text-center text-blue-200 mb-6">
           Sign In to Your Account
         </h1>
+          <p className="text-blue-200 text-sm lg:text-2xl text-center mt-4">
+              Enter your credentials and enjoy the best of HoodShop!
+            </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
@@ -120,7 +123,7 @@ function Login() {
           </Link>
 
           <div className="mt-6 text-white text-left">
-            <p className="mb-3 text-sm lg:text-xl text-center">
+            <p className="mb-6 text-sm lg:text-xl text-center">
               By signing in, you unlock all the benefits of our store focused on football, hockey, and cycling.
             </p>
             <ul className="list-disc list-inside space-y-1 text-sm lg:text-xl">
@@ -129,9 +132,6 @@ function Login() {
               <li>Manage your profile and update your avatar.</li>
               <li>Access exclusive member-only offers.</li>
             </ul>
-            <p className="text-blue-200 text-sm lg:text-2xl text-center mt-4">
-              Enter your credentials and enjoy the best of HoodShop!
-            </p>
           </div>
         </div>
       </div>
