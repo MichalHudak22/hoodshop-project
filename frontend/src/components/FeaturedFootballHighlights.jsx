@@ -61,7 +61,7 @@ const FeaturedFootballHighlights = () => {
 
   return (
     <section
-      className="lg:py-12 w-full bg-fixed"
+      className="py-12 w-full bg-fixed bg-black xl:bg-opacity-50 xl:bg-transparent"
       style={{
         backgroundImage: 'url(/img/bg-football4.jpg)',
         backgroundSize: 'cover',
@@ -69,7 +69,7 @@ const FeaturedFootballHighlights = () => {
         backgroundRepeat: 'no-repeat',
       }}
     >
-      <div className="xl:w-[80%] 2xl:w-[65%] m-auto lg:bg-black lg:bg-opacity-50 xl:border-[7px] xl:border-black xl:pb-8 xl:rounded-xl">
+      <div className="xl:w-[80%] 2xl:w-[65%] m-auto xl:bg-black xl:bg-opacity-50 xl:border-[7px] xl:border-black xl:pb-8 xl:rounded-xl">
         <h2 className="text-xl md:text-2xl lg:text-3xl text-white bg-black xl:bg-transparent py-4 font-bold text-center mb-5">
           Discover More You May Enjoy
         </h2>
