@@ -110,7 +110,7 @@ function Login() {
         </div>
 
         <div className="mt-8 text-center">
-          <p className="text-white">
+          <p className="text-blue-200 text-xl lg:Text-2xl">
             New to HoodShop? Create your account and unlock exclusive benefits!
           </p>
           <Link
@@ -121,9 +121,7 @@ function Login() {
           </Link>
 
           <div className="mb-8 text-white flex flex-col gap-3">
-            <h2 className="text-xl lg:text-3xl font-bold mb-4 text-blue-200 text-center">
-              Welcome back to HoodShop!
-            </h2>
+
             <p className="mb-3 text-lg lg:text-xl text-center">
               By signing in, you unlock all the benefits of our store focused on football, hockey, and cycling.
             </p>
