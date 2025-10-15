@@ -60,7 +60,7 @@ function Login() {
 
   return (
     <div
-      className="relative flex items-center justify-center min-h-screen bg-black bg-fixed bg-cover bg-center"
+      className="relative flex flex-col items-center min-h-screen bg-black bg-fixed bg-cover bg-center pt-32 md:pt-40"
       style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}
     >
       {/* Overlay */}
@@ -97,7 +97,6 @@ function Login() {
           </button>
         </form>
 
-        {/* Error / Message */}
         <div className="mt-4 text-center h-8">
           {error ? (
             <p className="text-red-400">{error}</p>
@@ -108,7 +107,6 @@ function Login() {
           )}
         </div>
 
-        {/* Registration CTA */}
         <div className="mt-8 text-center">
           <p className="text-blue-200 text-lg lg:text-xl mb-3">
             New to HoodShop? Create your account and unlock exclusive benefits!
@@ -120,7 +118,6 @@ function Login() {
             Create Account
           </Link>
 
-          {/* Benefits list */}
           <div className="mt-6 text-white text-left">
             <p className="mb-3 text-sm lg:text-xl text-center">
               By signing in, you unlock all the benefits of our store focused on football, hockey, and cycling.
@@ -138,6 +135,7 @@ function Login() {
         </div>
       </div>
     </div>
+
   );
 }
 
