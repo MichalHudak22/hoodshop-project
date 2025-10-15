@@ -67,15 +67,15 @@ function Login() {
       <div className="absolute inset-0 bg-black opacity-60 z-0" />
 
       {/* Form container */}
-      <div className="relative z-10 lg:bg-black lg:bg-opacity-70 rounded-2xl shadow-xl w-full max-w-xl md:max-w-3xl mx-4 p-6 md:p-12 lg:p-16">
+      <div className="relative z-10 lg:bg-black lg:bg-opacity-70 md:border-2 border-gray-600 rounded-2xl shadow-xl w-full max-w-xl md:max-w-3xl mx-4 p-6 md:p-12 lg:p-16">
         <h1 className="text-2xl lg:text-3xl font-bold text-center text-blue-200 mb-6">
           Sign In to Your Account
         </h1>
-          <p className="text-blue-200 text-sm lg:text-2xl text-center mt-4">
+          <p className="text-blue-200 text-sm lg:text-2xl text-center my-3">
               Enter your credentials and enjoy the best of HoodShop!
             </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 max-w-[450px]">
           <input
             type="email"
             placeholder="Email"
