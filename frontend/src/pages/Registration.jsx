@@ -77,7 +77,7 @@ const Registration = () => {
         <h2 className="text-2xl md:text-3xl font-bold text-center text-blue-200 mb-6">
           Welcome to HoodShop Registration!
         </h2>
-        <p className="text-white text-lg lg:text-xl text-center my-3">
+        <p className="text-white text-sm lg:text-xl text-center mb-3">
           Registration is quick and easy – get started now!
         </p>
 
