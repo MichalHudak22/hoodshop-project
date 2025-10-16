@@ -141,14 +141,14 @@ const Registration = () => {
             Here you can easily register and create your own account, which gives you many benefits:
           </p>
 
-          <ul className="list-disc list-inside space-y-1 text-xs lg:text-xl text-white text-left mx-auto max-w-md">
+          <ul className="list-none list-inside space-y-1 text-xs lg:text-xl text-white text-left mx-auto max-w-md">
             <li>Earn loyalty points with every purchase.</li>
             <li>Redeem points as a discount of up to 5% from your previous purchase.</li>
             <li>Fill in your profile and set a photo as your avatar.</li>
             <li>Enjoy exclusive offers and discounts available only to registered users.</li>
           </ul>
 
-          <p className="pt-3 text-sm lg:text-xl">
+          <p className="pt-4 text-sm lg:text-xl">
             Our store focuses on football, hockey, and cycling, offering a wide selection of jerseys, balls, hockey sticks, bikes, helmets, skates, and more.
           </p>
 

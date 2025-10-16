@@ -117,7 +117,7 @@ function Login() {
           </p>
           <Link
             to="/registration"
-            className="inline-block my-3 bg-blue-700 hover:bg-blue-600 text-white font-semibold px-7 py-3 rounded-lg transition duration-200"
+            className="w-full lg:w-[200px] inline-block my-3 bg-blue-700 hover:bg-blue-600 text-white font-semibold px-7 py-3 rounded-lg transition duration-200"
           >
             Create Account
           </Link>
@@ -126,7 +126,7 @@ function Login() {
             <p className="mb-6 text-sm lg:text-xl text-center">
               By signing in, you unlock all the benefits of our store focused on football, hockey, and cycling.
             </p>
-            <ul className="list-disc list-inside space-y-1 text-sm lg:text-xl">
+            <ul className="list-none list-inside space-y-1 text-sm lg:text-xl">
               <li>Earn loyalty points with every purchase.</li>
               <li>Get up to 5% off your next order using your points.</li>
               <li>Manage your profile and update your avatar.</li>
