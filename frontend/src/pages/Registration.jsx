@@ -73,7 +73,7 @@ const Registration = () => {
       <div className="absolute inset-0 bg-black opacity-60 z-0" />
 
       {/* Form container */}
-      <div className="relative z-10 bg-black bg-opacity-70 md:border-2 border-gray-600 lg:rounded-2xl shadow-xl w-full max-w-xl md:max-w-3xl lg:max-w-4xl p-6 md:p-12 lg:p-16">
+      <div className="relative z-10 bg-black bg-opacity-70 md:border-2 border-gray-600 lg:rounded-xl shadow-xl w-full max-w-xl md:max-w-3xl lg:max-w-4xl p-6 md:p-12 lg:p-16">
         <h2 className="text-2xl md:text-3xl font-bold text-center text-blue-200 mb-6">
           Welcome to HoodShop Registration!
         </h2>
@@ -137,18 +137,18 @@ const Registration = () => {
 
         <div className="mt-8 text-center text-white">
 
-          <p className="mb-3 text-blue-200 text-lg lg:text-xl">
+          <p className="mb-3 text-blue-200 text-sm lg:text-xl">
             Here you can easily register and create your own account, which gives you many benefits:
           </p>
 
-          <ul className="list-disc list-inside space-y-1 text-sm lg:text-xl text-white text-left mx-auto max-w-md">
+          <ul className="list-disc list-inside space-y-1 text-xs lg:text-xl text-white text-left mx-auto max-w-md">
             <li>Earn loyalty points with every purchase.</li>
             <li>Redeem points as a discount of up to 5% from your previous purchase.</li>
             <li>Fill in your profile and set a photo as your avatar.</li>
             <li>Enjoy exclusive offers and discounts available only to registered users.</li>
           </ul>
 
-          <p className="pt-3 lg:text-xl">
+          <p className="pt-3 text-sm lg:text-xl">
             Our store focuses on football, hockey, and cycling, offering a wide selection of jerseys, balls, hockey sticks, bikes, helmets, skates, and more.
           </p>
 
