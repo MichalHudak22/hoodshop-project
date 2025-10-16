@@ -71,7 +71,7 @@ function Login() {
         <h1 className="text-2xl lg:text-3xl font-bold text-center text-blue-200 mb-6">
           Sign In to Your Account
         </h1>
-          <p className="text-blue-200 text-sm lg:text-2xl text-center my-3">
+          <p className="text-white text-lg lg:text-xl text-center my-3">
               Enter your credentials and enjoy the best of HoodShop!
             </p>
 
