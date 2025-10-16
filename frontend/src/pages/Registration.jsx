@@ -128,7 +128,7 @@ const Registration = () => {
               </p>
             </div>
 
-            <div className="pt-5 w-full">
+            <div className="w-full">
               <button
                 type="submit"
                 className="w-full bg-blue-700 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition duration-200"
