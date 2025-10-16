@@ -73,7 +73,7 @@ const Registration = () => {
       <div className="absolute inset-0 bg-black opacity-60 z-0" />
 
       {/* Form container */}
-      <div className="relative z-10 bg-black bg-opacity-70 md:border-2 border-gray-600 rounded-2xl shadow-xl w-full max-w-xl md:max-w-3xl lg:max-w-4xl mx-4 p-6 md:p-12 lg:p-16">
+      <div className="relative z-10 bg-black bg-opacity-70 md:border-2 border-gray-600 lg:rounded-2xl shadow-xl w-full max-w-xl md:max-w-3xl lg:max-w-4xl p-6 md:p-12 lg:p-16">
         <h2 className="text-2xl md:text-3xl font-bold text-center text-blue-200 mb-6">
           Welcome to HoodShop Registration!
         </h2>
