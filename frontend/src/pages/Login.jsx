@@ -111,7 +111,7 @@ function Login() {
           )}
         </div>
 
-        <div className="mt-8 text-center">
+        <div className="mt-4 text-center">
           <p className="text-blue-200 text-lg lg:text-xl mb-3">
             New to HoodShop? Create your account and unlock exclusive benefits!
           </p>
