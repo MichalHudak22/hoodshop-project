@@ -136,9 +136,6 @@ const Registration = () => {
         </form>
 
         <div className="mt-8 text-center text-white">
-          <p className="mb-3 lg:text-xl">
-            Our store focuses on football, hockey, and cycling, offering a wide selection of jerseys, balls, hockey sticks, bikes, helmets, skates, and more.
-          </p>
 
           <p className="mb-3 text-blue-200 text-lg lg:text-xl">
             Here you can easily register and create your own account, which gives you many benefits:
@@ -150,6 +147,11 @@ const Registration = () => {
             <li>Fill in your profile and set a photo as your avatar.</li>
             <li>Enjoy exclusive offers and discounts available only to registered users.</li>
           </ul>
+
+          <p className="mb-3 lg:text-xl">
+            Our store focuses on football, hockey, and cycling, offering a wide selection of jerseys, balls, hockey sticks, bikes, helmets, skates, and more.
+          </p>
+
         </div>
       </div>
     </div>
