@@ -73,7 +73,7 @@ const Registration = () => {
     >
       <div className="absolute inset-0 bg-black opacity-60 z-0" />
 
-      <div className="relative z-10 bg-black bg-opacity-70 md:border-2 border-gray-600 py-8 lg:py-16 px-5 md:px-12 lg:px-12 rounded-2xl shadow-xl max-w-xl md:max-w-3xl w-full">
+      <div className="relative z-10 bg-black bg-opacity-70 md:border-2 border-gray-600 py-8 lg:py-16 px-5 md:px-12 lg:px-12 rounded-2xl shadow-xl max-w-xl md:max-w-3xl lg:max-w-4xl w-full">
 
         {/* Úvodný text */}
         <div className="mb-8 text-white flex flex-col gap-3">
