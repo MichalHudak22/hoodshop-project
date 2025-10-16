@@ -68,7 +68,7 @@ const Registration = () => {
   };
   return (
     <div
-      className="relative mt-12 pb-10 flex justify-center bg-fixed bg-cover bg-no-repeat bg-center"
+      className="relative mt-12 pb-10 min-h-screen flex justify-center bg-fixed bg-cover bg-no-repeat bg-center"
       style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}
     >
       <div className="absolute inset-0 bg-black opacity-60 z-0" />
