@@ -117,12 +117,12 @@ function Login() {
           </p>
           <Link
             to="/registration"
-            className="inline-block my-3 bg-blue-700 hover:bg-blue-600 text-white px-7 py-3 rounded-lg transition duration-200"
+            className="inline-block my-3 bg-blue-700 hover:bg-blue-600 text-white font-semibold px-7 py-3 rounded-lg transition duration-200"
           >
             Create Account
           </Link>
 
-          <div className="mt-6 text-white text-left">
+          <div className="mt-6 text-white text-center">
             <p className="mb-6 text-sm lg:text-xl text-center">
               By signing in, you unlock all the benefits of our store focused on football, hockey, and cycling.
             </p>

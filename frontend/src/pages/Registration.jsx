@@ -148,7 +148,7 @@ const Registration = () => {
             <li>Enjoy exclusive offers and discounts available only to registered users.</li>
           </ul>
 
-          <p className="mb-3 lg:text-xl">
+          <p className="pt-3 lg:text-xl">
             Our store focuses on football, hockey, and cycling, offering a wide selection of jerseys, balls, hockey sticks, bikes, helmets, skates, and more.
           </p>
 
