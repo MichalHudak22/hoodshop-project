@@ -36,7 +36,7 @@ function ProfileLoyaltyPoints() {
     if (!profile) return;
 
     const totalPoints = profile.loyalty_points || 0;
-    const duration = 3500; // ms
+    const duration = 3000; // ms
     const intervalTime = 20; // ms
     const steps = duration / intervalTime;
     const increment = totalPoints / steps;
@@ -104,7 +104,7 @@ function ProfileLoyaltyPoints() {
         </div>
 
         {/* Info o vernostných bodoch */}
-        <div className="max-w-5xl mx-auto bg-black bg-opacity-50 md:bg-opacity-70 shadow-md lg:rounded-2xl py-10 p-6 lg:mt-10 text-gray-800 lg:border-2 border-gray-600">
+        <div className="max-w-5xl mx-auto bg-black bg-opacity-50 md:bg-opacity-70 shadow-md lg:rounded-2xl py-6 lg:py-10 p-2 lg:p-6 lg:mt-10 text-gray-800 lg:border-2 border-gray-600">
           <h2 className="text-2xl text-blue-100 font-bold mb-4 text-center">
             🎁 Loyalty Points – Your Reward for Every Purchase
           </h2>
