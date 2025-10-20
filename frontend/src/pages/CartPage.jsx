@@ -13,23 +13,14 @@ const CartPage = () => {
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(0);
   const [sessionId, setSessionId] = useState(null);
-  const [isMobile, setIsMobile] = useState(false);
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
-
-  // určenie, či je mobil (ako v FootballCategories)
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   // Funkcia na opravu URL (Cloudinary vs lokálne)
   const fixCloudinaryUrl = (url) => {
     if (!url) return '';
-    if (url.startsWith('https://') || url.startsWith('http://')) return url;
-    return `${API_BASE_URL}${url}`;
+    if (url.startsWith('https://') || url.startsWith('http://')) return url; // už je plná URL
+    return `${API_BASE_URL}${url}`; // lokálna cesta
   };
 
   // Pri mountnutí vygeneruj alebo načítaj sessionId
@@ -127,10 +118,10 @@ const CartPage = () => {
 
   return (
     <div
-      className={`relative bg-cover bg-center md:py-16 min-h-screen ${!isMobile ? 'bg-fixed' : ''}`}
+      className="relative bg-cover bg-center md:py-16 min-h-screen"
       style={{
         backgroundImage: "url('/img/bg-shop.jpg')",
-        backgroundAttachment: isMobile ? 'scroll' : 'fixed',
+        backgroundAttachment: 'fixed',
       }}
     >
       {/* Overlay pre stmavenie */}

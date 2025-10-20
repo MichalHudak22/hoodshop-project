@@ -1,30 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 const HockeyCategories = () => {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    handleResize(); // init
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   return (
     <section
-      className={`py-0 lg:py-12 ${!isMobile ? 'bg-fixed' : ''}`}
+      className="py-12"
       style={{
         backgroundImage: 'url(/img/bg-hockey2.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed',
       }}
     >
-      <div className="mx-auto px-4 lg:px-5 xl:px-8 py-14 lg:py-6 bg-black bg-opacity-40 lg:bg-opacity-50 lg:border-[7px] lg:border-black lg:rounded-lg max-w-5xl xl:max-w-[80%]">
-        <h2 className="text-xl lg:text-3xl font-bold mb-8 text-center text-white">
-          Explore Hockey Categories
-        </h2>
+      <div className="mx-auto px-4 lg:px-5 xl:px-8 py-6 bg-black bg-opacity-40 lg:bg-opacity-50 lg:border-[7px] lg:border-black lg:rounded-lg max-w-5xl xl:max-w-[80%]">
+        <h2 className="text-xl lg:text-3xl font-bold mb-8 text-center text-white">Explore Hockey Categories</h2>
         <div className="grid grid-cols-2 xl:grid-cols-4 gap-x-4 gap-y-4 md:gap-x-12 md:gap-y-12">
           {[
             { to: "jersey", bg: "/img/bg-hockeyjerseys.jpg", label: "Jerseys" },

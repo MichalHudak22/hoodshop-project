@@ -25,12 +25,12 @@ const NewsPromoSection = () => {
 
   return (
     <section
-      className="relative py-16 px-4 bg-black bg-cover bg-center bg-fixed overflow-hidden"
+      className="relative py-16 px-4 bg-black bg-cover bg-center overflow-hidden"
       style={{
         backgroundImage: "url('/img/bg-sports.jpg')",
-        backgroundSize: 'cover',        // zachovať
-        backgroundPosition: 'center',   // zachovať
-        backgroundAttachment: 'fixed',  // desktop parallax
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed',
       }}
     >
       <div className="absolute inset-0 bg-black bg-opacity-30"></div>

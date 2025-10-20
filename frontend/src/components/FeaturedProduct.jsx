@@ -23,7 +23,7 @@ const FeaturedProduct = ({ product, handleAddToCart, backgroundImage }) => {
         <h1 className="text-center text-xl md:text-2xl lg:text-4xl font-bold text-white mb-4 lg:mb-10">
           {product.highlight_title}
         </h1>
-        <div className="flex flex-col md:flex-row items-center justify-center gap-4 lg:gap-8">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
 
           {/* OBÁLENIE obrázku do Link komponentu */}
           <Link to={`/product/${productSlug}`}>

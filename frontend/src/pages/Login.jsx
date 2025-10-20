@@ -13,69 +13,84 @@ function Login() {
   const { login } = useContext(AuthContext);
   const { refreshCartCount } = useContext(CartContext);
 
-  const baseURL = 'https://hoodshop-project.onrender.com';
+  const baseURL = 'https://hoodshop-project.onrender.com'; // <-- Render URL
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      const res = await fetch(`${baseURL}/user/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
+  try {
+    const res = await fetch(`${baseURL}/user/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await res.json();
 
-      if (data.error) {
-        setError(data.error);
-        setMessage('');
-        return;
-      } else if (data.message === 'Email is not verified. Please verify your account before logging in.') {
-        setError(data.message);
-        setMessage('');
-        return;
-      }
-
-      // Načítanie kompletného profilu
-      const profileRes = await fetch(`${baseURL}/user/profile`, {
-        headers: { Authorization: `Bearer ${data.token}` },
-      });
-      const profileData = await profileRes.json();
-
-      const completeUser = { ...profileData, token: data.token };
-      login(completeUser);
-      localStorage.setItem('user', JSON.stringify(completeUser));
-      localStorage.setItem('token', data.token);
-
-      refreshCartCount();
-      navigate('/profile');
-      setError('');
-      setMessage(data.message);
-    } catch (err) {
-      console.error('Error during login:', err);
-      setError('An error occurred while logging in.');
+    if (data.error) {
+      setError(data.error);
       setMessage('');
+      return;
+    } else if (data.message === 'Email is not verified. Please verify your account before logging in.') {
+      setError(data.message);
+      setMessage('');
+      return;
     }
-  };
+
+    // ✅ Načítaj kompletné údaje používateľa
+    const profileRes = await fetch(`${baseURL}/user/profile`, {
+      headers: { Authorization: `Bearer ${data.token}` },
+    });
+    const profileData = await profileRes.json();
+
+    // Nastav user v kontexte aj localStorage
+    const completeUser = { ...profileData, token: data.token };
+    login(completeUser);
+    localStorage.setItem('user', JSON.stringify(completeUser));
+    localStorage.setItem('token', data.token);
+
+    refreshCartCount();
+    navigate('/profile');
+    setError('');
+    setMessage(data.message);
+  } catch (err) {
+    console.error('Error during login:', err);
+    setError('An error occurred while logging in.');
+    setMessage('');
+  }
+};
+
 
   return (
     <div
-      className="relative flex flex-col items-center min-h-screen bg-black bg-fixed bg-cover bg-center lg:mt-12"
+      className="relative mt-10 pb-10 flex justify-center bg-fixed bg-cover bg-no-repeat bg-center"
       style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}
     >
-      {/* Overlay */}
       <div className="absolute inset-0 bg-black opacity-60 z-0" />
 
-      {/* Form container */}
-      <div className="relative z-10 bg-black bg-opacity-70 md:border-2 border-gray-600 lg:rounded-xl shadow-xl w-full max-w-xl md:max-w-3xl lg:max-w-4xl p-6 md:p-12 lg:p-16">
-        <h1 className="text-2xl md:text-3xl font-bold text-center text-blue-200 mb-6">
+      <div className="relative z-10 bg-black bg-opacity-70 md:border-2 border-gray-600 py-8 lg:py-16 px-5 md:px-12 lg:px-12 rounded-2xl shadow-xl max-w-xl md:max-w-3xl w-full">
+        <h1 className="text-3xl font-bold text-center text-blue-200 mb-6">
           Sign In to Your Account
         </h1>
-          <p className="text-white text-lg lg:text-xl text-center my-3">
-              Enter your credentials and enjoy the best of HoodShop!
-            </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4 max-w-sm mx-auto">
+        <div className="mb-8 text-white flex flex-col gap-3">
+          <h2 className="text-3xl font-bold mb-4 text-blue-200 text-center">
+            Welcome back to HoodShop!
+          </h2>
+          <p className="mb-3 lg:text-xl text-center">
+            By signing in, you unlock all the benefits of our store focused on football, hockey, and cycling.
+          </p>
+          <ul className="list-disc list-inside space-y-1 text-white lg:text-xl mb-4">
+            <li>Earn loyalty points with every purchase.</li>
+            <li>Get up to 5% off your next order using your points.</li>
+            <li>Manage your profile and update your avatar.</li>
+            <li>Access exclusive member-only offers.</li>
+          </ul>
+          <p className="text-blue-200 lg:text-2xl text-center">
+            Enter your credentials and enjoy the best of HoodShop!
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4 max-w-md m-auto">
           <input
             type="email"
             placeholder="Email"
@@ -92,13 +107,14 @@ function Login() {
             className="w-full p-3 rounded-lg text-lg font-bold bg-gray-100 text-black focus:outline-none focus:ring-2 focus:ring-blue-400 placeholder:text-black placeholder:font-bold"
             required
           />
-          <button
-            type="submit"
-            className="w-full lg:w-[200px] block mx-auto bg-blue-700 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition duration-200"
-          >
-            Log In
-          </button>
-
+          <div className="pt-3">
+            <button
+              type="submit"
+              className="w-full bg-blue-700 hover:bg-blue-600 text-white font-semibold py-3 rounded-lg transition duration-200"
+            >
+              Log In
+            </button>
+          </div>
         </form>
 
         <div className="mt-4 text-center h-8">
@@ -111,32 +127,19 @@ function Login() {
           )}
         </div>
 
-        <div className="mt-4 text-center">
-          <p className="text-blue-200 text-lg lg:text-xl mb-3">
+        <div className="mt-8 text-center">
+          <p className="text-white">
             New to HoodShop? Create your account and unlock exclusive benefits!
           </p>
           <Link
             to="/registration"
-            className="w-full lg:w-[200px] inline-block my-3 bg-blue-700 hover:bg-blue-600 text-white font-semibold px-7 py-3 rounded-lg transition duration-200"
+            className="inline-block mt-2 bg-blue-700 hover:bg-blue-600 text-white px-7 py-3 rounded-lg transition duration-200"
           >
             Create Account
           </Link>
-
-          <div className="mt-6 text-white text-center">
-            <p className="mb-6 text-sm lg:text-xl text-center">
-              By signing in, you unlock all the benefits of our store focused on football, hockey, and cycling.
-            </p>
-            <ul className="list-none list-inside space-y-1 text-sm lg:text-xl">
-              <li>Earn loyalty points with every purchase.</li>
-              <li>Get up to 5% off your next order using your points.</li>
-              <li>Manage your profile and update your avatar.</li>
-              <li>Access exclusive member-only offers.</li>
-            </ul>
-          </div>
         </div>
       </div>
     </div>
-
   );
 }
 

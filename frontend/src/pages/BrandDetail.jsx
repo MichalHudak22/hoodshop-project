@@ -13,17 +13,8 @@ const BrandDetail = () => {
   const [products, setProducts] = useState([]);
   const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
-  const [isMobile, setIsMobile] = useState(false);
 
-  // 🔹 zistí, či je používateľ na mobile
-  useEffect(() => {
-    const checkScreenSize = () => setIsMobile(window.innerWidth < 768);
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-    return () => window.removeEventListener("resize", checkScreenSize);
-  }, []);
-
-  // Načítanie všetkých značiek
+  // Načítanie všetkých značiek (len raz)
   useEffect(() => {
     const fetchAllBrands = async () => {
       try {
@@ -37,7 +28,7 @@ const BrandDetail = () => {
     fetchAllBrands();
   }, []);
 
-  // Načítanie brandu a produktov podľa slug
+  // Načítanie brandu podľa slug (len keď sa slug zmení)
   useEffect(() => {
     const fetchBrandAndProducts = async () => {
       if (!slug) return;
@@ -47,6 +38,7 @@ const BrandDetail = () => {
         const data = await res.json();
         setBrand(data);
 
+        // fetch products len raz po načítaní brandu
         if (data?.name) {
           const productRes = await fetch(`${baseURL}/products/brand/${data.name.toLowerCase()}`);
           const productData = await productRes.json();
@@ -58,7 +50,7 @@ const BrandDetail = () => {
     };
 
     fetchBrandAndProducts();
-  }, [slug]);
+  }, [slug]); // ⚠️ iba slug ako dependency
 
   const handleAddToCart = async (product) => {
     const sessionId = localStorage.getItem("sessionId");
@@ -102,7 +94,7 @@ const BrandDetail = () => {
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
-          backgroundAttachment: isMobile ? "scroll" : "fixed", // 🔹 parallax len na desktopoch
+          backgroundAttachment: "fixed",
         }}
       >
         <div className="absolute inset-0 bg-black opacity-40 z-0"></div>

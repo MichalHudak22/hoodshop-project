@@ -1,11 +1,9 @@
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
-const sgMail = require('@sendgrid/mail');
+const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const db = require('../database');
 
-// Nastavenie SendGrid API kľúča
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // Funkcia pre získanie všetkých používateľov
 const getUsers = async (req, res) => {
@@ -18,35 +16,46 @@ const getUsers = async (req, res) => {
   }
 };
 
-// Funkcia pre vytvorenie nového používateľa registrácia
+
+// Funkcia pre vytvorenie nového používateľa registracia 
+// Konfigurácia emailu
+require('dotenv').config();
+
+console.log('EMAIL_USER:', process.env.EMAIL_USER);
+console.log('EMAIL_PASS:', process.env.EMAIL_PASS);
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER, // napr. tvojemail@gmail.com
+    pass: process.env.EMAIL_PASS, // alebo App Password
+
+  },
+});
+
 const createUser = async (req, res) => {
   const { name, email, password } = req.body;
   const defaultAvatarUrl = 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1755594977/default-avatar_z3c30l.jpg';
 
   try {
-    console.log('📌 Registrácia používateľa začala pre email:', email);
-
     // 1️⃣ Overenie, či už email existuje
     const [existingUsers] = await db.query('SELECT * FROM user WHERE email = ?', [email]);
     if (existingUsers.length > 0) {
-      console.log('⚠️ Email už existuje:', email);
       return res.status(400).json({ error: 'Email je už zaregistrovaný.' });
     }
-    console.log('✅ Email nie je obsadený, pokračujem v registrácii.');
 
     // 2️⃣ Hashovanie hesla
     const hashedPassword = await bcrypt.hash(password, 10);
-    console.log('🔒 Heslo zašifrované.');
 
-    // 3️⃣ Vloženie používateľa do DB
+    // 3️⃣ Vloženie používateľa s default avatarom
     const [insertResult] = await db.query(
       'INSERT INTO user (name, email, password, is_verified, user_photo, user_photo_public_id) VALUES (?, ?, ?, false, ?, NULL)',
       [name, email, hashedPassword, defaultAvatarUrl]
     );
-    const userId = insertResult.insertId;
-    console.log('📝 Používateľ vložený do DB s ID:', userId);
 
-    // 4️⃣ Vytvorenie tokenu pre overenie emailu
+    const userId = insertResult.insertId;
+
+    // 4️⃣ Vytvorenie tokenu na overenie emailu
     const token = uuidv4();
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
     const expiresAtFormatted = expiresAt.toISOString().slice(0, 19).replace('T', ' ');
@@ -55,44 +64,33 @@ const createUser = async (req, res) => {
       'INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
       [userId, token, expiresAtFormatted]
     );
-    console.log('🔑 Token pre overenie emailu vytvorený a uložený do DB:', token);
 
+    // 5️⃣ Odoslanie overovacieho emailu s FRONTEND_URL z env
     const frontendURL = process.env.FRONTEND_URL;
     const verificationLink = `${frontendURL}/verify-email?token=${token}`;
 
-    // 5️⃣ Odoslanie overovacieho emailu cez SendGrid
-    try {
-      await sgMail.send({
-        to: email,
-        from: process.env.EMAIL_USER, // musí byť overený v SendGrid
-        subject: 'Overenie emailu - HoodShop',
-        html: `
-          <p>Ahoj ${name},</p>
-          <p>Prosím, over svoj účet kliknutím na odkaz nižšie:</p>
-          <a href="${verificationLink}">${verificationLink}</a>
-          <p>Ak si sa neregistroval, ignoruj tento email.</p>
-        `,
-      });
-      console.log(`✅ Overovací email odoslaný na: ${email}`);
-    } catch (emailErr) {
-      console.error('❌ Chyba pri odosielaní overovacieho emailu:', emailErr);
-      console.log('ℹ️ Registrácia prebehla, používateľ je uložený, email nebol odoslaný.');
-    }
-
-    // 6️⃣ Úspešná odpoveď klientovi
-    res.status(201).json({
-      message: 'Registrácia úspešná. Skontroluj email pre overenie účtu.',
-      userId,
+    await transporter.sendMail({
+      to: email,
+      subject: 'Overenie emailu',
+      html: `
+        <p>Ahoj ${name},</p>
+        <p>Prosím, over svoj účet kliknutím na odkaz nižšie:</p>
+        <a href="${verificationLink}">${verificationLink}</a>
+        <p>Ak si sa neregistroval, ignoruj tento email.</p>
+      `,
     });
-    console.log('🎉 Registrácia úspešne dokončená pre email:', email);
+
+    // 6️⃣ Úspešná odpoveď
+    res.status(201).json({ message: 'Registrácia úspešná. Skontroluj email pre overenie účtu.' });
 
   } catch (err) {
-    console.error('❌ Chyba pri registrácii používateľa:', err);
+    console.error('Chyba pri registrácii používateľa:', err);
     res.status(500).json({ error: 'Interná chyba servera' });
   }
 };
 
-// Funkcia pre overenie registrácie pomocou emailu
+
+// Funkcia pre overenie registracie pomocou emailu
 const verifyEmail = async (req, res) => {
   const token = req.query.token;
   if (!token) {
@@ -142,14 +140,14 @@ const loginUser = async (req, res) => {
     const attemptData = getAttempts(email);
     if (attemptData.lockUntil && Date.now() < attemptData.lockUntil) {
       const minutesLeft = Math.ceil((attemptData.lockUntil - Date.now()) / 60000);
-      return res.status(429).json({ error: `The account is temporarily locked. Please try again in ${minutesLeft} minutes.` });
+      return res.status(429).json({ error: `Účet je dočasne zablokovaný. Skúste znova o ${minutesLeft} min.` });
     }
 
     // 2️⃣ Načítame používateľa podľa emailu
     const [users] = await db.query('SELECT * FROM user WHERE email = ?', [email]);
     if (users.length === 0) {
       registerFailedAttempt(email);
-      return res.status(404).json({ error: 'The user with this email does not exist.' });
+      return res.status(404).json({ error: 'Používateľ s týmto emailom neexistuje.' });
     }
 
     const user = users[0];
@@ -157,14 +155,14 @@ const loginUser = async (req, res) => {
     // 3️⃣ Skontrolujeme, či je email overený
     if (user.is_verified === 0) {
       registerFailedAttempt(email);
-      return res.status(403).json({ error: 'The email is not verified. Please check your inbox.' });
+      return res.status(403).json({ error: 'Email nie je overený. Skontroluj svoj email.' });
     }
 
     // 4️⃣ Porovnanie hesla
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       registerFailedAttempt(email);
-      return res.status(400).json({ error: 'Incorrect password.' });
+      return res.status(400).json({ error: 'Nesprávne heslo.' });
     }
 
     // 5️⃣ Reset pokusov po úspešnom prihlásení
@@ -179,7 +177,7 @@ const loginUser = async (req, res) => {
 
     // 7️⃣ Odpoveď klientovi
     res.status(200).json({
-      message: 'Login successful',
+      message: 'Prihlásenie úspešné',
       token,
       email: user.email,
       name: user.name,
@@ -205,7 +203,7 @@ const getUserProfile = async (req, res) => {
     `, [userId]);
 
     if (results.length === 0) {
-      return res.status(404).json({ error: 'User does not exist' });
+      return res.status(404).json({ error: 'Používateľ neexistuje' });
     }
 
     res.status(200).json(results[0]);

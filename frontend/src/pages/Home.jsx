@@ -9,22 +9,13 @@ function Home() {
   const [carouselSlides, setCarouselSlides] = useState([]);
   const { refreshCartCount } = useContext(CartContext);
   const [message, setMessage] = useState('');
-  const [isMobile, setIsMobile] = useState(false);
 
-  // zisťuje, či ide o mobil
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 1024);
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // načítanie carousel produktov
   useEffect(() => {
     fetch(`${import.meta.env.VITE_API_BASE_URL}/products/carousel-top`)
-      .then(res => res.json())
-      .then(data => setCarouselSlides(data))
-      .catch(e => console.error('Chyba pri načítaní carousel produktov:', e));
+
+      .then((res) => res.json())
+      .then((data) => setCarouselSlides(data))
+      .catch((e) => console.error('Chyba pri načítaní carousel produktov:', e));
   }, []);
 
   const handleAddToCart = async (jersey) => {
@@ -49,6 +40,8 @@ function Home() {
       if (response.ok) {
         setMessage("Product added to cart!");
         refreshCartCount();
+
+        // automaticky zmizne po 3 sekundách
         setTimeout(() => setMessage(''), 3000);
       } else {
         setMessage("Failed to add to cart: " + data.message);
@@ -65,15 +58,14 @@ function Home() {
     <div className="bg-black text-white min-h-screen flex flex-col">
       <HeroVideoCarousel />
 
-      {/* ✅ HomeCategories sekcia s adaptívnym paralaxom */}
-      <div className="relative mt-6 md:mt-14 overflow-hidden">
+      <div className="relative mt-16">
         <div
-          className={`absolute inset-0 bg-black opacity-60 ${!isMobile ? 'bg-fixed' : ''}`}
+          className="absolute inset-0 bg-black opacity-60"
           style={{
             backgroundImage: "url('/img/bg-sports.jpg')",
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-            backgroundAttachment: isMobile ? 'scroll' : 'fixed',
+            backgroundAttachment: 'fixed',
           }}
         />
         <div className="relative z-10">
@@ -81,25 +73,31 @@ function Home() {
         </div>
       </div>
 
-      {/* ✅ Popular Products */}
       <div className="pt-5">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 text-center">
-          Popular Products
-        </h2>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 text-center">Popular Products</h2>
         <ProductsCarousel slides={carouselSlides} handleAddToCart={handleAddToCart} />
       </div>
 
-      {/* 🧹 HomeBrands už bez pozadia */}
       <div className="relative mt-16">
+        <div
+          className="absolute inset-0 bg-black opacity-60"
+          style={{
+            backgroundImage: "url('/img/bg-sports.jpg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundAttachment: 'fixed',
+          }}
+        />
         <div className="relative z-10">
           <HomeBrands />
         </div>
 
-        {message && (
-          <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
-            {message}
-          </div>
-        )}
+         {/* ✅ MESSAGE NA STRED OBRAZOVKY */}
+      {message && (
+        <div className="fixed top-16 right-6 bg-black text-green-400 px-6 py-3 rounded-lg shadow-lg z-50 text-lg font-semibold">
+          {message}
+        </div>
+      )}
       </div>
     </div>
   );

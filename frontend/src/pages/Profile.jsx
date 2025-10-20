@@ -123,35 +123,30 @@ function Profile() {
 
 
   // Formular
-useEffect(() => {
-  const token = localStorage.getItem('token');
+  useEffect(() => {
+    const token = localStorage.getItem('token');
 
-  if (!token) {
-    navigate('/login');
-    return;
-  }
-
-  fetch(`${baseURL}/user/profile`, {
-    method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.error) {
-        setError(data.error);
-        logout(); // odstráni token z localStorage a user z contextu
-        navigate('/login');
-      } else {
-        login({ ...data, token });
-      }
-    })
-    .catch(() => {
-      setError('Chyba pri načítaní údajov o používateľovi');
-      logout();
+    if (!token) {
       navigate('/login');
-    });
-}, [navigate, login, logout]);
+      return;
+    }
 
+   fetch(`${baseURL}/user/profile`, {
+  method: 'GET',
+  headers: { Authorization: `Bearer ${token}` },
+})
+  .then((res) => res.json())
+  .then((data) => {
+    if (data.error) {
+      setError(data.error);
+    } else {
+      // 👉 update user v AuthContext
+      login({ ...data, token });
+    }
+  })
+  .catch(() => setError('Chyba pri načítaní údajov o používateľovi'));
+
+  }, [navigate]);
 
   // Handler pre update stavov políčok
   const handleChange = (e) => {
@@ -237,6 +232,13 @@ const handleSave = () => {
       <div className="relative z-10 w-full flex flex-col items-center">
         {error && <div className="text-red-500 mb-4">{error}</div>}
 
+        {/* Nadpis */}
+        <div className="py-8 text-center bg-black w-full">
+          <h1 className="text-2xl lg:text-4xl font-bold text-white">
+            Welcome <span className="text-blue-200">{user.name}</span>
+          </h1>
+        </div>
+
         {/* Profile Navigation */}
         <div className="w-full lg:max-w-2xl">
           <ProfileNavigation />
@@ -244,7 +246,7 @@ const handleSave = () => {
 
         {/* Admin Panel - zobrazí sa len adminovi */}
         {user.role === 'admin' && (
-          <div className="md:pb-5 w-[220px] md:m-auto">
+          <div className=" pb-5 w-[220px] md:m-auto">
             <button
               onClick={() => navigate('/admin')}
               className="w-full px-3 py-3 bg-black text-white hover:text-blue-200 text-[12px] sm:text-[16px] lg:text-[20px] font-bold transition-all duration-300 border-2 border-gray-500 hover:border-blue-200"
@@ -259,7 +261,7 @@ const handleSave = () => {
 
           {/* Sekcia na nahranie fotky */}
           <div className="py-6 rounded-lg shadow-lg w-full m-auto md:max-w-sm text-white">
-            <h1 className="text-2xl lg:text-3xl font-bold mb-2 text-center text-blue-200">Welcome {user.name}</h1>
+            <h1 className="text-2xl lg:text-3xl font-bold mb-2 text-center text-blue-200">User Photo</h1>
             <p className='text-center pb-5'>Upload a photo to use as your profile avatar.</p>
 
             <div className="flex flex-col items-center gap-5">
