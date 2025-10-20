@@ -71,7 +71,7 @@ function ProfileLoyaltyPoints() {
           <ProfileNavigation />
 
           {/* Nadpis */}
-          <div className="pb-8 text-center w-full">
+          <div className="pt-8 text-center w-full">
             <h1 className="text-2xl lg:text-4xl font-bold text-white">
               Points & <span className="text-blue-200">Rewards</span>
             </h1>

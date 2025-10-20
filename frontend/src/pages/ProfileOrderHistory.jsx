@@ -81,7 +81,7 @@ function OrderHistory() {
 
 
         {/* Order History */}
-        <div className="w-full px-4">
+        <div className="w-full px-2 lg:px-4">
           {orders.length === 0 && <p>Nemáte žiadne objednávky.</p>}
 
           {orders.map((order) => {
