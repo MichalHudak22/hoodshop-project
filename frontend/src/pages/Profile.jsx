@@ -131,91 +131,91 @@ function Profile() {
       return;
     }
 
-   fetch(`${baseURL}/user/profile`, {
-  method: 'GET',
-  headers: { Authorization: `Bearer ${token}` },
-})
-  .then((res) => res.json())
-  .then((data) => {
-    if (data.error) {
-      setError(data.error);
-    } else {
-      // 👉 update user v AuthContext
-      login({ ...data, token });
-    }
-  })
-  .catch(() => setError('Chyba pri načítaní údajov o používateľovi'));
+    fetch(`${baseURL}/user/profile`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          setError(data.error);
+        } else {
+          // 👉 update user v AuthContext
+          login({ ...data, token });
+        }
+      })
+      .catch(() => setError('Chyba pri načítaní údajov o používateľovi'));
 
   }, [navigate]);
 
   // Handler pre update stavov políčok
   const handleChange = (e) => {
-  const { name, value } = e.target;
-  login({
-    ...user,
-    [name]: value,
-    token: localStorage.getItem('token'),
-  });
-};
-
-
-// Handler pre uloženie zmien
-const handleSave = () => {
-  const token = localStorage.getItem('token');
-
-  const allowedFields = [
-    'name',
-    'email',
-    'profile_email',
-    'birth_date',
-    'mobile_number',
-    'address',
-    'city',
-    'postal_code',
-  ];
-
-  // Vytvoriť iba objekt s povolenými údajmi
-  const filteredUserData = allowedFields.reduce((acc, key) => {
-    if (user[key] !== undefined) {
-      acc[key] = user[key];
-    }
-    return acc;
-  }, {});
-
-  fetch(`${baseURL}/user/profile`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(filteredUserData),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.error) {
-        setError(data.error);
-        setSuccess('');
-      } else {
-        setSuccess('Profile was successfully saved.');
-        setError('');
-
-        // 👉 update globálneho usera v AuthContext
-        login({
-          ...user, // zachováš pôvodné údaje (napr. user_photo, role…)
-          ...data, // prepíšeš hodnoty, ktoré prišli z backendu
-          token,   // nechaj uložený token
-        });
-
-        setTimeout(() => {
-          setSuccess('');
-        }, 3000);
-      }
-    })
-    .catch(() => {
-      setError('Error saving profile.');
-      setSuccess('');
+    const { name, value } = e.target;
+    login({
+      ...user,
+      [name]: value,
+      token: localStorage.getItem('token'),
     });
-};
+  };
+
+
+  // Handler pre uloženie zmien
+  const handleSave = () => {
+    const token = localStorage.getItem('token');
+
+    const allowedFields = [
+      'name',
+      'email',
+      'profile_email',
+      'birth_date',
+      'mobile_number',
+      'address',
+      'city',
+      'postal_code',
+    ];
+
+    // Vytvoriť iba objekt s povolenými údajmi
+    const filteredUserData = allowedFields.reduce((acc, key) => {
+      if (user[key] !== undefined) {
+        acc[key] = user[key];
+      }
+      return acc;
+    }, {});
+
+    fetch(`${baseURL}/user/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(filteredUserData),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          setError(data.error);
+          setSuccess('');
+        } else {
+          setSuccess('Profile was successfully saved.');
+          setError('');
+
+          // 👉 update globálneho usera v AuthContext
+          login({
+            ...user, // zachováš pôvodné údaje (napr. user_photo, role…)
+            ...data, // prepíšeš hodnoty, ktoré prišli z backendu
+            token,   // nechaj uložený token
+          });
+
+          setTimeout(() => {
+            setSuccess('');
+          }, 3000);
+        }
+      })
+      .catch(() => {
+        setError('Error saving profile.');
+        setSuccess('');
+      });
+  };
 
 
   if (!user) return <div>Načítavam...</div>;
@@ -364,11 +364,16 @@ const handleSave = () => {
                     id={id}
                     name={id}
                     placeholder={label}
-                    value={user[id] || (type === 'date' ? '' : '')}
+                    value={
+                      type === 'date'
+                        ? user[id] ? new Date(user[id]).toISOString().split('T')[0] : ''
+                        : user[id] || ''
+                    }
                     onChange={handleChange}
                     maxLength={maxLength}
-                    className="w-full lg:w-2/3 p-3 pl-5  bg-gray-900 text-white border border-gray-500"
+                    className="w-full lg:w-2/3 p-3 pl-5  bg-gray-700 text-white border border-gray-500"
                   />
+
                 </div>
               ))}
 
