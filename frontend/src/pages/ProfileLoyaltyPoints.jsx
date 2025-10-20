@@ -67,7 +67,7 @@ function ProfileLoyaltyPoints() {
       <div className="relative z-10 w-full flex flex-col items-center">
 
 
-        <div className="w-full lg:max-w-2xl">
+        <div className="w-full lg:max-w-2xl mb-4">
           <ProfileNavigation />
 
           {/* Nadpis */}
