@@ -32,17 +32,17 @@ export default function TopCustomers() {
     fetchTopCustomers();
   }, [API_BASE_URL]);
 
-  if (loading) return <p className="text-center text-blue-400">Načítavam top zákazníkov...</p>;
+  if (loading) return <p className="text-center text-blue-400">Loading top customers…</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
     <section className="lg:p-6 max-w-3xl mx-auto">
       <h3 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-5 text-center text-blue-200">
-        Top 5 zákazníkov
+        Top 10 Customers
       </h3>
 
       {customers.length === 0 ? (
-        <p className="text-center text-gray-400">Žiadne dáta k dispozícii.</p>
+        <p className="text-center text-gray-400">No data available.</p>
       ) : (
         <div className="flex flex-col space-y-3">
           {customers.map((c, index) => (
