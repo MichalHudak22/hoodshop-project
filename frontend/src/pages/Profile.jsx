@@ -122,109 +122,105 @@ function Profile() {
   };
 
 
+  // Formular
   useEffect(() => {
-  const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token');
 
-  if (!token) {
-    navigate('/login');
-    return;
-  }
+    if (!token) {
+      navigate('/login');
+      return;
+    }
 
-  fetch(`${baseURL}/user/profile`, {
-    method: 'GET',
-    headers: { Authorization: `Bearer ${token}` },
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.error) {
-        setError(data.error);
+    fetch(`${baseURL}/user/profile`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          setError(data.error);
+          logout(); // odstráni token z localStorage a user z contextu
+          navigate('/login');
+        } else {
+          login({ ...data, token });
+        }
+      })
+      .catch(() => {
+        setError('Chyba pri načítaní údajov o používateľovi');
         logout();
         navigate('/login');
-      } else {
-        login({ ...data, token });
-
-        // Naplni formData
-        setFormData({
-          name: data.name || '',
-          profile_email: data.profile_email || '',
-          birth_date: data.birth_date ? data.birth_date.substring(0, 10) : '',
-          mobile_number: data.mobile_number || '',
-          address: data.address || '',
-          city: data.city || '',
-          postal_code: data.postal_code || '',
-        });
-      }
-    })
-    .catch(() => {
-      setError('Chyba pri načítaní údajov o používateľovi');
-      logout();
-      navigate('/login');
-    });
-}, [navigate, login, logout]);
+      });
+  }, [navigate, login, logout]);
 
 
   // Handler pre update stavov políčok
- const handleChange = (e) => {
-  const { name, value } = e.target;
-  setFormData(prev => ({ ...prev, [name]: value }));
-};
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    login({
+      ...user,
+      [name]: value,
+      token: localStorage.getItem('token'),
+    });
+  };
 
-const [formData, setFormData] = useState({
-  name: '',
-  profile_email: '',
-  birth_date: '',
-  mobile_number: '',
-  address: '',
-  city: '',
-  postal_code: '',
-});
 
   // Handler pre uloženie zmien
-const handleSave = () => {
-  const token = localStorage.getItem('token');
+  const handleSave = () => {
+    const token = localStorage.getItem('token');
 
-  const allowedFields = [
-    'name',
-    'email',
-    'profile_email',
-    'birth_date',
-    'mobile_number',
-    'address',
-    'city',
-    'postal_code',
-  ];
+    const allowedFields = [
+      'name',
+      'email',
+      'profile_email',
+      'birth_date',
+      'mobile_number',
+      'address',
+      'city',
+      'postal_code',
+    ];
 
-  const filteredUserData = allowedFields.reduce((acc, key) => {
-    if (formData[key] !== undefined) acc[key] = formData[key];
-    return acc;
-  }, {});
-
-  fetch(`${baseURL}/user/profile`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(filteredUserData),
-  })
-    .then((res) => res.json())
-    .then((data) => {
-      if (data.error) {
-        setError(data.error);
-        setSuccess('');
-      } else {
-        setSuccess('Profile was successfully saved.');
-        setError('');
-
-        login({ ...user, ...data, token }); // aktualizuje globálny user
-        setTimeout(() => setSuccess(''), 3000);
+    // Vytvoriť iba objekt s povolenými údajmi
+    const filteredUserData = allowedFields.reduce((acc, key) => {
+      if (user[key] !== undefined) {
+        acc[key] = user[key];
       }
+      return acc;
+    }, {});
+
+    fetch(`${baseURL}/user/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(filteredUserData),
     })
-    .catch(() => {
-      setError('Error saving profile.');
-      setSuccess('');
-    });
-};
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) {
+          setError(data.error);
+          setSuccess('');
+        } else {
+          setSuccess('Profile was successfully saved.');
+          setError('');
+
+          // 👉 update globálneho usera v AuthContext
+          login({
+            ...user, // zachováš pôvodné údaje (napr. user_photo, role…)
+            ...data, // prepíšeš hodnoty, ktoré prišli z backendu
+            token,   // nechaj uložený token
+          });
+
+          setTimeout(() => {
+            setSuccess('');
+          }, 3000);
+        }
+      })
+      .catch(() => {
+        setError('Error saving profile.');
+        setSuccess('');
+      });
+  };
 
 
   if (!user) return <div>Načítavam...</div>;
@@ -350,23 +346,29 @@ const handleSave = () => {
                 handleSave();
               }}
             >
-            {inputs.map(({ id, label, type, maxLength }) => (
-  <div key={id} className="flex flex-col lg:flex-row lg:items-center gap-2">
-    <label htmlFor={id} className="block pl-3 lg:pl-0 lg:mb-0 lg:w-1/3 xl:w-1/4 text-[14px] lg:text-lg text-white">
-      {label}
-    </label>
-    <input
-      type={type}
-      id={id}
-      name={id}
-      placeholder={label}
-      value={formData[id]}
-      onChange={handleChange}
-      maxLength={maxLength}
-      className="w-full lg:w-2/3 p-3 pl-5 bg-gray-700 text-white border border-gray-500"
-    />
-  </div>
-))}
+              {inputs.map(({ id, label, type, maxLength }) => (
+                <div
+                  key={id}
+                  className="flex flex-col lg:flex-row lg:items-center gap-2"
+                >
+                  <label
+                    htmlFor={id}
+                    className="block pl-3 lg:pl-0 lg:mb-0 lg:w-1/3 xl:w-1/4 text-[14px] lg:text-lg text-white"
+                  >
+                    {label}
+                  </label>
+                  <input
+                    type={type}
+                    id={id}
+                    name={id}
+                    placeholder={label}
+                    value={user[id] || (type === 'date' ? '' : '')}
+                    onChange={handleChange}
+                    maxLength={maxLength}
+                    className="w-full lg:w-2/3 p-3 pl-5  bg-gray-800 text-white border border-gray-500"
+                  />
+                </div>
+              ))}
 
               <div className='py-2 w-full md:w-[220px] md:m-auto'>
                 <button
