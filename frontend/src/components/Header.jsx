@@ -63,9 +63,9 @@ const Header = () => {
   }, [user, refreshCartCount]);
 
   return (
-    <header className={`fixed w-full flex flex-col bg-black bg-opacity-90 text-white border-b border-white border-opacity-70 z-50 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
+    <header className={`fixed w-full flex flex-col bg-black bg-opacity-90 text-white border-b border-white border-opacity-60 z-50 transition-transform duration-300 ${isVisible ? 'translate-y-0' : '-translate-y-full'}`}>
       {/* Top bar */}
-      <div className="flex justify-between items-center p-4 px-8">
+      <div className="flex justify-between items-center p-2 px-8">
         <Link to="/">
           <img src={logo} alt="Logo" className="h-16 rounded-full hover:scale-105 transition-transform" />
         </Link>

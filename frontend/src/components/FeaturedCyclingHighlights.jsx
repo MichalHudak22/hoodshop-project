@@ -10,11 +10,10 @@ const FeaturedCyclingHighlights = () => {
 
   const baseURL = import.meta.env.VITE_API_BASE_URL;
 
-  // Funkcia na opravu URL (Cloudinary vs lokálne)
   const fixCloudinaryUrl = (url) => {
     if (!url) return '';
-    if (url.startsWith('https')) return url; // už je plná URL
-    return `${baseURL}${url}`; // lokálna cesta
+    if (url.startsWith('https')) return url;
+    return `${baseURL}${url}`;
   };
 
   useEffect(() => {
@@ -25,10 +24,7 @@ const FeaturedCyclingHighlights = () => {
         const res = await axios.get(`${baseURL}/products/cycling/${category}`);
         const highlighted = res.data
           .filter((p) => p.highlight_title && p.description)
-          .map((p) => ({
-            ...p,
-            image: fixCloudinaryUrl(p.image),
-          }));
+          .map((p) => ({ ...p, image: fixCloudinaryUrl(p.image) }));
         setter(highlighted.slice(0, 2));
       } catch (err) {
         console.error(`Nepodarilo sa načítať cycling ${category}:`, err);
@@ -41,42 +37,37 @@ const FeaturedCyclingHighlights = () => {
     fetchProducts('helmets', setFeaturedHelmets);
   }, [baseURL]);
 
-  // Spojíme produkty do jedného poľa
+  // Spojíme všetky produkty do jedného poľa, max 6
   const featuredItems = [];
-  for (let i = 0; i < 2; i++) {
-    if (featuredClothes[i]) {
-      featuredItems.push({
-        name: "Santini",
-        product: featuredClothes[i],
-        defaultBg: "/img/cycling-clothes.jpg",
-      });
-    }
-    if (featuredHelmets[i]) {
-      featuredItems.push({
-        name: "Kask",
-        product: featuredHelmets[i],
-        defaultBg: "/img/cycling-helmets.jpg",
-      });
-    }
-    if (featuredBikes[i]) {
-      featuredItems.push({
-        name: "Specialized",
-        product: featuredBikes[i],
-        defaultBg: "/img/cycling-bikes.jpg",
-      });
+  const categories = [
+    { items: featuredClothes, name: 'Santini', defaultBg: '/img/cycling-clothes.jpg' },
+    { items: featuredHelmets, name: 'Kask', defaultBg: '/img/cycling-helmets.jpg' },
+    { items: featuredBikes, name: 'Specialized', defaultBg: '/img/cycling-bikes.jpg' },
+  ];
+
+  let count = 0;
+  for (let i = 0; i < 2 && count < 6; i++) {
+    for (const cat of categories) {
+      if (cat.items[i] && count < 6) {
+        featuredItems.push({
+          name: cat.name,
+          product: cat.items[i],
+          defaultBg: cat.defaultBg,
+        });
+        count++;
+      }
     }
   }
 
   return (
     <section
+      className="py-12 w-full bg-fixed"
       style={{
         backgroundImage: 'url(/img/bg-cycling3.jpg)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed',
       }}
-      className="py-12 w-full"
     >
       <div className="xl:w-[80%] 2xl:w-[65%] m-auto xl:bg-black xl:bg-opacity-50 xl:border-[7px] xl:border-black xl:pb-8 xl:rounded-xl">
         <h2 className="text-xl md:text-2xl lg:text-3xl text-white bg-black xl:bg-transparent py-4 font-bold text-center mb-5">
@@ -85,27 +76,27 @@ const FeaturedCyclingHighlights = () => {
 
         {errorMessage && <p className="text-red-500 text-center mb-4">{errorMessage}</p>}
 
-        <div className="w-full xl:w-[90%] 2xl:max-w-[90%] mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+        <div className="w-full xl:w-[90%] 2xl:max-w-[90%] mx-auto px-2 md:px-4 grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8 items-stretch">
           {featuredItems.map(({ name, product, defaultBg }, index) => (
             <Link
               key={`${name}-${index}`}
               to={`/product/${product?.slug || ''}`}
               className="flex flex-col h-full bg-white rounded-lg overflow-hidden shadow-lg hover:brightness-125 transition"
             >
-              <h3 className="py-4 px-3 text-[14px] md:min-h-[80px] font-bold bg-black text-white text-center">
+              <h3 className="py-4 px-3 text-sm min-h-[80px] font-bold bg-black text-white text-center flex items-center justify-center">
                 {product?.highlight_title || `${name} Featured Product`}
               </h3>
 
               <div className="relative h-64 overflow-hidden shadow-lg group">
                 <img
-                  src={product ? fixCloudinaryUrl(product.image) : defaultBg}
+                  src={product ? product.image : defaultBg}
                   alt={product?.highlight_title || `${name} default`}
                   className="w-full h-full object-contain transform transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-10"></div>
               </div>
 
-              <div className="bg-black bg-opacity-90 text-white text-sm p-4 flex-1">
+              <div className="bg-black bg-opacity-90 text-white text-xs lg:text-sm p-4 flex-1">
                 {product?.description || `Explore top products from ${name}.`}
               </div>
             </Link>
