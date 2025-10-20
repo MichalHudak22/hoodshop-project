@@ -49,7 +49,7 @@ const SportsDropdown = () => {
 
       {showSportsMenu && (
         <div
-          className="fixed top-[97px] left-0 w-full bg-black bg-opacity-95 py-4 transition-all duration-300 z-10"
+          className="fixed top-[80px] left-0 w-full bg-black bg-opacity-95 py-4 transition-all duration-300 z-10"
           style={{ pointerEvents: 'all' }}
         >
           <div className="max-w-full mx-auto flex px-4">
