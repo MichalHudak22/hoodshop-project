@@ -59,7 +59,7 @@ function OrderHistory() {
       style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}
     >
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black opacity-30 z-0" />
+      <div className="absolute inset-0 bg-black opacity-40 z-0" />
 
       {/* Obsah */}
       <div className="relative z-10 w-full flex flex-col items-center min-h-screen">

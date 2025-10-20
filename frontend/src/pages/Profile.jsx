@@ -226,7 +226,7 @@ function Profile() {
       style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}
     >
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black opacity-30 z-0" />
+      <div className="absolute inset-0 bg-black opacity-40 z-0" />
 
       {/* ***************** Obsah ********************* */}
       <div className="relative z-10 w-full flex flex-col items-center">
@@ -250,10 +250,10 @@ function Profile() {
         )}
 
         {/* Personal Info Form */}
-        <div className="flex flex-col lg:flex-row justify-center lg:w-[85%] xl:w-[1240px] items-start bg-black bg-opacity-50 md:bg-opacity-80 lg:border-2 border-gray-600 p-2">
+        <div className="flex flex-col lg:flex-row justify-center lg:w-[85%] xl:w-[1240px] items-start bg-black bg-opacity-50 md:bg-opacity-80 lg:border-2 border-gray-600 lg:p-2">
 
           {/* Sekcia na nahranie fotky */}
-          <div className="py-6 rounded-lg shadow-lg w-full m-auto md:max-w-sm text-white">
+          <div className="lg:py-6 rounded-lg shadow-lg w-full md:max-w-sm md:m-auto text-white">
             <h1 className="text-2xl lg:text-3xl font-bold mb-2 text-center text-blue-200">Welcome {user.name}</h1>
             <p className='text-center text-xs pb-5'>Upload a photo to use as your profile avatar.</p>
 

@@ -62,7 +62,7 @@ function ProfileLoyaltyPoints() {
       className="relative min-h-[100vh] text-white flex flex-col items-center bg-fixed bg-cover bg-no-repeat bg-center"
       style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}
     >
-      <div className="absolute inset-0 bg-black opacity-30 z-0" />
+      <div className="absolute inset-0 bg-black opacity-40 z-0" />
 
       <div className="relative z-10 w-full flex flex-col items-center">
 
@@ -70,14 +70,16 @@ function ProfileLoyaltyPoints() {
         <div className="w-full lg:max-w-2xl">
           <ProfileNavigation />
 
+          {/* Nadpis */}
+          <div className="pb-8 text-center w-full">
+            <h1 className="text-2xl lg:text-4xl font-bold text-white">
+              Points & <span className="text-blue-200">Rewards</span>
+            </h1>
+          </div>
+
           {profile ? (
             <div className="lg:mt-6 bg-black bg-opacity-50 md:bg-opacity-70 p-6 lg:rounded-xl shadow-md text-center lg:border-2 border-gray-600">
-              {/* Nadpis */}
-              <div className="pb-8 text-center w-full">
-                <h1 className="text-2xl lg:text-4xl font-bold text-white">
-                  Points & <span className="text-blue-200">Rewards</span>
-                </h1>
-              </div>
+
               <p className="text-lg text-white">
                 You currently have{' '}
                 <span className="font-bold text-5xl p-3 text-yellow-400">
@@ -102,7 +104,7 @@ function ProfileLoyaltyPoints() {
         </div>
 
         {/* Info o vernostných bodoch */}
-        <div className="max-w-5xl mx-auto bg-black bg-opacity-50 md:bg-opacity-70 shadow-md lg:rounded-2xl py-6 lg:py-10 p-2 lg:p-6 lg:mt-10 text-gray-800 lg:border-2 border-gray-600">
+        <div className="max-w-5xl mx-auto bg-black bg-opacity-50 md:bg-opacity-70 shadow-md lg:rounded-2xl py-6 lg:py-10 p-3 lg:p-6 lg:mt-10 text-gray-800 lg:border-2 border-gray-600">
           <h2 className="text-2xl text-blue-100 font-bold mb-4 text-center">
             🎁 Loyalty Points – Your Reward for Every Purchase
           </h2>
