@@ -62,7 +62,7 @@ function App() {
     <Router>
       <CartProvider> {/* OBALÍME TÝMTO VŠETKO, ČO POTREBUJE PRÍSTUP KU KART CONTEXT */}
         <Header />
-        <div className="pt-[89px]">
+        <div className="pt-[80px]">
           <Suspense fallback={<div>Loading...</div>}>
             <Routes>
               <Route path="/" element={<Home />} />
