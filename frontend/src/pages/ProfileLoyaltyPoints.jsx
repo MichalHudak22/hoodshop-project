@@ -73,7 +73,7 @@ function ProfileLoyaltyPoints() {
           {profile ? (
             <div className="lg:mt-6 bg-black bg-opacity-50 md:bg-opacity-70 p-6 lg:rounded-xl shadow-md text-center lg:border-2 border-gray-600">
               {/* Nadpis */}
-              <div className="py-8 text-center bg-black w-full">
+              <div className="pb-8 text-center w-full">
                 <h1 className="text-2xl lg:text-4xl font-bold text-white">
                   Points & <span className="text-blue-200">Rewards</span>
                 </h1>
