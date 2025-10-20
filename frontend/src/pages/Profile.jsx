@@ -328,7 +328,7 @@ function Profile() {
 
 
           {/* Formulár s osobnými údajmi (pôvodný kód) */}
-          <div className="p-6 rounded-lg shadow-lg w-[92%] mx-auto md:max-w-2xl lg:max-w-3xl text-white">
+          <div className="p-2 lg:p-6 rounded-lg shadow-lg w-[92%] mx-auto md:max-w-2xl lg:max-w-3xl text-white">
             <h1 className="text-2xl lg:text-3xl font-bold mb-2 text-center text-blue-200">Personal Information</h1>
             <p className="text-sm lg:text-[16px] text-white my-5 pl-3">
               Fill out your personal details below. These will be saved to your profile and automatically used during checkout to speed up the ordering process.
