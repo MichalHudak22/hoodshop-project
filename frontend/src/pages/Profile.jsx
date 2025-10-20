@@ -255,7 +255,7 @@ function Profile() {
           {/* Sekcia na nahranie fotky */}
           <div className="py-6 rounded-lg shadow-lg w-full m-auto md:max-w-sm text-white">
             <h1 className="text-2xl lg:text-3xl font-bold mb-2 text-center text-blue-200">Welcome {user.name}</h1>
-            <p className='text-center pb-5'>Upload a photo to use as your profile avatar.</p>
+            <p className='text-center text-xs pb-5'>Upload a photo to use as your profile avatar.</p>
 
             <div className="flex flex-col items-center gap-5">
 

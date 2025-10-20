@@ -65,21 +65,19 @@ function ProfileLoyaltyPoints() {
       <div className="absolute inset-0 bg-black opacity-30 z-0" />
 
       <div className="relative z-10 w-full flex flex-col items-center">
-        {/* Nadpis */}
-        <div className="py-8 text-center bg-black w-full">
-          <h1 className="text-2xl lg:text-4xl font-bold text-white">
-            Points & <span className="text-blue-200">Rewards</span>
-          </h1>
-        </div>
+
 
         <div className="w-full lg:max-w-2xl">
           <ProfileNavigation />
 
           {profile ? (
             <div className="lg:mt-6 bg-black bg-opacity-50 md:bg-opacity-70 p-6 lg:rounded-xl shadow-md text-center lg:border-2 border-gray-600">
-              <h3 className="text-2xl font-semibold text-blue-100 mb-2">
-                Welcome, {profile.name}!
-              </h3>
+              {/* Nadpis */}
+              <div className="py-8 text-center bg-black w-full">
+                <h1 className="text-2xl lg:text-4xl font-bold text-white">
+                  Points & <span className="text-blue-200">Rewards</span>
+                </h1>
+              </div>
               <p className="text-lg text-white">
                 You currently have{' '}
                 <span className="font-bold text-5xl p-3 text-yellow-400">

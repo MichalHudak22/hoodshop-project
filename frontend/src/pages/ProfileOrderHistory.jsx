@@ -67,6 +67,11 @@ function OrderHistory() {
 
         {user && <div className="text-green-500"></div>}
 
+        {/* Profile Navigation */}
+        <div className="w-full lg:max-w-2xl mb-4">
+          <ProfileNavigation />
+        </div>
+
         {/* Nadpis */}
         <div className="py-8 text-center bg-black w-full">
           <h1 className="text-2xl lg:text-4xl font-bold text-white">
@@ -74,10 +79,6 @@ function OrderHistory() {
           </h1>
         </div>
 
-        {/* Profile Navigation */}
-        <div className="w-full lg:max-w-2xl mb-4">
-          <ProfileNavigation />
-        </div>
 
         {/* Order History */}
         <div className="w-full px-4">
