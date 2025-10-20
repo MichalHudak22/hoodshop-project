@@ -258,9 +258,9 @@ function Profile() {
         <div className="flex flex-col lg:flex-row justify-center lg:w-[85%] xl:w-[1240px] items-start bg-black bg-opacity-50 md:bg-opacity-80 lg:border-2 border-gray-600 p-2">
 
           {/* Sekcia na nahranie fotky */}
-          <div className="pt-6 lg:py-6 lg:pt-0 rounded-lg shadow-lg w-full m-auto md:max-w-sm text-white">
+          <div className="py-6 rounded-lg shadow-lg w-full m-auto md:max-w-sm text-white">
             <h1 className="text-2xl lg:text-3xl font-bold mb-2 text-center text-blue-200">Welcome {user.name}</h1>
-            <p className='text-center text-sm pb-5'>Upload a photo to use as your profile avatar.</p>
+            <p className='text-center pb-5'>Upload a photo to use as your profile avatar.</p>
 
             <div className="flex flex-col items-center gap-5">
 
@@ -362,18 +362,13 @@ function Profile() {
                     id={id}
                     name={id}
                     placeholder={label}
-                    value={
-                      type === 'date'
-                        ? (user[id] ? String(user[id]).substring(0, 10) : '')
-                        : user[id] || ''
-                    }
+                    value={user[id] || (type === 'date' ? '' : '')}
                     onChange={handleChange}
                     maxLength={maxLength}
-                    className="w-full lg:w-2/3 p-3 pl-5 bg-gray-700 text-white border border-gray-500"
+                    className="w-full lg:w-2/3 p-3 pl-5  bg-gray-800 text-white border border-gray-500"
                   />
                 </div>
               ))}
-
 
               <div className='py-2 w-full md:w-[220px] md:m-auto'>
                 <button
