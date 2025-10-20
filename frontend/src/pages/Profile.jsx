@@ -362,14 +362,18 @@ function Profile() {
                     id={id}
                     name={id}
                     placeholder={label}
-                  value={user[id] || (type === 'date' ? '' : '')}
-
+                    value={
+                      type === 'date'
+                        ? (user[id] ? String(user[id]).substring(0, 10) : '')
+                        : user[id] || ''
+                    }
                     onChange={handleChange}
                     maxLength={maxLength}
-                    className="w-full lg:w-2/3 p-3 pl-5  bg-gray-800 text-white border border-gray-500"
+                    className="w-full lg:w-2/3 p-3 pl-5 bg-gray-800 text-white border border-gray-500"
                   />
                 </div>
               ))}
+
 
               <div className='py-2 w-full md:w-[220px] md:m-auto'>
                 <button
