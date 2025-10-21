@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import ProfileNavigation from '../components/ProfileNavigation';
-import { AuthContext } from '../context/AuthContext';
+import React, { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import ProfileNavigation from "../components/ProfileNavigation";
+import { AuthContext } from "../context/AuthContext";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -11,50 +11,37 @@ function ProfileLoyaltyPoints() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [displayPoints, setDisplayPoints] = useState(0);
-  const [isAuthChecked, setIsAuthChecked] = useState(false);
 
-  // ✅ Overenie prihlásenia – počká na načítanie z AuthContextu
+  // 🔒 presmerovanie po načítaní auth
   useEffect(() => {
-    if (loading) return; // čakáme, kým AuthContext overí token
-
-    if (!user || !user.token) {
-      navigate('/login');
-      return;
+    if (!loading && (!user || !user.token)) {
+      navigate("/login");
     }
-
-    setIsAuthChecked(true);
   }, [user, loading, navigate]);
 
-  // ⏳ Zobraz loading počas čakania
-  if (loading || !isAuthChecked) {
+  // ⏳ Loading UI
+  if (loading || !user || !user.token) {
     return <div className="text-center text-white py-20">Loading...</div>;
   }
 
-  // 🚫 Fallback – ak user neexistuje
-  if (!user || !user.token) return null;
-
   // 🔄 Načítanie profilu
   useEffect(() => {
-    if (!user?.token) return;
-
     axios
       .get(`${API_BASE_URL}/user/profile`, {
         headers: { Authorization: `Bearer ${user.token}` },
       })
       .then((res) => setProfile(res.data))
-      .catch((err) => console.error('Chyba pri načítaní profilu:', err));
+      .catch((err) => console.error(err));
   }, [user]);
 
   // 🎯 Animácia bodov
   useEffect(() => {
     if (!profile) return;
-
     const totalPoints = profile.loyalty_points || 0;
-    const duration = 3000; // 3 sekundy
+    const duration = 3000;
     const intervalTime = 20;
     const steps = duration / intervalTime;
     const increment = totalPoints / steps;
-
     let currentPoints = 0;
     const interval = setInterval(() => {
       currentPoints += increment;
@@ -64,23 +51,16 @@ function ProfileLoyaltyPoints() {
       }
       setDisplayPoints(Math.floor(currentPoints));
     }, intervalTime);
-
     return () => clearInterval(interval);
   }, [profile]);
 
-  // 🧩 UI
   return (
-    <div
-      className="relative min-h-[100vh] text-white flex flex-col items-center bg-fixed bg-cover bg-no-repeat bg-center"
-      style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}
-    >
+    <div className="relative min-h-[100vh] text-white flex flex-col items-center bg-fixed bg-cover bg-no-repeat bg-center"
+         style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}>
       <div className="absolute inset-0 bg-black opacity-40 z-0" />
-
       <div className="relative z-10 w-full flex flex-col items-center">
         <div className="w-full lg:max-w-2xl mb-4">
           <ProfileNavigation />
-
-          {/* Nadpis */}
           <div className="pt-8 text-center w-full">
             <h1 className="text-2xl lg:text-4xl font-bold text-white">
               Points & <span className="text-blue-200">Rewards</span>
@@ -90,25 +70,18 @@ function ProfileLoyaltyPoints() {
           {profile ? (
             <div className="lg:mt-6 bg-black bg-opacity-50 md:bg-opacity-70 p-6 lg:rounded-xl shadow-md text-center lg:border-2 border-gray-600">
               <p className="text-lg text-white">
-                You currently have{' '}
-                <span className="font-bold text-5xl p-3 text-yellow-400">
-                  <br className="md:hidden" />
-                  {displayPoints}
-                </span>{' '}
+                You currently have{" "}
+                <span className="font-bold text-5xl p-3 text-yellow-400">{displayPoints}</span>{" "}
                 loyalty points.
               </p>
               <p className="text-xl mt-2 text-white">
-                That’s worth approximately{' '}
-                <span className="text-yellow-400 font-semibold">
-                  {(displayPoints * 0.10).toFixed(2)}€
-                </span>{' '}
+                That’s worth approximately{" "}
+                <span className="text-yellow-400 font-semibold">{(displayPoints * 0.1).toFixed(2)}€</span>{" "}
                 in discounts!
               </p>
             </div>
           ) : (
-            <div className="mt-6 text-center text-gray-300">
-              Loading your profile...
-            </div>
+            <div className="mt-6 text-center text-gray-300">Loading your profile...</div>
           )}
         </div>
 
