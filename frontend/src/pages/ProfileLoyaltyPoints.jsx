@@ -7,35 +7,30 @@ import { AuthContext } from '../context/AuthContext';
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function ProfileLoyaltyPoints() {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [displayPoints, setDisplayPoints] = useState(0);
-
-  // 🧠 Stav načítania – aby sme vedeli, že čakáme na usera
   const [isAuthChecked, setIsAuthChecked] = useState(false);
 
-  // ✅ Skontroluj prihlásenie po načítaní usera
+  // ✅ Overenie prihlásenia – počká na načítanie z AuthContextu
   useEffect(() => {
-    // Ak AuthContext ešte nie je načítaný → nič nerob
-    if (user === undefined) return;
+    if (loading) return; // čakáme, kým AuthContext overí token
 
-    // Ak nie je prihlásený → presmeruj
     if (!user || !user.token) {
       navigate('/login');
       return;
     }
 
-    // Označ, že kontrola prebehla
     setIsAuthChecked(true);
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
 
-  // ⏳ Zobraz loading počas čakania na AuthContext
-  if (user === undefined || !isAuthChecked) {
+  // ⏳ Zobraz loading počas čakania
+  if (loading || !isAuthChecked) {
     return <div className="text-center text-white py-20">Loading...</div>;
   }
 
-  // 🚫 Ak nie je prihlásený (fallback)
+  // 🚫 Fallback – ak user neexistuje
   if (!user || !user.token) return null;
 
   // 🔄 Načítanie profilu
@@ -73,6 +68,7 @@ function ProfileLoyaltyPoints() {
     return () => clearInterval(interval);
   }, [profile]);
 
+  // 🧩 UI
   return (
     <div
       className="relative min-h-[100vh] text-white flex flex-col items-center bg-fixed bg-cover bg-no-repeat bg-center"
