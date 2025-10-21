@@ -8,18 +8,32 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 function ProfileLoyaltyPoints() {
   const { user } = useContext(AuthContext);
-  const navigate = useNavigate(); // hook na presmerovanie
+  const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
   const [displayPoints, setDisplayPoints] = useState(0);
 
-  // ✅ Presmerovanie neprihlásených
+  // ✅ Ochrana prístupu – čaká, kým sa user načíta
   useEffect(() => {
-    if (!user?.token) {
-      navigate('/login'); // ak nie je prihlásený, presmeruj na login
+    // Ak sa AuthContext ešte nenačítal, nerob nič
+    if (user === undefined) return;
+
+    // Ak nie je prihlásený, presmeruj na login
+    if (!user || !user.token) {
+      navigate('/login');
     }
   }, [user, navigate]);
 
-  // Načítanie profilu
+  // ⏳ Ak sa user ešte načítava (napr. po refreshe)
+  if (user === undefined) {
+    return <div className="text-center text-white py-20">Načítavam...</div>;
+  }
+
+  // 🚫 Ak nie je prihlásený (bez tokenu)
+  if (!user || !user.token) {
+    return null;
+  }
+
+  // 🔄 Načítanie profilu
   useEffect(() => {
     if (!user?.token) return;
 
@@ -31,12 +45,12 @@ function ProfileLoyaltyPoints() {
       .catch((err) => console.error('Chyba pri načítaní profilu:', err));
   }, [user]);
 
-  // Animácia bodov
+  // 🎯 Animácia počítadla bodov
   useEffect(() => {
     if (!profile) return;
 
     const totalPoints = profile.loyalty_points || 0;
-    const duration = 3000; // ms
+    const duration = 3000; // 3 sekundy
     const intervalTime = 20; // ms
     const steps = duration / intervalTime;
     const increment = totalPoints / steps;
@@ -54,9 +68,7 @@ function ProfileLoyaltyPoints() {
     return () => clearInterval(interval);
   }, [profile]);
 
-  // Zabránime renderu, kým prebieha presmerovanie
-  if (!user?.token) return null;
-
+  // 🧩 UI
   return (
     <div
       className="relative min-h-[100vh] text-white flex flex-col items-center bg-fixed bg-cover bg-no-repeat bg-center"
@@ -65,8 +77,6 @@ function ProfileLoyaltyPoints() {
       <div className="absolute inset-0 bg-black opacity-40 z-0" />
 
       <div className="relative z-10 w-full flex flex-col items-center">
-
-
         <div className="w-full lg:max-w-2xl mb-4">
           <ProfileNavigation />
 
@@ -79,7 +89,6 @@ function ProfileLoyaltyPoints() {
 
           {profile ? (
             <div className="lg:mt-6 bg-black bg-opacity-50 md:bg-opacity-70 p-6 lg:rounded-xl shadow-md text-center lg:border-2 border-gray-600">
-
               <p className="text-lg text-white">
                 You currently have{' '}
                 <span className="font-bold text-5xl p-3 text-yellow-400">

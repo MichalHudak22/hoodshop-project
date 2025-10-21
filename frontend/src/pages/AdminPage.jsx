@@ -12,7 +12,7 @@ import DeleteProduct from '../admin/DeleteProduct';
 import AllOrders from '../admin/AllOrders';
 
 function AdminPage() {
-  const { user, logout } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [footballHeaderText, setFootballHeaderText] = useState({ title: '', paragraph: '' });
@@ -21,23 +21,22 @@ function AdminPage() {
 
   // 🔒 Ochrana prístupu
   useEffect(() => {
-    // 1️⃣ Neprihlásený používateľ → presmeruj na login
-    if (!user || !user.token) {
+    if (!user?.token) {
       navigate('/login');
       return;
     }
 
-    // 2️⃣ Používateľ bez role admin → presmeruj na hlavnú stránku
     if (user.role !== 'admin') {
       navigate('/');
-      return;
     }
-  }, [user, navigate, logout]);
+  }, [user, navigate]);
 
-  // Ak sa kontrola ešte spracúva (napr. user sa načítava)
-  if (!user) return <div className="text-center text-white py-20">Načítavam...</div>;
+  // ⏳ Zobrazí sa počas načítavania usera
+  if (user === undefined || user === null) {
+    return <div className="text-center text-white py-20">Loading...</div>;
+  }
 
-  // Ak nie je admin (pre istotu, ak by navigácia nestihla prebehnúť)
+  // 🚫 Ak nie je admin (fallback)
   if (user.role !== 'admin') {
     return <div className="text-center text-red-500 py-20">Access denied</div>;
   }
@@ -47,31 +46,30 @@ function AdminPage() {
       className="relative min-h-screen text-white bg-fixed bg-cover bg-no-repeat bg-center pb-12 md:px-8"
       style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}
     >
+      {/* Overlay */}
       <div className="absolute inset-0 bg-black opacity-50 z-0" />
 
       <div className="relative z-10 max-w-screen-2xl mx-auto space-y-10">
-        {/* Nadpis */}
+        {/* 🏷️ Nadpis */}
         <div className="py-8 text-center bg-black w-full">
           <h1 className="text-2xl lg:text-4xl font-bold text-white">
             Welcome to the <span className="text-blue-200">Admin Panel</span>
           </h1>
         </div>
 
-        {/* GRID LAYOUT: Summary, Users */}
+        {/* 📊 GRID: Orders summary & Top customers */}
         <div className="grid gap-5 grid-cols-1 lg:grid-cols-2 xl:grid-cols-6">
-          {/* OrdersSummary */}
-          <div className="lg:col-span-1 xl:col-span-3 bg-black bg-opacity-70 md:rounded-xl md:px-20 lg:px-0 xl:px-5 p-5 shadow-lg border border-gray-700">
+          <div className="lg:col-span-1 xl:col-span-3 bg-black bg-opacity-70 rounded-xl p-5 shadow-lg border border-gray-700">
             <OrdersSummary />
           </div>
 
-          {/* TopCustomers */}
-          <div className="lg:col-span-1 xl:col-span-3 bg-black bg-opacity-70 md:rounded-xl md:px-20 lg:px-0 xl:px-5 p-5 shadow-lg border border-gray-700">
+          <div className="lg:col-span-1 xl:col-span-3 bg-black bg-opacity-70 rounded-xl p-5 shadow-lg border border-gray-700">
             <TopCustomers />
           </div>
 
-          {/* UserListAdmin */}
+          {/* 👥 User list */}
           <div className="lg:col-span-2 xl:col-span-6 flex justify-center w-full">
-            <div className="bg-black bg-opacity-60 md:bg-opacity-70 md:rounded-xl p-5 shadow-lg border border-gray-700 w-full max-w-3xl">
+            <div className="bg-black bg-opacity-70 rounded-xl p-5 shadow-lg border border-gray-700 w-full max-w-3xl">
               <h2 className="text-2xl lg:text-3xl font-semibold text-center text-blue-200 mb-4">
                 User List
               </h2>
@@ -80,52 +78,52 @@ function AdminPage() {
           </div>
         </div>
 
-        {/* All Orders */}
-        <div>
+        {/* 📦 All Orders */}
+        <section>
           <AllOrders />
-        </div>
+        </section>
 
-        {/* Add New Product */}
-        <div>
+        {/* ➕ Add Product */}
+        <section>
           <AddProductForm />
-        </div>
+        </section>
 
-        {/* Delete Product */}
-        <div>
+        {/* ❌ Delete Product */}
+        <section>
           <DeleteProduct />
-        </div>
+        </section>
 
-        {/* Shipping Price Config */}
-        <div className="bg-black bg-opacity-70 md:rounded-xl p-2 md:p-5 shadow-lg lg:col-span-2 xl:col-span-6 border border-gray-700">
+        {/* 🚚 Shipping Price Config */}
+        <section className="bg-black bg-opacity-70 rounded-xl p-5 shadow-lg border border-gray-700">
           <ShippingPriceConfig />
-        </div>
+        </section>
 
-        {/* Edit Section Headers */}
-        <section className="bg-black bg-opacity-70 md:rounded-xl p-5 shadow-lg border border-gray-700">
+        {/* 📝 Edit Section Headers */}
+        <section className="bg-black bg-opacity-70 rounded-xl p-5 shadow-lg border border-gray-700">
           <h2 className="text-2xl lg:text-3xl font-semibold text-center text-blue-200 mb-8">
             Edit Section Headers
           </h2>
 
-          {/* Instructions */}
+          {/* 🧭 Návod */}
           <div className="flex justify-center mb-12">
-            <div className="md:rounded-xl md:p-5 md:text-center max-w-[380px] md:max-w-3xl w-full">
-              <p className="text-sm md:text-base text-left max-w-[450px] mx-auto text-white">
-                <strong className="text-blue-200 text-sm md:text-lg text-center block mb-2">
+            <div className="rounded-xl p-5 text-center max-w-3xl w-full">
+              <p className="text-sm md:text-base text-white text-left mx-auto max-w-[500px]">
+                <strong className="text-blue-200 text-lg text-center block mb-2">
                   🛠 Instructions for Editing the Title and Text
                 </strong>
                 1. Type or paste text into the field.<br />
-                2. Select the part of the text you want to highlight with color.<br />
+                2. Select the part you want to highlight.<br />
                 3. Choose a color from the palette.<br />
-                4. Click the <em>“Change Color”</em> button.<br />
-                5. To change color, remove old tags and repeat.<br />
-                6. Click the <em>“Save text”</em> button to save your changes.
+                4. Click <em>“Change Color”</em>.<br />
+                5. To change color again, remove old tags.<br />
+                6. Click <em>“Save text”</em> to store changes.
               </p>
             </div>
           </div>
 
-          {/* Editors Grid */}
+          {/* ✏️ Editors Grid */}
           <div className="grid gap-8 grid-cols-1 xl:grid-cols-3">
-            <div className="border-t-4 lg:border border-gray-600 md:rounded-xl md:p-5 shadow-lg md:bg-black md:bg-opacity-50">
+            <div className="border-t-4 border-gray-600 rounded-xl p-5 shadow-lg bg-black bg-opacity-50">
               <h3 className="text-xl font-semibold text-center text-blue-200 mb-4">
                 Edit Football Section Title
               </h3>
@@ -136,7 +134,7 @@ function AdminPage() {
               />
             </div>
 
-            <div className="border-t-4 lg:border border-gray-600 rounded-xl md:p-5 shadow-lg md:bg-black md:bg-opacity-50">
+            <div className="border-t-4 border-gray-600 rounded-xl p-5 shadow-lg bg-black bg-opacity-50">
               <h3 className="text-xl font-semibold text-center text-blue-200 mb-4">
                 Edit Hockey Section Title
               </h3>
@@ -147,7 +145,7 @@ function AdminPage() {
               />
             </div>
 
-            <div className="border-t-4 lg:border border-gray-600 rounded-xl md:p-5 shadow-lg md:bg-black md:bg-opacity-50">
+            <div className="border-t-4 border-gray-600 rounded-xl p-5 shadow-lg bg-black bg-opacity-50">
               <h3 className="text-xl font-semibold text-center text-blue-200 mb-4">
                 Edit Cycling Section Title
               </h3>

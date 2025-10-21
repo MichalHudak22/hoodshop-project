@@ -73,7 +73,7 @@ function OrderHistory() {
         </div>
 
         {/* Nadpis */}
-        <div className="pb-8 text-center w-full">
+        <div className="pb-8 pt-4 text-center w-full">
           <h1 className="text-2xl lg:text-4xl font-bold text-white">
             My Order <span className="text-blue-200">History</span>
           </h1>
