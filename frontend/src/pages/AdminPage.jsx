@@ -12,7 +12,7 @@ import DeleteProduct from '../admin/DeleteProduct';
 import AllOrders from '../admin/AllOrders';
 
 function AdminPage() {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const [footballHeaderText, setFootballHeaderText] = useState({ title: '', paragraph: '' });
@@ -21,22 +21,24 @@ function AdminPage() {
 
   // 🔒 Ochrana prístupu
   useEffect(() => {
-    if (!user?.token) {
-      navigate('/login');
+    if (loading) return; // čakáme, kým AuthContext overí token
+
+    if (!user || !user.token) {
+      navigate('/login'); // presmerovanie, ak nie je prihlásený
       return;
     }
 
     if (user.role !== 'admin') {
-      navigate('/');
+      navigate('/'); // presmerovanie, ak nie je admin
     }
-  }, [user, navigate]);
+  }, [user, loading, navigate]);
 
-  // ⏳ Zobrazí sa počas načítavania usera
-  if (user === undefined || user === null) {
+  // ⏳ Loading počas overovania usera
+  if (loading || !user) {
     return <div className="text-center text-white py-20">Loading...</div>;
   }
 
-  // 🚫 Ak nie je admin (fallback)
+  // 🚫 Fallback – ak nie je admin
   if (user.role !== 'admin') {
     return <div className="text-center text-red-500 py-20">Access denied</div>;
   }
