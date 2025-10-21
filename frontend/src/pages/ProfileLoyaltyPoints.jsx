@@ -12,26 +12,31 @@ function ProfileLoyaltyPoints() {
   const [profile, setProfile] = useState(null);
   const [displayPoints, setDisplayPoints] = useState(0);
 
-  // ✅ Ochrana prístupu – čaká, kým sa user načíta
+  // 🧠 Stav načítania – aby sme vedeli, že čakáme na usera
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+
+  // ✅ Skontroluj prihlásenie po načítaní usera
   useEffect(() => {
-    // Ak sa AuthContext ešte nenačítal, nerob nič
+    // Ak AuthContext ešte nie je načítaný → nič nerob
     if (user === undefined) return;
 
-    // Ak nie je prihlásený, presmeruj na login
+    // Ak nie je prihlásený → presmeruj
     if (!user || !user.token) {
       navigate('/login');
+      return;
     }
+
+    // Označ, že kontrola prebehla
+    setIsAuthChecked(true);
   }, [user, navigate]);
 
-  // ⏳ Ak sa user ešte načítava (napr. po refreshe)
-  if (user === undefined) {
-    return <div className="text-center text-white py-20">Načítavam...</div>;
+  // ⏳ Zobraz loading počas čakania na AuthContext
+  if (user === undefined || !isAuthChecked) {
+    return <div className="text-center text-white py-20">Loading...</div>;
   }
 
-  // 🚫 Ak nie je prihlásený (bez tokenu)
-  if (!user || !user.token) {
-    return null;
-  }
+  // 🚫 Ak nie je prihlásený (fallback)
+  if (!user || !user.token) return null;
 
   // 🔄 Načítanie profilu
   useEffect(() => {
@@ -45,13 +50,13 @@ function ProfileLoyaltyPoints() {
       .catch((err) => console.error('Chyba pri načítaní profilu:', err));
   }, [user]);
 
-  // 🎯 Animácia počítadla bodov
+  // 🎯 Animácia bodov
   useEffect(() => {
     if (!profile) return;
 
     const totalPoints = profile.loyalty_points || 0;
     const duration = 3000; // 3 sekundy
-    const intervalTime = 20; // ms
+    const intervalTime = 20;
     const steps = duration / intervalTime;
     const increment = totalPoints / steps;
 
@@ -68,7 +73,6 @@ function ProfileLoyaltyPoints() {
     return () => clearInterval(interval);
   }, [profile]);
 
-  // 🧩 UI
   return (
     <div
       className="relative min-h-[100vh] text-white flex flex-col items-center bg-fixed bg-cover bg-no-repeat bg-center"
@@ -112,49 +116,37 @@ function ProfileLoyaltyPoints() {
           )}
         </div>
 
-        {/* Info o vernostných bodoch */}
+        {/* Info o bodoch */}
         <div className="max-w-5xl mx-auto bg-black bg-opacity-50 md:bg-opacity-70 shadow-md lg:rounded-2xl py-6 lg:py-10 p-3 lg:p-6 lg:mt-10 text-gray-800 lg:border-2 border-gray-600">
           <h2 className="text-2xl text-blue-100 font-bold mb-4 text-center">
             🎁 Loyalty Points – Your Reward for Every Purchase
           </h2>
           <p className="mb-4 text-white">
             We truly value every customer, and that’s why we’ve introduced a{' '}
-            <strong>loyalty program</strong> that rewards you for shopping with
-            us.
+            <strong>loyalty program</strong> that rewards you for shopping with us.
           </p>
           <p className="mb-4 text-white">
             With every purchase, you automatically earn{' '}
             <strong>loyalty points</strong>. The amount you receive equals{' '}
             <strong>5% of your total order value</strong>. These points are
-            added to your account immediately after checkout and can be used as
-            a discount on your next purchase.
+            added to your account immediately after checkout and can be used as a
+            discount on your next purchase.
           </p>
           <h3 className="text-2xl text-blue-100 font-semibold mt-6 mb-2">
             🔍 How does it work?
           </h3>
           <ul className="list-disc list-inside space-y-1 mb-4 text-white">
-            <li>
-              💸 For every 100 € spent, you earn <strong>50 points</strong>
-            </li>
+            <li>💸 For every 100 € spent, you earn <strong>50 points</strong></li>
             <li>🧾 <strong>10 points = 1 €</strong> discount</li>
-            <li>
-              🛒 You can apply your points as a full or partial discount on
-              your next order
-            </li>
-            <li>
-              🔐 Loyalty points are available only to{' '}
-              <strong>registered and logged-in users</strong>
-            </li>
+            <li>🛒 Use your points as a full or partial discount</li>
+            <li>🔐 Only <strong>registered users</strong> can earn points</li>
           </ul>
           <p className="mb-4 text-white">
-            <em>Example:</em> If you spend 60 €, you’ll earn 30 points, which
-            gives you a 3 € discount on your next purchase. The more you shop,
-            the more you save – it’s that simple.
+            <em>Example:</em> Spend 60 €, earn 30 points → get 3 € discount.
           </p>
           <p className="font-medium text-center mt-6 text-white">
-            💡 Loyalty points are our way of saying <strong>thank you</strong>{' '}
-            for your trust and continued support. Shop, earn, and enjoy the
-            rewards you deserve!
+            💡 Loyalty points are our way of saying <strong>thank you</strong> for
+            your trust and continued support.
           </p>
         </div>
       </div>
