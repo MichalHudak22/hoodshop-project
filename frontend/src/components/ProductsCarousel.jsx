@@ -59,7 +59,7 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
 
           return (
             <SwiperSlide key={index}>
-              <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-start p-4 text-center hover:shadow-xl transition relative">
+              <div className="w-full h-full bg-gray-100 flex flex-col items-center justify-center p-4 text-center hover:shadow-xl transition relative">
 
                 {/* Názov s odkazom */}
                 <h2 className="h-[42px] text-lg font-bold mb-1 text-black">
