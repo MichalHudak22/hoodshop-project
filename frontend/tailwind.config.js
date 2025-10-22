@@ -7,7 +7,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        heading: ['Bebas Neue', 'sans-serif'], // pre nadpisy
+        heading: ['Lexend', 'sans-serif'], // pre nadpisy
         body: ['Lexend', 'sans-serif'], // pre bežný text
       },
     },
