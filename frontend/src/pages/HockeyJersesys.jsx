@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { CartContext } from '../context/CartContext';
+import HeadTitle from '../components/HeadTitle';
 import ProductsCarousel from '../components/ProductsCarousel';
 import FeaturedProduct from '../components/FeaturedProduct';
 import FeaturedProductReversed from '../components/FeaturedProductReversed';
@@ -69,22 +70,23 @@ const HockeyJerseys = () => {
   return (
     <div>
       {/* HEAD TITLE */}
-      <section
-        className="relative text-center py-10 px-4 bg-gradient-to-br from-blue-600 via-black to-blue-900 text-white overflow-hidden border-b-4 border-black"
-      >
-        <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
-        <div className="relative z-10 max-w-4xl mx-auto">
-          <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
-            Premium <span className="text-blue-200">Hockey Jerseys</span>
-          </h1>
-          <p className="text-[14px] md:text-lg lg:text-xl text-gray-100 leading-relaxed">
+      <HeadTitle
+        title="Premium"
+        highlight="Hockey Jerseys"
+        bgImage="/img/football-bg.jpg"
+        gradientFrom="blue-600"
+        gradientVia="black"
+        gradientTo="blue-900"
+        description={
+          <>
             Discover our exclusive collection of hockey jerseys combining{' '}
             <span className="text-blue-200 font-medium">style</span>,{' '}
             <span className="text-blue-200 font-medium">comfort</span>, and{' '}
             <span className="text-blue-200 font-medium">durability</span>.
-          </p>
-        </div>
-      </section>
+          </>
+        }
+      />
+
 
       {/* 1st FEATURED JERSEY */}
       {featuredJersey && (

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { CartContext } from '../context/CartContext';
+import HeadTitle from '../components/HeadTitle';
 import ProductsCarousel from '../components/ProductsCarousel';
 import FeaturedProduct from '../components/FeaturedProduct';
 import FeaturedProductReversed from '../components/FeaturedProductReversed';
@@ -74,20 +75,22 @@ const CyclingBike = () => {
   return (
     <div>
       {/* HEAD TITLE */}
-      <section className="relative text-center py-10 px-4 bg-gradient-to-br from-orange-400 via-black to-orange-400 text-white overflow-hidden border-b-4 border-black">
-        <div className="absolute inset-0 bg-[url('/img/cycling-bg.jpg')] bg-cover bg-center opacity-20"></div>
-        <div className="relative z-10 max-w-4xl mx-auto">
-          <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
-            Explore High-Performance <span className="text-blue-200">Cycling Bikes</span>
-          </h1>
-          <p className="text-[14px] md:text-lg lg:text-xl text-gray-100 leading-relaxed">
+      <HeadTitle
+        title="Explore High-Performance"
+        highlight="Cycling Bikes"
+        bgImage="/img/cycling-bg.jpg"
+        gradientFrom="orange-400"
+        gradientVia="black"
+        gradientTo="orange-400"
+        description={
+          <>
             Whether you’re racing or cruising, our collection of{' '}
             <span className="text-blue-200 font-medium">road</span>,{' '}
             <span className="text-blue-200 font-medium">mountain</span>, and{' '}
             <span className="text-blue-200 font-medium">hybrid</span> bikes delivers exceptional performance and design.
-          </p>
-        </div>
-      </section>
+          </>
+        }
+      />
 
       {/* 1st FEATURED PRODUCT */}
       {featured1 && (

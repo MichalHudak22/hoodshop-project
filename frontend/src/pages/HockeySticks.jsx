@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { CartContext } from '../context/CartContext';
+import HeadTitle from '../components/HeadTitle';
 import ProductsCarousel from '../components/ProductsCarousel';
 import ProductSection from '../components/ProductSection';
 import FeaturedProduct from '../components/FeaturedProduct';
@@ -59,7 +60,7 @@ const HockeySticks = () => {
     brand: p.brand,
     price: p.price,
     image: p.image,
-    slug: p.slug, 
+    slug: p.slug,
   }));
 
   const highlighted = sticks.filter(s => s.highlight_title && s.description);
@@ -69,20 +70,22 @@ const HockeySticks = () => {
   return (
     <div>
       {/* HEAD TITLE */}
-      <section className="relative text-center py-10 px-4 bg-gradient-to-br from-blue-600 via-black to-blue-900 text-white overflow-hidden border-b-4 border-black">
-        <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
-        <div className="relative z-10 max-w-4xl mx-auto">
-          <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
-            Discover Elite <span className="text-blue-200">Hockey Sticks</span>
-          </h1>
-          <p className="text-[14px] md:text-lg lg:text-xl text-gray-100 leading-relaxed">
+      <HeadTitle
+        title="Discover Elite"
+        highlight="Hockey Sticks"
+        bgImage="/img/football-bg.jpg"
+        gradientFrom="blue-600"
+        gradientVia="black"
+        gradientTo="blue-900"
+        description={
+          <>
             Dominate the rink with precision-engineered hockey sticks designed for{' '}
             <span className="text-blue-200 font-medium">power</span>,{' '}
             <span className="text-blue-200 font-medium">accuracy</span>, and{' '}
             <span className="text-blue-200 font-medium">performance</span>.
-          </p>
-        </div>
-      </section>
+          </>
+        }
+      />
 
       {featured1 && (
         <FeaturedProduct

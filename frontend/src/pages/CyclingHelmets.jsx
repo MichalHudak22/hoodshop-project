@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { CartContext } from '../context/CartContext';
+import HeadTitle from '../components/HeadTitle';
 import ProductsCarousel from '../components/ProductsCarousel';
 import FeaturedProduct from '../components/FeaturedProduct';
 import FeaturedProductReversed from '../components/FeaturedProductReversed';
@@ -76,20 +77,22 @@ const CyclingHelmets = () => {
   return (
     <div>
       {/* HEAD TITLE */}
-      <section className="relative text-center py-10 px-4 bg-gradient-to-br from-orange-400 via-black to-orange-400 text-white overflow-hidden border-b-4 border-black">
-        <div className="absolute inset-0 bg-[url('/img/cycling-bg.jpg')] bg-cover bg-center opacity-20"></div>
-        <div className="relative z-10 max-w-4xl mx-auto">
-          <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
-            Top-Quality <span className="text-blue-200">Cycling Helmets</span> for Every Ride
-          </h1>
-          <p className="text-[14px] md:text-lg lg:text-xl text-gray-100 leading-relaxed">
+      <HeadTitle
+        title="Top-Quality"
+        highlight="Cycling Helmets"
+        bgImage="/img/cycling-bg.jpg"
+        gradientFrom="orange-400"
+        gradientVia="black"
+        gradientTo="orange-400"
+        description={
+          <>
             Discover our selection of premium helmets for{' '}
             <span className="text-blue-200 font-medium">safety</span>,{' '}
             <span className="text-blue-200 font-medium">comfort</span>, and{' '}
             <span className="text-blue-200 font-medium">style</span> — ideal for every cyclist, from daily commuters to pro riders.
-          </p>
-        </div>
-      </section>
+          </>
+        }
+      />
 
       {/* 1st FEATURED HELMET */}
       {featured1 && (

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
+import HeadTitle from '../components/HeadTitle';
 import ProductsCarousel from '../components/ProductsCarousel';
 import ProductSection from '../components/ProductSection';
 import FeaturedProduct from '../components/FeaturedProduct';
@@ -61,7 +62,7 @@ const HockeyHelmets = () => {
     brand: p.brand,
     price: p.price,
     image: p.image,
-    slug: p.slug, 
+    slug: p.slug,
   }));
 
   // Zvýraznené produkty
@@ -72,19 +73,21 @@ const HockeyHelmets = () => {
   return (
     <div>
       {/* HEAD TITLE */}
-      <section className="relative text-center py-10 px-4 bg-gradient-to-br from-blue-600 via-black to-blue-900 text-white overflow-hidden border-b-4 border-black">
-        <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
-        <div className="relative z-10 max-w-4xl mx-auto">
-          <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
-            Premium <span className="text-blue-200">Hockey Helmets</span>
-          </h1>
-          <p className="text-[14px] md:text-lg lg:text-xl text-gray-100 leading-relaxed">
+      <HeadTitle
+        title="Premium"
+        highlight="Hockey Helmets"
+        bgImage="/img/football-bg.jpg"
+        gradientFrom="blue-600"
+        gradientVia="black"
+        gradientTo="blue-900"
+        description={
+          <>
             Stay protected on the ice with our top-tier selection of hockey helmets offering the best in{' '}
             <span className="text-blue-200 font-medium">safety</span> and{' '}
             <span className="text-blue-200 font-medium">comfort</span>.
-          </p>
-        </div>
-      </section>
+          </>
+        }
+      />
 
       {/* 1st FEATURED */}
       {featured1 && (
