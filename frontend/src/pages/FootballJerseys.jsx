@@ -77,15 +77,14 @@ const slides = Array.isArray(jerseys) ? jerseys.map(product => ({
 
   return (
     <div>
-      <section className="relative text-center py-5 px-4 bg-gradient-to-br from-green-600 via-black to-green-700 text-white overflow-hidden border-b-4 border-black">
+      <section className="relative text-center py-4 px-4 bg-gradient-to-br from-green-600 via-black to-green-700 text-white overflow-hidden border-b-4 border-black">
         <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
         <div className="relative z-10 max-w-4xl mx-auto">
-          <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-2 tracking-wide drop-shadow-md">
+          <h1 className="text-lg md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-2 tracking-wide drop-shadow-md">
             Discover Iconic <span className="text-blue-200">Football Jerseys</span>
           </h1>
           <p className="text-sm md:text-lg text-gray-100 leading-relaxed">
-            Explore our exclusive collection of football jerseys – from legendary clubs and national teams,
-            featuring designs worn by your favorite players on the world’s biggest stages like the{' '}
+            Explore our exclusive collection of football jerseys – from legendary clubs and national teams, featured on the world’s biggest stages like the{' '}
             <span className="text-blue-200 font-medium">UEFA Champions League</span> and{' '}
             <span className="text-blue-200 font-medium">World Cup</span> finals.
           </p>
