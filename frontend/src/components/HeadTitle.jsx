@@ -10,7 +10,7 @@ const HeadTitle = ({
 }) => {
   return (
     <section
-      className={`relative text-center py-4 px-4 bg-gradient-to-br from-${gradientFrom} via-${gradientVia} to-${gradientTo} text-white overflow-hidden border-b-4 border-black`}
+      className={`relative text-center pb-3 pt-5 px-4 bg-gradient-to-br from-${gradientFrom} via-${gradientVia} to-${gradientTo} text-white overflow-hidden border-b-4 border-black`}
     >
       {/* Pozadie */}
       <div

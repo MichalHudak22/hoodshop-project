@@ -29,7 +29,7 @@ const FeaturedProductReversed = ({ product, handleAddToCart, backgroundImage }) 
       }}
     >
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black opacity-70 z-0"></div>
+      <div className="absolute inset-0 bg-black opacity-50 z-0"></div>
 
       <div className="relative z-10">
         <h1 className="text-center text-xl md:text-2xl lg:text-4xl font-bold text-white mb-4 lg:mb-10">
