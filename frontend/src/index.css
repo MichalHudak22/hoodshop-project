@@ -2,8 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* === 🧠 Globálne nastavenie fontov === */
+
+/* Nadpisy budú automaticky používať Anton */
+h1, h2, h3, h4, h5, h6 {
+  @apply font-heading;
+}
+
+/* Bežný text, tlačidlá a pod. budú mať systémový font */
+body, p, span, a, li, button, input, label {
+  @apply font-body;
+}
+
+/* === 🎨 Ostatné štýly === */
 body {
-    background-color: rgb(0, 0, 0);
+  background-color: rgb(0, 0, 0);
 }
 
 @media (max-width: 1024px) {
