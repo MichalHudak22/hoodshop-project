@@ -260,7 +260,7 @@ function Profile() {
             <div className="flex flex-col items-center gap-5">
 
               {/* Miesto na zobrazenie fotky */}
-              <div className="w-60 h-52 rounded-full overflow-hidden border-2 border-gray-400">
+              <div className="w-56 h-56 rounded-full overflow-hidden border-2 border-gray-400 shadow-xl shadow-black">
                 <img
                   src={
                     user?.user_photo
@@ -348,7 +348,7 @@ function Profile() {
                 >
                   <label
                     htmlFor={id}
-                    className="block pl-3 lg:pl-0 lg:mb-0 lg:w-1/3 xl:w-1/4 text-[14px] lg:text-lg text-white"
+                    className="block pl-3 lg:pl-0 lg:mb-0 lg:w-1/3 xl:w-1/4 text-[14px] lg:text-lg text-blue-100 font-semibold"
                   >
                     {label}
                   </label>
