@@ -19,7 +19,7 @@ const HeadTitle = ({
       ></div>
 
       {/* Obsah */}
-      <div className="relative z-10 max-w-4xl mx-auto">
+      <div className="relative z-10 max-w-5xl mx-auto">
         <h1 className="text-lg md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-2 tracking-wide drop-shadow-md">
           {title} <span className="text-blue-200">{highlight}</span>
         </h1>
