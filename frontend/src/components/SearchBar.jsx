@@ -67,11 +67,11 @@ const SearchBar = ({ onResultClick }) => {
       />
 
       {results.length > 0 && (
-        <ul className="absolute z-50 w-full lg:w-[280px] bg-white border-4 border-blue-300 mt-1 rounded-md shadow-lg max-h-72 overflow-y-auto">
+        <ul className="absolute z-50 w-full lg:w-[280px] bg-white border-4 border-black mt-1 rounded-md shadow-lg max-h-72 overflow-y-auto">
           {results.map((product) => (
             <li
               key={product.id}
-              className="p-2 hover:bg-blue-100 text-black cursor-pointer"
+              className="p-2 hover:bg-gray-200 text-black cursor-pointer"
             >
               <Link
                 to={`/product/${product.slug}`}
