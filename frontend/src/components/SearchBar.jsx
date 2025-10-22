@@ -71,11 +71,11 @@ const SearchBar = ({ onResultClick }) => {
           {results.map((product) => (
             <li
               key={product.id}
-              className="p-2 hover:bg-gray-200 text-black cursor-pointer"
+              className="p-2 hover:bg-black text-black cursor-pointer"
             >
               <Link
                 to={`/product/${product.slug}`}
-                className="flex items-center gap-2 p-2 hover:bg-blue-100 text-black"
+                className="flex items-center gap-2 p-2 hover:bg-gray-300 text-black"
                 onClick={handleResultClick}
               >
                 <img
@@ -85,7 +85,7 @@ const SearchBar = ({ onResultClick }) => {
                 />
                 <div>
                   <span className="font-semibold text-sm">{product.name}</span>
-                  <span className="ml-1 text-gray-500 text-sm">
+                  <span className="ml-1 text-gray-600 text-sm">
                     ({product.type})
                   </span>
                 </div>
