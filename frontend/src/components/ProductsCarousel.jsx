@@ -65,7 +65,7 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
                 <h2 className="h-[42px] text-lg font-bold mb-1 text-black">
                   <Link
                     to={`/product/${productSlug}`}
-                    className="hover:underline"
+                    className=""
                   >
                     {slide.name}
                   </Link>
@@ -79,7 +79,7 @@ const ProductsCarousel = ({ slides, handleAddToCart }) => {
                   <img
                     src={imageUrl}
                     alt={slide.name}
-                    className="h-[180px] mb-2 transition duration-300 hover:brightness-110"
+                    className="h-[160px] lg:h-[180px] mb-2 transition duration-300 hover:brightness-110"
                   />
                 </Link>
 

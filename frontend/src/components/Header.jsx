@@ -149,7 +149,7 @@ const Header = () => {
       </div>
 
     {menuOpen && (
-  <div className="lg:hidden bg-black bg-opacity-95 p-4 flex flex-col space-y-4 text-xl items-center">
+  <div className="lg:hidden bg-black bg-opacity-90 p-4 flex flex-col space-y-4 text-xl items-center">
     <div className="w-full mb-4">
       <SearchBar onResultClick={() => setMenuOpen(false)} />
     </div>
