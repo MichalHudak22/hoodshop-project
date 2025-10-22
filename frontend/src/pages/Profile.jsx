@@ -260,7 +260,7 @@ function Profile() {
             <div className="flex flex-col items-center gap-5">
 
               {/* Miesto na zobrazenie fotky */}
-              <div className="w-56 h-56 rounded-full overflow-hidden border-2 border-gray-400">
+              <div className="w-60 h-52 rounded-full overflow-hidden border-2 border-gray-400">
                 <img
                   src={
                     user?.user_photo
