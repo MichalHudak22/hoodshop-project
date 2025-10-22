@@ -257,7 +257,7 @@ function Profile() {
             <h1 className="text-2xl lg:text-3xl font-bold mb-2 text-center text-blue-200">Welcome {user.name}</h1>
             <p className='text-center text-xs pb-5'>Upload a photo to use as your profile avatar.</p>
 
-            <div className="flex flex-col items-center gap-3 lg:gap-5">
+            <div className="flex flex-col items-center gap-4 lg:gap-6">
 
               {/* Miesto na zobrazenie fotky */}
               <div className="w-56 h-56 rounded-full overflow-hidden border-2 border-gray-400 shadow-xl shadow-black">
@@ -272,23 +272,16 @@ function Profile() {
                 />
               </div>
 
-              {/* Tlačidlo Default Photo */}
-              <button
-                onClick={setDefaultPhoto}
-                className="bg-gray-700 hover:bg-gray-500 transition-colors text-sm py-2 px-2 rounded-lg font-semibold cursor-pointer"
-              >
-                Use Default Photo
-              </button>
-
-              <div className='flex flex-col text-center items-center gap-2'>
-                {/* Input pre výber súboru */}
-                <label className="bg-green-800 hover:bg-green-600 transition-colors py-3 px-5 rounded-lg font-semibold cursor-pointer">
+              {/* Tlačidlá vedľa seba */}
+              <div className="flex flex-row gap-4 items-center justify-center">
+                {/* Select Photo */}
+                <label className="bg-green-800 hover:bg-green-600 transition-colors py-3 px-5 rounded-lg font-semibold cursor-pointer text-sm">
                   <input
                     type="file"
                     accept="image/*"
                     ref={fileInputRef}
                     onChange={(e) => {
-                      setUploadError('');    // reset chyby pri novom výbere
+                      setUploadError('');
                       setSelectedFile(e.target.files[0]);
                     }}
                     className="hidden"
@@ -296,16 +289,25 @@ function Profile() {
                   Select Photo
                 </label>
 
-                {/* Zobrazenie názvu vybraného súboru */}
-                <div className='h-5'>
-                  {selectedFile && (
-                    <p className="text-[14px] text-gray-100 italic">{selectedFile.name}</p>
-                  )}
-                </div>
+                {/* Use Default Photo */}
+                <button
+                  onClick={setDefaultPhoto}
+                  className="bg-gray-700 hover:bg-gray-500 transition-colors text-sm py-3 px-5 rounded-lg font-semibold cursor-pointer"
+                >
+                  Use Default Photo
+                </button>
               </div>
 
+              {/* Chybová hláška alebo názov súboru */}
+              <div className="h-5 text-center">
+                {uploadError ? (
+                  <div className="text-red-500 font-semibold">{uploadError}</div>
+                ) : selectedFile ? (
+                  <p className="text-[14px] text-gray-100 italic">{selectedFile.name}</p>
+                ) : null}
+              </div>
 
-              {/* Tlačidlo na upload fotky */}
+              {/* Upload Photo */}
               <button
                 onClick={uploadPhoto}
                 className="bg-green-800 hover:bg-green-600 transition-colors py-3 px-10 rounded-lg font-semibold cursor-pointer"
@@ -313,17 +315,8 @@ function Profile() {
               >
                 Upload Photo
               </button>
-
-              {/* Chybová hláška a Úspešná hláška po nahratí  pri zlyhaní uploadu */}
-              <div className='h-5'>
-                {uploadError && (
-                  <div className="text-red-500 text-center font-semibold">
-                    {uploadError}
-                  </div>
-                )}
-              </div>
-
             </div>
+
           </div>
 
 
