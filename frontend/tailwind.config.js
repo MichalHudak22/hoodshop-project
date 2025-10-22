@@ -5,7 +5,12 @@ module.exports = {
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        heading: ['Anton', 'sans-serif'], // 🧠 Pridaný font Anton
+         body: ['system-ui', 'sans-serif'], // pre bežný text
+      },
+    },
   },
   plugins: [
     require('tailwind-scrollbar'),
