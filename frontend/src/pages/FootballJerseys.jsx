@@ -77,20 +77,29 @@ const slides = Array.isArray(jerseys) ? jerseys.map(product => ({
 
   return (
     <div>
-      <section className="relative text-center py-10 px-4 bg-gradient-to-br from-green-600 via-black to-green-700 text-white overflow-hidden border-b-4 border-black">
-        <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
-        <div className="relative z-10 max-w-4xl mx-auto">
-          <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
-            Discover Iconic <span className="text-blue-200">Football Jerseys</span>
-          </h1>
-          <p className="text-[14px] md:text-lg lg:text-xl text-gray-100 leading-relaxed">
-            Explore our exclusive collection of football jerseys – from legendary clubs and national teams,
-            featuring designs worn by your favorite players on the world’s biggest stages like the{' '}
-            <span className="text-blue-200 font-medium">UEFA Champions League</span> and{' '}
-            <span className="text-blue-200 font-medium">World Cup</span> finals.
-          </p>
-        </div>
-      </section>
+    <section className="relative text-center py-20 px-6 bg-gradient-to-br from-green-700 via-black to-green-800 text-white overflow-hidden border-b-4 border-black">
+  {/* Overlay vrstvy */}
+  <div className="absolute inset-0 bg-gradient-to-br from-black/40 via-green-700/30 to-black/40"></div>
+  <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-30 mix-blend-overlay"></div>
+
+  {/* Content */}
+  <div className="relative z-10 max-w-4xl mx-auto">
+    <h1 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-extrabold mb-4 tracking-wide drop-shadow-lg bg-clip-text text-transparent bg-gradient-to-r from-green-400 via-blue-300 to-green-500">
+      Discover Iconic <span className="font-bold">Football Jerseys</span>
+    </h1>
+    <p className="text-[14px] md:text-lg lg:text-xl text-gray-100 leading-relaxed max-w-3xl mx-auto">
+      Explore our exclusive collection of football jerseys – from legendary clubs and national teams,
+      featuring designs worn by your favorite players on the world’s biggest stages like the{' '}
+      <span className="text-blue-300 font-medium">UEFA Champions League</span> and{' '}
+      <span className="text-blue-300 font-medium">World Cup</span> finals.
+    </p>
+
+    <button className="mt-8 px-8 py-3 bg-blue-500 hover:bg-blue-400 rounded-lg font-semibold transition-all shadow-lg">
+      Explore Collection
+    </button>
+  </div>
+</section>
+
 
       <FeaturedProduct
         product={featuredJersey}
