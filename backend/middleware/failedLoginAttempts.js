@@ -18,7 +18,7 @@ function registerFailedAttempt(email) {
 
   data.count += 1;
   if (data.count >= 5) {
-    data.lockUntil = now + 2 * 60 * 1000; // 10 minút blok
+    data.lockUntil = now + 5 * 60 * 1000; // 10 minút blok
     data.count = 0; // resetujeme counter po locku
   }
 

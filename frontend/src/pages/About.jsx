@@ -16,7 +16,7 @@ const fadeInUp = {
 
 const ProjectInfo = () => {
   const paragraphs = [
-    "I developed this project from scratch as a full-featured e-commerce web application focused on sports equipment. It serves as a portfolio piece demonstrating my skills across both frontend and backend development.",
+    "I developed this project from scratch as a full-featured e-commerce web application focused on sports equipment.It serves as a portfolio showcasing my skills in both frontend and backend development.",
     "One of the key features is the loyalty points system, where logged-in users earn points with each purchase that they can redeem as discounts on future orders.",
     "Users can browse products by sport (football, hockey, cycling) and filter by type (jerseys, helmets, gloves, balls, etc.). Each product has its own detail page with price, category, brand, and the option to add it to the shopping cart. Cart contents are updated dynamically and users can proceed to a simulated checkout that includes delivery options, payment methods, and form validation.",
     "This project also includes a classic product search by name. When users click on a searched product, they are redirected directly to its detail page. Additionally, I focused heavily on responsiveness to ensure the app looks and works well on both small and large devices.",
@@ -103,7 +103,7 @@ const ProjectInfo = () => {
             custom={8}
             className="list-disc space-y-2 px-4 mx-auto max-w-2xl text-left text-gray-200"
           >
-            <li>📦 <strong>Order Summary:</strong> Total number of orders, total loyalty points used, total revenue (€), top 10 best-selling products (by number of units sold)</li>
+         <li>📦 <strong>Order Summary:</strong> Total number of orders, total loyalty points used, total revenue (€), top 10 best-selling products (by number of units sold), top 10 customers by total purchases in the shop</li>
             <li>👥 <strong>User Management:</strong> Full user list, role control, order history, delete user</li>
             <li>🛍️ <strong>Product Management:</strong> Add/Delete products by name, with image, price, description</li>
             <li>🚚 <strong>Delivery Settings:</strong> Modify delivery pricing</li>
@@ -157,7 +157,7 @@ const ProjectInfo = () => {
             className="list-disc space-y-2 px-4 mx-auto max-w-2xl text-left text-gray-200"
           >
             <li>Passwords hashed with bcrypt</li>
-            <li>5 failed login attempts trigger a 10-minute account lock</li>
+            <li>5 failed login attempts trigger a 5-minute account lock</li>
             <li>Inactive users are automatically logged out after 6 hours</li>
             <li>Sanitized input to prevent SQL injection and XSS attacks</li>
           </motion.ul>
