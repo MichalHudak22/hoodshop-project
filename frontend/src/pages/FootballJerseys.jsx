@@ -1,10 +1,13 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { CartContext } from '../context/CartContext';
+import HeadTitle from '../components/HeadTitle';
 import ProductsCarousel from '../components/ProductsCarousel';
 import FeaturedProduct from '../components/FeaturedProduct';
 import FeaturedProductReversed from '../components/FeaturedProductReversed';
 import ProductSection from '../components/ProductSection';
+
+
 
 const FootballJerseys = () => {
   const [jerseys, setJerseys] = useState([]);
@@ -58,14 +61,14 @@ const FootballJerseys = () => {
     setTimeout(() => setMessage(''), 3000);
   };
 
-const slides = Array.isArray(jerseys) ? jerseys.map(product => ({
-  id: product.id,
-  name: product.name,
-  brand: product.brand,
-  price: product.price,
-  image: product.image, // iba Cloudinary URL
-  slug: product.slug,
-})) : [];
+  const slides = Array.isArray(jerseys) ? jerseys.map(product => ({
+    id: product.id,
+    name: product.name,
+    brand: product.brand,
+    price: product.price,
+    image: product.image, // iba Cloudinary URL
+    slug: product.slug,
+  })) : [];
 
 
   const highlightedJerseys = Array.isArray(jerseys)
@@ -77,19 +80,16 @@ const slides = Array.isArray(jerseys) ? jerseys.map(product => ({
 
   return (
     <div>
-      <section className="relative text-center py-4 px-4 bg-gradient-to-br from-green-600 via-black to-green-700 text-white overflow-hidden border-b-4 border-black">
-        <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
-        <div className="relative z-10 max-w-4xl mx-auto">
-          <h1 className="text-lg md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-2 tracking-wide drop-shadow-md">
-            Discover Iconic <span className="text-blue-200">Football Jerseys</span>
-          </h1>
-          <p className="text-sm md:text-lg text-gray-100 leading-relaxed">
-            Explore our exclusive collection of football jerseys – from legendary clubs and national teams, featured on the world’s biggest stages like the{' '}
-            <span className="text-blue-200 font-medium">UEFA Champions League</span> and{' '}
-            <span className="text-blue-200 font-medium">World Cup</span> finals.
-          </p>
-        </div>
-      </section>
+      <HeadTitle
+        title="Discover Iconic"
+        highlight="Football Jerseys"
+        description="Explore our exclusive collection of football jerseys – from legendary clubs and national teams, featured on the world’s biggest stages like the UEFA Champions League and World Cup finals."
+        bgImage="/img/football-bg.jpg"
+        gradientFrom="green-600"
+        gradientVia="black"
+        gradientTo="green-700"
+      />
+
 
       <FeaturedProduct
         product={featuredJersey}
