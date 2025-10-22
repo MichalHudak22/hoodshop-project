@@ -7,8 +7,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        heading: ['Anton', 'sans-serif'], // 🧠 Pridaný font Anton
-         body: ['system-ui', 'sans-serif'], // pre bežný text
+        heading: ['Bebas Neue', 'sans-serif'], // pre nadpisy
+        body: ['Lexend', 'sans-serif'], // pre bežný text
       },
     },
   },
