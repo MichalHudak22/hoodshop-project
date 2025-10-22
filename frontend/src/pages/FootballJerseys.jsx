@@ -80,16 +80,22 @@ const FootballJerseys = () => {
 
   return (
     <div>
+
       <HeadTitle
         title="Discover Iconic"
         highlight="Football Jerseys"
-        description="Explore our exclusive collection of football jerseys – from legendary clubs and national teams, featured on the world’s biggest stages like the UEFA Champions League and World Cup finals."
         bgImage="/img/football-bg.jpg"
         gradientFrom="green-600"
         gradientVia="black"
         gradientTo="green-700"
+        description={
+          <>
+            Explore our exclusive collection of football jerseys – from legendary clubs and national teams, featured on the world’s biggest stages like the{' '}
+            <span className="text-blue-200 font-medium">UEFA Champions League</span> and{' '}
+            <span className="text-blue-200 font-medium">World Cup</span> finals.
+          </>
+        }
       />
-
 
       <FeaturedProduct
         product={featuredJersey}
