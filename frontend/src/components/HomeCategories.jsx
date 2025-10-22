@@ -45,7 +45,7 @@ export default function SportsSection() {
       </h1>
 
       {/* Grid s kartami */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mx-4 lg:mx-0">
         {sports.map(({ name, image, categories, link }) => (
           <div
             key={name}

@@ -155,7 +155,7 @@ const Header = () => {
     </div>
 
     {/* WRAPPER ktorý drží obsah v strede, ale texty sú zarovnané vľavo */}
-    <div className="w-full max-w-[102px] text-left space-y-4">
+    <div className="w-full max-w-[120px] text-left space-y-4">
       <Link to="/" onClick={() => setMenuOpen(false)} className="hover:text-blue-200 block">Home</Link>
 
       <div>
