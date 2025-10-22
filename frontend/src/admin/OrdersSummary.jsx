@@ -85,7 +85,7 @@ function OrdersSummary() {
 
         {/* Top produkty */}
         <div className="bg-gray-700 bg-opacity-50 p-3 rounded-md mt-4">
-          <h4 className="text-lg font-semibold mb-2 text-center text-blue-200">
+          <h4 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-2 text-center text-blue-200">
             Top 10 Best-Selling Products
           </h4>
           {topProducts.length === 0 ? (

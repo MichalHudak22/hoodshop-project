@@ -53,7 +53,7 @@ function AdminPage() {
 
       <div className="relative z-10 max-w-screen-2xl mx-auto space-y-10">
         {/* 🏷️ Nadpis */}
-        <div className="py-8 text-center bg-black w-full">
+        <div className="py-4 lg:py-8 text-center w-full">
           <h1 className="text-2xl lg:text-4xl font-bold text-white">
             Welcome to the <span className="text-blue-200">Admin Panel</span>
           </h1>
