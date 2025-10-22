@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { CartContext } from '../context/CartContext';
+import HeadTitle from '../components/HeadTitle';
 import ProductsCarousel from '../components/ProductsCarousel';
 import FeaturedProduct from '../components/FeaturedProduct';
 import FeaturedProductReversed from '../components/FeaturedProductReversed';
@@ -73,27 +74,30 @@ const FootballBalls = () => {
   return (
     <div>
       {/* HEAD TITLE */}
-      <section className="relative text-center py-10 px-4 bg-gradient-to-br from-green-600 via-black to-green-700 text-white overflow-hidden border-b-4 border-black">
-        <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
-        <div className="relative z-10 max-w-4xl mx-auto">
-          <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
-            Discover Legendary <span className="text-blue-200">Football Balls</span>
-          </h1>
-          <p className="text-[14px] md:text-lg lg:text-xl text-gray-100 leading-relaxed">
-            Explore our exclusive collection of premium football balls – including
-            <span className="text-blue-200 font-medium"> iconic models</span> used in the{' '}
+      <HeadTitle
+        title="Discover Legendary"
+        highlight="Football Balls"
+        bgImage="/img/football-bg.jpg"
+        gradientFrom="green-600"
+        gradientVia="black"
+        gradientTo="green-700"
+        description={
+          <>
+            Explore our exclusive collection of premium football balls – including{' '}
+            <span className="text-blue-200 font-medium">iconic models</span> used in the{' '}
             <span className="text-blue-200 font-medium">FIFA World Cup</span> and{' '}
             <span className="text-blue-200 font-medium">Champions League</span> finals.
-          </p>
-        </div>
-      </section>
+          </>
+        }
+      />
+
 
       {/* 1st FEATURED BALL */}
       {featuredBall && (
-        <FeaturedProduct 
-          product={featuredBall} 
-          handleAddToCart={handleAddToCart} 
-          backgroundImage="/img/bg-football3.jpg" 
+        <FeaturedProduct
+          product={featuredBall}
+          handleAddToCart={handleAddToCart}
+          backgroundImage="/img/bg-football3.jpg"
         />
       )}
 

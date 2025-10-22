@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { CartContext } from '../context/CartContext';
+import HeadTitle from '../components/HeadTitle';
 import ProductsCarousel from '../components/ProductsCarousel';
 import FeaturedProduct from '../components/FeaturedProduct';
 import FeaturedProductReversed from '../components/FeaturedProductReversed';
@@ -16,7 +17,7 @@ const FootballCleatsPage = () => {
   useEffect(() => {
     axios.get(`${baseURL}/products/football/cleats`)
       .then(response => {
-        console.log('Response from backend:', response.data); 
+        console.log('Response from backend:', response.data);
         setCleats(Array.isArray(response.data) ? response.data : response.data.products || []);
       })
       .catch(error => {
@@ -75,17 +76,22 @@ const FootballCleatsPage = () => {
   return (
     <div>
       {/* HEAD TITLE */}
-      <section className="relative text-center py-10 px-4 bg-gradient-to-br from-green-600 via-black to-green-700 text-white overflow-hidden border-b-4 border-black">
-        <div className="absolute inset-0 bg-[url('/img/football-bg.jpg')] bg-cover bg-center opacity-20"></div>
-        <div className="relative z-10 max-w-4xl mx-auto">
-          <h1 className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold mb-4 tracking-wide drop-shadow-md">
-            Discover Elite <span className="text-blue-200">Football Cleats</span>
-          </h1>
-          <p className="text-[14px] md:text-lg lg:text-xl text-gray-100 leading-relaxed">
-            Step up your game with top-quality football cleats worn by pros. Our collection features advanced designs for <span className='text-blue-200'>speed, control</span> and <span className='text-blue-200'>comfort</span> on any pitch.
-          </p>
-        </div>
-      </section>
+      <HeadTitle
+        title="Discover Elite"
+        highlight="Football Cleats"
+        bgImage="/img/football-bg.jpg"
+        gradientFrom="green-600"
+        gradientVia="black"
+        gradientTo="green-700"
+        description={
+          <>
+            Step up your game with top-quality football cleats worn by pros. Our collection features advanced designs for{' '}
+            <span className="text-blue-200">speed, control</span> and{' '}
+            <span className="text-blue-200">comfort</span> on any pitch.
+          </>
+        }
+      />
+
 
       {/* 1st FEATURED CLEAT */}
       <FeaturedProduct
