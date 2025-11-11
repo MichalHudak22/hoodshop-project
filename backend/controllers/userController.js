@@ -1,37 +1,14 @@
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
-const nodemailer = require('nodemailer');
+// const nodemailer = require('nodemailer'); // už nepotrebné
 const bcrypt = require('bcrypt');
 const db = require('../database');
+const sgMail = require('@sendgrid/mail');
 
-
-// Funkcia pre získanie všetkých používateľov
-const getUsers = async (req, res) => {
-  try {
-    const [results] = await db.query('SELECT id, name, email, role FROM user');
-    res.json(results);
-  } catch (err) {
-    console.error('Chyba pri načítaní používateľov:', err);
-    res.status(500).json({ error: 'Interná chyba servera' });
-  }
-};
-
-
-// Funkcia pre vytvorenie nového používateľa registracia 
-// Konfigurácia emailu
 require('dotenv').config();
 
-console.log('EMAIL_USER:', process.env.EMAIL_USER);
-console.log('EMAIL_PASS:', process.env.EMAIL_PASS);
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER, // napr. tvojemail@gmail.com
-    pass: process.env.EMAIL_PASS, // alebo App Password
-
-  },
-});
+// Nastavenie SendGrid API key
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const createUser = async (req, res) => {
   const { name, email, password } = req.body;
@@ -65,31 +42,30 @@ const createUser = async (req, res) => {
       [userId, token, expiresAtFormatted]
     );
 
-    // 5️⃣ Odoslanie overovacieho emailu s FRONTEND_URL z env
+    // 5️⃣ Odoslanie overovacieho emailu cez SendGrid
     const frontendURL = process.env.FRONTEND_URL;
     const verificationLink = `${frontendURL}/verify-email?token=${token}`;
 
     try {
-  console.log('🔹 Pokúšam sa odoslať e-mail na:', email);
-  console.log('Používam účet:', process.env.EMAIL_USER);
+      console.log('🔹 Pokúšam sa odoslať e-mail na:', email);
 
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: 'Overenie emailu - HoodShop',
-    html: `
-      <p>Ahoj ${name},</p>
-      <p>Prosím, over svoj účet kliknutím na odkaz nižšie:</p>
-      <a href="${verificationLink}">${verificationLink}</a>
-      <p>Ak si sa neregistroval, ignoruj tento e-mail.</p>
-    `,
-  });
+      await sgMail.send({
+        to: email,
+        from: process.env.EMAIL_USER, // musí byť overený sendgrid sender
+        subject: 'Overenie emailu - HoodShop',
+        html: `
+          <p>Ahoj ${name},</p>
+          <p>Prosím, over svoj účet kliknutím na odkaz nižšie:</p>
+          <a href="${verificationLink}">${verificationLink}</a>
+          <p>Ak si sa neregistroval, ignoruj tento e-mail.</p>
+        `,
+      });
 
-  console.log('✅ E-mail úspešne odoslaný');
-} catch (mailErr) {
-  console.error('❌ Chyba pri odosielaní e-mailu:', mailErr);
-}
+      console.log('✅ E-mail úspešne odoslaný cez SendGrid');
 
+    } catch (mailErr) {
+      console.error('❌ Chyba pri odosielaní e-mailu cez SendGrid:', mailErr);
+    }
 
     // 6️⃣ Úspešná odpoveď
     res.status(201).json({ message: 'Registrácia úspešná. Skontroluj email pre overenie účtu.' });
