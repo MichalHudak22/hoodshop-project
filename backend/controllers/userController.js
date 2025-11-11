@@ -69,16 +69,27 @@ const createUser = async (req, res) => {
     const frontendURL = process.env.FRONTEND_URL;
     const verificationLink = `${frontendURL}/verify-email?token=${token}`;
 
-    await transporter.sendMail({
-      to: email,
-      subject: 'Overenie emailu',
-      html: `
-        <p>Ahoj ${name},</p>
-        <p>Prosím, over svoj účet kliknutím na odkaz nižšie:</p>
-        <a href="${verificationLink}">${verificationLink}</a>
-        <p>Ak si sa neregistroval, ignoruj tento email.</p>
-      `,
-    });
+    try {
+  console.log('🔹 Pokúšam sa odoslať e-mail na:', email);
+  console.log('Používam účet:', process.env.EMAIL_USER);
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: 'Overenie emailu - HoodShop',
+    html: `
+      <p>Ahoj ${name},</p>
+      <p>Prosím, over svoj účet kliknutím na odkaz nižšie:</p>
+      <a href="${verificationLink}">${verificationLink}</a>
+      <p>Ak si sa neregistroval, ignoruj tento e-mail.</p>
+    `,
+  });
+
+  console.log('✅ E-mail úspešne odoslaný');
+} catch (mailErr) {
+  console.error('❌ Chyba pri odosielaní e-mailu:', mailErr);
+}
+
 
     // 6️⃣ Úspešná odpoveď
     res.status(201).json({ message: 'Registrácia úspešná. Skontroluj email pre overenie účtu.' });
