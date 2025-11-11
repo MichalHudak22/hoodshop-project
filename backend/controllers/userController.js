@@ -1,14 +1,38 @@
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
-// const nodemailer = require('nodemailer'); // už nepotrebné
+const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const db = require('../database');
-const sgMail = require('@sendgrid/mail');
 
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+// Funkcia pre získanie všetkých používateľov
+const getUsers = async (req, res) => {
+  try {
+    const [results] = await db.query('SELECT id, name, email, role FROM user');
+    res.json(results);
+  } catch (err) {
+    console.error('Chyba pri načítaní používateľov:', err);
+    res.status(500).json({ error: 'Interná chyba servera' });
+  }
+};
+
+
+// Funkcia pre vytvorenie nového používateľa registracia 
+// Konfigurácia emailu
 require('dotenv').config();
 
-// Nastavenie SendGrid API key
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+console.log('EMAIL_USER:', process.env.EMAIL_USER);
+console.log('EMAIL_PASS:', process.env.EMAIL_PASS);
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER, // napr. tvojemail@gmail.com
+    pass: process.env.EMAIL_PASS, // alebo App Password
+
+  },
+});
 
 const createUser = async (req, res) => {
   const { name, email, password } = req.body;
