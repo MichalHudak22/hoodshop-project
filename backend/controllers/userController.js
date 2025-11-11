@@ -4,7 +4,6 @@ const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const db = require('../database');
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // Funkcia pre získanie všetkých používateľov
 const getUsers = async (req, res) => {
@@ -66,30 +65,20 @@ const createUser = async (req, res) => {
       [userId, token, expiresAtFormatted]
     );
 
-    // 5️⃣ Odoslanie overovacieho emailu cez SendGrid
+    // 5️⃣ Odoslanie overovacieho emailu s FRONTEND_URL z env
     const frontendURL = process.env.FRONTEND_URL;
     const verificationLink = `${frontendURL}/verify-email?token=${token}`;
 
-    try {
-      console.log('🔹 Pokúšam sa odoslať e-mail na:', email);
-
-      await sgMail.send({
-        to: email,
-        from: process.env.EMAIL_USER, // musí byť overený sendgrid sender
-        subject: 'Overenie emailu - HoodShop',
-        html: `
-          <p>Ahoj ${name},</p>
-          <p>Prosím, over svoj účet kliknutím na odkaz nižšie:</p>
-          <a href="${verificationLink}">${verificationLink}</a>
-          <p>Ak si sa neregistroval, ignoruj tento e-mail.</p>
-        `,
-      });
-
-      console.log('✅ E-mail úspešne odoslaný cez SendGrid');
-
-    } catch (mailErr) {
-      console.error('❌ Chyba pri odosielaní e-mailu cez SendGrid:', mailErr);
-    }
+    await transporter.sendMail({
+      to: email,
+      subject: 'Overenie emailu',
+      html: `
+        <p>Ahoj ${name},</p>
+        <p>Prosím, over svoj účet kliknutím na odkaz nižšie:</p>
+        <a href="${verificationLink}">${verificationLink}</a>
+        <p>Ak si sa neregistroval, ignoruj tento email.</p>
+      `,
+    });
 
     // 6️⃣ Úspešná odpoveď
     res.status(201).json({ message: 'Registrácia úspešná. Skontroluj email pre overenie účtu.' });
