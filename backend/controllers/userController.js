@@ -64,6 +64,7 @@ const createUser = async (req, res) => {
       await sgMail.send({
         to: email,
         from: process.env.EMAIL_USER, // overený sender na SendGrid
+        replyTo: process.env.EMAIL_USER,
         subject: 'Overenie emailu - HoodShop',
         html: `
           <p>Ahoj ${name},</p>
