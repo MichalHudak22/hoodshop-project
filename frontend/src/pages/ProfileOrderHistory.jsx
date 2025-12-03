@@ -85,9 +85,9 @@ function OrderHistory() {
 
         {/* Order History */}
         <div className="w-full px-2 lg:px-4">
-          {loading && <p className='text-lg text-green-300 text-center'>Načítavam objednávky...</p>}
+          {loading && <p className='text-lg text-green-300 text-center'>Loading orders...</p>}
 
-          {!loading && orders.length === 0 && <p>Nemáte žiadne objednávky.</p>}
+          {!loading && orders.length === 0 && <p>You have no orders.</p>}
 
           {!loading && orders.map((order) => {
             const totalQuantity = order.items.reduce((sum, item) => sum + item.quantity, 0);

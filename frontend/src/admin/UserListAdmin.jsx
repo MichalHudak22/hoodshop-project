@@ -195,11 +195,11 @@ export default function UserListWithDelete() {
         </ul>
       </div>
 
-      <div className="max-w-3xl mx-auto mt-6 flex justify-center items-center gap-3 md:gap-5">
+      <div className="max-w-3xl mx-auto mt-6 flex justify-center items-center gap-1 md:gap-5">
         <button
           onClick={handleSelectUser}
           disabled={!selectedUserId}
-          className="w-[80px] md:w-[140px] text-center bg-green-700 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2 px-4 text-sm md:text-lg rounded-lg transition"
+          className="w-[78px] md:w-[140px] text-center bg-green-700 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2 px-4 text-sm md:text-lg rounded-lg transition"
         >
           Select
         </button>
@@ -215,7 +215,7 @@ export default function UserListWithDelete() {
             }
           }}
           disabled={!selectedUserId || loading}
-          className="w-[120px] md:w-[165px] text-center bg-blue-700 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2 px-4 text-sm md:text-lg rounded-lg transition"
+          className="w-[124px] md:w-[165px] text-center bg-blue-700 hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2 px-4 text-sm md:text-lg rounded-lg transition"
         >
           {selectedUserId
             ? (Array.isArray(users)
@@ -229,7 +229,7 @@ export default function UserListWithDelete() {
         <button
           onClick={handleDeleteClick}
           disabled={!selectedUserId || loading}
-          className="w-[80px] md:w-[140px] text-center bg-red-700 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2 px-4 text-sm md:text-lg rounded-lg transition"
+          className="w-[78px] md:w-[140px] text-center bg-red-700 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white py-2 px-4 text-sm md:text-lg rounded-lg transition"
         >
           {loading ? 'Mažem...' : 'Delete'}
         </button>
