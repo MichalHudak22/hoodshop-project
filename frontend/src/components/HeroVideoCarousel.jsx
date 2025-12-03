@@ -41,7 +41,7 @@ export default function HeroVideoCarousel() {
         src={videoSources[currentIndex]}
         muted
         playsInline
-        className={`w-full h-full object-cover transition-opacity duration-1000 ${
+        className={`w-full h-full object-cover object-top transition-opacity duration-1000 ${
           fade ? 'opacity-100' : 'opacity-0'
         }`}
       />
