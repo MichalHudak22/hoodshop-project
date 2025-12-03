@@ -3,8 +3,8 @@ import logo from '../img/logo.png';
 
 const Footer = () => {
   return (
-    <footer className="w-full bg-black text-white py-10">
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-evenly gap-8">
+    <footer className="w-full bg-black text-white py-5">
+      <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-evenly gap-5">
 
         {/* Logo */}
         <div className="flex justify-center">
