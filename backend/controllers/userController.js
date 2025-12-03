@@ -30,7 +30,7 @@ const createUser = async (req, res) => {
     // 1️⃣ Overenie, či už email existuje
     const [existingUsers] = await db.query('SELECT * FROM user WHERE email = ?', [email]);
     if (existingUsers.length > 0) {
-      return res.status(400).json({ error: 'Email je už zaregistrovaný.' });
+      return res.status(400).json({ error: 'Email is already registered.' });
     }
 
     // 2️⃣ Hashovanie hesla
@@ -67,10 +67,10 @@ const createUser = async (req, res) => {
         replyTo: process.env.EMAIL_USER,
         subject: 'Overenie emailu - HoodShop',
         html: `
-          <p>Ahoj ${name},</p>
-          <p>Prosím, over svoj účet kliknutím na odkaz nižšie:</p>
-          <a href="${verificationLink}">${verificationLink}</a>
-          <p>Ak si sa neregistroval, ignoruj tento e-mail.</p>
+        <p>Hello ${name},</p>
+        <p>Please verify your account by clicking the link below:</p>
+        <a href="${verificationLink}">${verificationLink}</a>
+        <p>If you did not register, please ignore this email.</p>
         `,
       });
 
@@ -138,7 +138,7 @@ const loginUser = async (req, res) => {
     const attemptData = getAttempts(email);
     if (attemptData.lockUntil && Date.now() < attemptData.lockUntil) {
       const minutesLeft = Math.ceil((attemptData.lockUntil - Date.now()) / 60000);
-     return res.status(429).json({ error: `The account is temporarily locked. Please try again in ${minutesLeft} minutes.` });
+      return res.status(429).json({ error: `The account is temporarily locked. Please try again in ${minutesLeft} minutes.` });
 
     }
 
