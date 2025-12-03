@@ -8,18 +8,17 @@ const videoSources = [
 
 export default function HeroVideoCarousel() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [fade, setFade] = useState(true); // true = visible, false = transparent
+  const [fade, setFade] = useState(true);
   const videoRef = useRef(null);
 
   useEffect(() => {
-    const duration = 10000; // 10 sekúnd na jedno video
-    const fadeDuration = 2000; // 2 sekundy fade
+    const duration = 10000;
+    const fadeDuration = 2000;
 
     const timeoutId = setTimeout(() => {
       setFade(false);
-
       setTimeout(() => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % videoSources.length);
+        setCurrentIndex((prev) => (prev + 1) % videoSources.length);
         setFade(true);
       }, fadeDuration);
     }, duration);
@@ -48,18 +47,18 @@ export default function HeroVideoCarousel() {
       />
 
       {/* Overlay s obsahom */}
-      <div className="absolute inset-0 flex items-center justify-start px-4 md:px-12">
+      <div className="absolute inset-0 flex items-end justify-start px-4 md:px-12 pb-4 md:pb-8">
         <div className="bg-black bg-opacity-40 p-4 md:p-6 md:rounded-lg max-w-3xl text-white">
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-2 text-blue-200 drop-shadow-lg">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-blue-200 drop-shadow-lg">
             Discover top sports equipment for football, hockey, and cycling
           </h1>
-          <p className="text-xs sm:text-sm md:text-base lg:text-lg mb-4 md:mb-6 drop-shadow-md">
+          <p className="text-sm sm:text-base md:text-lg mb-4 md:mb-6 drop-shadow-md">
             Shop with us and collect loyalty points you can use as a discount on your next purchase!
           </p>
 
           <a
             href="/sports"
-            className="inline-block px-4 py-1 md:px-6 md:py-2 bg-blue-700 hover:bg-blue-600 rounded-md font-semibold text-sm md:text-base transition"
+            className="inline-block px-6 py-2 md:px-8 md:py-3 bg-blue-700 hover:bg-blue-600 rounded-md font-semibold text-base md:text-lg transition"
           >
             Shop Now
           </a>
