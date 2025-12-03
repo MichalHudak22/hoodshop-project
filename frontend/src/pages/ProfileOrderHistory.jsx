@@ -7,6 +7,7 @@ const baseURL = 'https://hoodshop-project.onrender.com';
 function OrderHistory() {
   const [user, setUser] = useState(null);
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true); // nový stav
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
@@ -28,6 +29,7 @@ function OrderHistory() {
 
         if (userData.error) {
           setError(userData.error);
+          setLoading(false);
           return;
         }
         setUser(userData);
@@ -47,6 +49,8 @@ function OrderHistory() {
       } catch (err) {
         console.error(err);
         setError('Chyba pri načítaní údajov');
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -79,12 +83,13 @@ function OrderHistory() {
           </h1>
         </div>
 
-
         {/* Order History */}
         <div className="w-full px-2 lg:px-4">
-          {orders.length === 0 && <p>Nemáte žiadne objednávky.</p>}
+          {loading && <p>Načítavam objednávky...</p>}
 
-          {orders.map((order) => {
+          {!loading && orders.length === 0 && <p>Nemáte žiadne objednávky.</p>}
+
+          {!loading && orders.map((order) => {
             const totalQuantity = order.items.reduce((sum, item) => sum + item.quantity, 0);
             const totalPrice = Number(order.total_price);
 

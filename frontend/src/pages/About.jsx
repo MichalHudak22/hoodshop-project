@@ -27,7 +27,7 @@ const ProjectInfo = () => {
       className="relative min-h-[100vh] text-white flex flex-col items-center bg-fixed bg-cover bg-no-repeat bg-center"
       style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}
     >
-      <div className="pt-8 text-center bg-black/80 w-full z-10">
+      <div className="pt-8 pb-2 text-center bg-black/80 w-full z-10">
         <h1 className="text-2xl lg:text-4xl font-bold text-white">
           About This <span className="text-blue-200">Project</span>
         </h1>
@@ -72,7 +72,7 @@ const ProjectInfo = () => {
             <li><strong>Database:</strong> TiDB Cloud (MySQL-compatible) + MySQL Workbench for schema design and data management</li>
             <li><strong>Authentication:</strong> JWT, bcrypt, and email verification (SendGrid)</li>
             <li><strong>Security:</strong> Input validation, XSS & SQL injection protection, and brute-force defense</li>
-            <li><strong>Deployment:</strong> Render (hosting for backend & environment variable configuration)</li>
+            <li><strong>Deployment:</strong> Render (hosting for both backend and frontend, including environment variable configuration)</li>
           </motion.ul>
 
 
