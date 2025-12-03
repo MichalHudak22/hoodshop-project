@@ -16,7 +16,7 @@ const fadeInUp = {
 
 const ProjectInfo = () => {
   const paragraphs = [
-    "I developed this project from scratch as a full-featured e-commerce web application focused on sports equipment.It serves as a portfolio showcasing my skills in both frontend and backend development.",
+    "I developed this project from scratch as a full-featured e-commerce web application focused on sports equipment. It is a portfolio project that showcases my skills in both frontend and backend development.",
     "One of the key features is the loyalty points system, where logged-in users earn points with each purchase that they can redeem as discounts on future orders.",
     "Users can browse from over 168 base products across multiple sports (football, hockey, cycling), with administrators having the ability to add new products or remove existing ones. Products can be filtered by type (jerseys, helmets, gloves, balls, etc.), and each product includes its own detail page with price, category, brand, and an option to add it to the shopping cart. The cart updates dynamically and users can proceed to a simulated checkout that includes delivery options, payment methods, and full form validation.",
     "This project also includes a classic product search by name. When users click on a searched product, they are redirected directly to its detail page. Additionally, I focused heavily on responsiveness to ensure the app looks and works well on both small and large devices.",
@@ -35,7 +35,7 @@ const ProjectInfo = () => {
 
       <div className="absolute inset-0 bg-black opacity-30 z-0" />
 
-      <div className="relative z-10 w-full py-10 px-4 lg:px-24 max-w-7xl mx-auto text-gray-200 bg-black bg-opacity-60 lg:rounded-xl shadow-md">
+      <div className="relative z-10 w-full py-10 px-4 lg:px-24 max-w-7xl mx-auto text-gray-200 bg-black/60 lg:rounded-xl shadow-md">
         <div className="space-y-6 text-sm md:text-lg xl:text-xl leading-relaxed">
           {paragraphs.map((text, i) => (
             <motion.p
