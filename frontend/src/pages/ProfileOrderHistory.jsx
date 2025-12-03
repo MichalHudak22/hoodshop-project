@@ -85,7 +85,7 @@ function OrderHistory() {
 
         {/* Order History */}
         <div className="w-full px-2 lg:px-4">
-          {loading && <p>Načítavam objednávky...</p>}
+          {loading && <p className='text-lg text-green-300 text-center'>Načítavam objednávky...</p>}
 
           {!loading && orders.length === 0 && <p>Nemáte žiadne objednávky.</p>}
 
