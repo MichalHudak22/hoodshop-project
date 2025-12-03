@@ -34,7 +34,7 @@ export default function HeroVideoCarousel() {
   }, [currentIndex]);
 
   return (
-    <div className="relative w-full h-[40vh] overflow-hidden">
+    <div className="relative w-full min-h-[40vh] overflow-hidden">
       {/* Video */}
       <video
         ref={videoRef}
