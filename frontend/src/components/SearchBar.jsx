@@ -75,7 +75,7 @@ const SearchBar = ({ onResultClick }) => {
             >
               <Link
                 to={`/product/${product.slug}`}
-                className="flex items-center gap-2 p-2 hover:bg-gray-200 text-black"
+                className="flex items-center gap-2 p-2 hover:bg-blue-200 text-black"
                 onClick={handleResultClick}
               >
                 <img
