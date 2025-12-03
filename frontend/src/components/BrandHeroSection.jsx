@@ -62,7 +62,7 @@ const BrandHeroSection = () => {
       <p className="mb-4 xl:text-[24px]">{brand.brand_info}</p>
       <p className="mb-4 xl:text-2xl text-blue-200 font-semibold">{brand.brand_Text}</p>
       <a href={`/brands/${slug}`}>
-        <button className="bg-blue-600 hover:bg-blue-700 px-6 py-2 w-[210px] text-[22px] rounded-xl text-white font-semibold transition duration-300">
+        <button className="bg-blue-600 hover:bg-blue-700 px-6 py-2 w-[220px] text-[22px] rounded-xl text-white font-semibold transition duration-300">
           Explore {brand.name}
         </button>
       </a>
