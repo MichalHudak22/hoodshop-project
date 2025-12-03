@@ -47,12 +47,12 @@ const VerifyEmailPage = () => {
       {status === 'loading' && <p>Overovanie emailu prebieha...</p>}
       {status === 'success' && (
         <div className="text-green-600 text-xl">
-          Email bol úspešne overený! Budeš presmerovaný na prihlásenie.
+         Email has been successfully verified! You will be redirected to the login page.
         </div>
       )}
       {status === 'error' && (
         <div className="text-red-600 text-xl">
-          Overenie emailu zlyhalo. Skontroluj odkaz alebo kontaktuj podporu.
+          Email verification failed. Please check the link or contact support.
         </div>
       )}
     </div>
