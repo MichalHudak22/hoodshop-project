@@ -34,7 +34,7 @@ export default function HeroVideoCarousel() {
   }, [currentIndex]);
 
   return (
-    <div className="relative w-full h-[40vh] overflow-hidden">
+    <div className="relative w-full min-h-[40vh] max-h-[40vh] overflow-hidden">
       {/* Video */}
       <video
         ref={videoRef}
@@ -47,7 +47,7 @@ export default function HeroVideoCarousel() {
       />
 
       {/* Overlay s obsahom */}
-      <div className="absolute inset-0 flex items-end justify-start px-4 md:px-12 pb-4 md:pb-8">
+      <div className="absolute inset-0 flex items-end md:items-center justify-start md:px-12 pb-4 md:pb-8">
         <div className="bg-black bg-opacity-40 p-4 md:p-6 md:rounded-lg max-w-3xl text-white">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-blue-200 drop-shadow-lg">
             Discover top sports equipment for football, hockey, and cycling
