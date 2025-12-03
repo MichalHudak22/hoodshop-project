@@ -7,7 +7,7 @@ import { Menu, X, User, ShoppingCart } from 'lucide-react';
 import SportsDropdown from './SportsDropdown';
 import SearchBar from './SearchBar';
 
- const baseURL = 'https://hoodshop-project.onrender.com'; // produkčný backend
+const baseURL = 'https://hoodshop-project.onrender.com'; // produkčný backend
 
 const Header = () => {
   const { user, logout } = useContext(AuthContext);
@@ -71,8 +71,6 @@ const Header = () => {
         </Link>
 
 
-
-
         {/* Mobilné ikony */}
         <div className="flex items-center space-x-4 lg:hidden">
           <Link to="/cart" className="relative hover:text-blue-200">
@@ -99,8 +97,6 @@ const Header = () => {
           <button onClick={toggleMenu} className="hover:text-blue-200">
             {menuOpen ? <X size={32} /> : <Menu size={32} />}
           </button>
-
-
         </div>
 
         {/* Desktop navigácia */}
@@ -148,105 +144,105 @@ const Header = () => {
 
       </div>
 
-    {menuOpen && (
-  <div className="lg:hidden bg-black bg-opacity-90 p-4 flex flex-col space-y-4 text-xl items-center">
-    <div className="w-full mb-4">
-      <SearchBar onResultClick={() => setMenuOpen(false)} />
-    </div>
-
-    {/* WRAPPER ktorý drží obsah v strede, ale texty sú zarovnané vľavo */}
-    <div className="w-full max-w-[120px] text-left space-y-4">
-      <Link to="/" onClick={() => setMenuOpen(false)} className="hover:text-blue-200 block">Home</Link>
-
-      <div>
-        <div className="flex items-center justify-between">
-          <Link to="/sports" onClick={() => setMenuOpen(false)} className="hover:text-blue-200 block">Sports</Link>
-          <button onClick={() => setSportsOpen(!sportsOpen)} className="hover:text-blue-200">
-            {sportsOpen ? '▲' : '▼'}
-          </button>
-        </div>
-        {sportsOpen && (
-          <div className="mt-2 space-y-2 text-base border border-gray-400 p-2 rounded-sm">
-            <Link to="/sports/football" onClick={() => { setMenuOpen(false); setSportsOpen(false); }} className="hover:text-blue-200 block">Football</Link>
-            <Link to="/sports/hockey" onClick={() => { setMenuOpen(false); setSportsOpen(false); }} className="hover:text-blue-200 block">Hockey</Link>
-            <Link to="/sports/cycling" onClick={() => { setMenuOpen(false); setSportsOpen(false); }} className="hover:text-blue-200 block">Cycling</Link>
+      {menuOpen && (
+        <div className="lg:hidden bg-black bg-opacity-90 p-4 flex flex-col space-y-4 text-xl items-center">
+          <div className="w-full mb-4">
+            <SearchBar onResultClick={() => setMenuOpen(false)} />
           </div>
-        )}
-      </div>
 
-      <Link to="/brands" onClick={() => setMenuOpen(false)} className="hover:text-blue-200 block">Brands</Link>
-      <Link to="/about" onClick={() => setMenuOpen(false)} className="hover:text-blue-200 block">Project Info</Link>
+          {/* WRAPPER ktorý drží obsah v strede, ale texty sú zarovnané vľavo */}
+          <div className="w-full max-w-[120px] text-left space-y-4">
+            <Link to="/" onClick={() => setMenuOpen(false)} className="hover:text-blue-200 block">Home</Link>
 
-      {user ? (
-        <button onClick={handleLogout} className="hover:text-blue-200 block">Logout</button>
-      ) : (
-        <Link to="/login" onClick={() => setMenuOpen(false)} className="hover:text-blue-200 block">Login</Link>
+            <div>
+              <div className="flex items-center justify-between">
+                <Link to="/sports" onClick={() => setMenuOpen(false)} className="hover:text-blue-200 block">Sports</Link>
+                <button onClick={() => setSportsOpen(!sportsOpen)} className="hover:text-blue-200">
+                  {sportsOpen ? '▲' : '▼'}
+                </button>
+              </div>
+              {sportsOpen && (
+                <div className="mt-2 space-y-2 text-base border border-gray-400 p-2 rounded-sm">
+                  <Link to="/sports/football" onClick={() => { setMenuOpen(false); setSportsOpen(false); }} className="hover:text-blue-200 block">Football</Link>
+                  <Link to="/sports/hockey" onClick={() => { setMenuOpen(false); setSportsOpen(false); }} className="hover:text-blue-200 block">Hockey</Link>
+                  <Link to="/sports/cycling" onClick={() => { setMenuOpen(false); setSportsOpen(false); }} className="hover:text-blue-200 block">Cycling</Link>
+                </div>
+              )}
+            </div>
+
+            <Link to="/brands" onClick={() => setMenuOpen(false)} className="hover:text-blue-200 block">Brands</Link>
+            <Link to="/about" onClick={() => setMenuOpen(false)} className="hover:text-blue-200 block">Project Info</Link>
+
+            {user ? (
+              <button onClick={handleLogout} className="hover:text-blue-200 block">Logout</button>
+            ) : (
+              <Link to="/login" onClick={() => setMenuOpen(false)} className="hover:text-blue-200 block">Login</Link>
+            )}
+          </div>
+        </div>
       )}
-    </div>
-  </div>
-)}
 
 
 
-{profileModalOpen && user && (
-  <div
-    ref={modalRef}
-    className="absolute top-[96px] right-8 bg-black text-white shadow-lg rounded-lg w-56 z-50 p-4 border-2 border-gray-400"
-  >
-    {/* Ak existuje profilová fotka */}
-    {user.user_photo && (
-<div className="flex justify-center mb-3">
-  <img
-    src={
-      user?.user_photo
-        ? user.user_photo.startsWith('http')
-          ? user.user_photo
-          : `${baseURL}${user.user_photo}`
-        : 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1755594977/default-avatar_z3c30l.jpg'
-    }
-    alt="Profile"
-    className="w-16 h-16 rounded-full object-cover border-2 border-gray-500"
-  />
-</div>
-
-    )}
-
-    {/* Meno alebo email */}
-    <h3 className="text-lg text-blue-200 font-bold mb-4 border-b pb-2 text-center">
-      👤 {user?.name || user?.email || 'User'}
-    </h3>
-
-    <ul className="space-y-2 text-lg pl-3">
-      <li>
-        <Link
-          to="/profile"
-          onClick={() => setProfileModalOpen(false)}
-          className="block hover:text-blue-200 border-b pb-1 font-semibold"
+      {profileModalOpen && user && (
+        <div
+          ref={modalRef}
+          className="absolute top-[96px] right-8 bg-black text-white shadow-lg rounded-lg w-56 z-50 p-4 border-2 border-gray-400"
         >
-          My Account
-        </Link>
-      </li>
-      <li>
-        <Link
-          to="/profileloyaltypoints"
-          onClick={() => setProfileModalOpen(false)}
-          className="block hover:text-blue-200 border-b pb-1 font-semibold"
-        >
-          Loyalty Points
-        </Link>
-      </li>
-      <li>
-        <Link
-          to="/profileorderhistory"
-          onClick={() => setProfileModalOpen(false)}
-          className="block hover:text-blue-200 font-semibold"
-        >
-          Order History
-        </Link>
-      </li>
-    </ul>
-  </div>
-)}
+          {/* Ak existuje profilová fotka */}
+          {user.user_photo && (
+            <div className="flex justify-center mb-3">
+              <img
+                src={
+                  user?.user_photo
+                    ? user.user_photo.startsWith('http')
+                      ? user.user_photo
+                      : `${baseURL}${user.user_photo}`
+                    : 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1755594977/default-avatar_z3c30l.jpg'
+                }
+                alt="Profile"
+                className="w-16 h-16 rounded-full object-cover border-2 border-gray-500"
+              />
+            </div>
+
+          )}
+
+          {/* Meno alebo email */}
+          <h3 className="text-lg text-blue-200 font-bold mb-4 border-b pb-2 text-center">
+            👤 {user?.name || user?.email || 'User'}
+          </h3>
+
+          <ul className="space-y-2 text-lg pl-3">
+            <li>
+              <Link
+                to="/profile"
+                onClick={() => setProfileModalOpen(false)}
+                className="block hover:text-blue-200 border-b pb-1 font-semibold"
+              >
+                My Account
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/profileloyaltypoints"
+                onClick={() => setProfileModalOpen(false)}
+                className="block hover:text-blue-200 border-b pb-1 font-semibold"
+              >
+                Loyalty Points
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/profileorderhistory"
+                onClick={() => setProfileModalOpen(false)}
+                className="block hover:text-blue-200 font-semibold"
+              >
+                Order History
+              </Link>
+            </li>
+          </ul>
+        </div>
+      )}
 
     </header>
   );
