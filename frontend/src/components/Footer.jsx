@@ -15,7 +15,7 @@ const Footer = () => {
 
         {/* text */}
         <div className="text-center md:text-left">
-          <p className="text-lg font-semibold">© 2025 HoodShop. All rights reserved.</p>
+          <p className="text-lg font-semibold">© 2025 HoodSport Shop. All rights reserved.</p>
           <p className="text-base text-blue-200">Your favorite store for sports equipment.</p>
         </div>
 
