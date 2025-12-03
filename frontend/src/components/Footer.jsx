@@ -3,7 +3,7 @@ import logo from '../img/logo.png';
 
 const Footer = () => {
   return (
-    <footer className="w-full bg-black text-white py-5">
+    <footer className="w-full bg-black text-white py-5 border-t border-white border-opacity-60">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-evenly gap-5">
 
         {/* Logo */}
@@ -16,7 +16,7 @@ const Footer = () => {
         {/* text */}
         <div className="text-center md:text-left">
           <p className="text-lg font-semibold">© 2025 HoodShop. All rights reserved.</p>
-          <p className="text-sm opacity-70">Your favorite store for sports equipment.</p>
+          <p className="text-base text-blue-200">Your favorite store for sports equipment.</p>
         </div>
 
         {/* Right links → stacked */}
