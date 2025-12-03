@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
+import logo from '../img/logo.png';
 
 const Footer = () => {
   return (
     <footer className="w-full bg-black text-white py-10">
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+      <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-evenly gap-8">
 
         {/* Left text */}
         <div className="text-center md:text-left">
@@ -13,11 +14,9 @@ const Footer = () => {
 
         {/* Logo in center */}
         <div className="flex justify-center">
-          <img
-            src="/img/logo.png"
-            alt="Logo"
-            className="w-20 h-20 object-contain"
-          />
+          <Link to="/">
+            <img src={logo} alt="Logo" className="h-16 rounded-full hover:scale-105 transition-transform" />
+          </Link>
         </div>
 
         {/* Right links → stacked */}
