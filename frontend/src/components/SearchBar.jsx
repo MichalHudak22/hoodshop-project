@@ -71,7 +71,7 @@ const SearchBar = ({ onResultClick }) => {
           {results.map((product) => (
             <li
               key={product.id}
-              className="p-2 hover:bg-gray-200 text-black cursor-pointer"
+              className="p-2 hover:bg-blue-200 text-black cursor-pointer"
             >
               <Link
                 to={`/product/${product.slug}`}
