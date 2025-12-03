@@ -27,7 +27,7 @@ const ProjectInfo = () => {
       className="relative min-h-[100vh] text-white flex flex-col items-center bg-fixed bg-cover bg-no-repeat bg-center"
       style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}
     >
-      <div className="py-8 text-center bg-black w-full z-10">
+      <div className="pt-8 text-center bg-black w-full z-10">
         <h1 className="text-2xl lg:text-4xl font-bold text-white">
           About This <span className="text-blue-200">Project</span>
         </h1>
@@ -40,7 +40,7 @@ const ProjectInfo = () => {
           {paragraphs.map((text, i) => (
             <motion.p
               key={i}
-              className="text-white text-center"
+              className="text-white sm:text-center"
               variants={fadeInUp}
               initial="hidden"
               animate="visible"
