@@ -18,7 +18,7 @@ const ProjectInfo = () => {
   const paragraphs = [
     "I developed this project from scratch as a full-featured e-commerce web application focused on sports equipment.It serves as a portfolio showcasing my skills in both frontend and backend development.",
     "One of the key features is the loyalty points system, where logged-in users earn points with each purchase that they can redeem as discounts on future orders.",
-    "Users can browse products by sport (football, hockey, cycling) and filter by type (jerseys, helmets, gloves, balls, etc.). Each product has its own detail page with price, category, brand, and the option to add it to the shopping cart. Cart contents are updated dynamically and users can proceed to a simulated checkout that includes delivery options, payment methods, and form validation.",
+    "Users can browse from over 168 base products across multiple sports (football, hockey, cycling), with administrators having the ability to add new products or remove existing ones. Products can be filtered by type (jerseys, helmets, gloves, balls, etc.), and each product includes its own detail page with price, category, brand, and an option to add it to the shopping cart. The cart updates dynamically and users can proceed to a simulated checkout that includes delivery options, payment methods, and full form validation.",
     "This project also includes a classic product search by name. When users click on a searched product, they are redirected directly to its detail page. Additionally, I focused heavily on responsiveness to ensure the app looks and works well on both small and large devices.",
   ];
 
@@ -60,19 +60,20 @@ const ProjectInfo = () => {
           >
             🛠️ Technologies Used
           </motion.h2>
-<motion.ul
-  variants={fadeInUp}
-  initial="hidden"
-  animate="visible"
-  custom={5}
-  className="list-disc space-y-2 px-4 mx-auto max-w-2xl text-left text-gray-200"
->
-  <li><strong>Frontend:</strong> React + Tailwind CSS</li>
-  <li><strong>Backend:</strong> Express (Node.js) with route/controller architecture</li>
-  <li><strong>Database:</strong> TiDB (connected via Render, with environment variables configured)</li>
-  <li><strong>Authentication:</strong> JWT + bcrypt + email verification</li>
-  <li><strong>Security:</strong> Input validation, XSS & SQL injection protection, brute-force defense</li>
-</motion.ul>
+          <motion.ul
+            variants={fadeInUp}
+            initial="hidden"
+            animate="visible"
+            custom={5}
+            className="list-disc space-y-2 px-4 mx-auto max-w-2xl text-left text-gray-200"
+          >
+            <li><strong>Frontend:</strong> React + Tailwind CSS</li>
+            <li><strong>Backend:</strong> Express (Node.js) with a modular routes/controllers architecture</li>
+            <li><strong>Database:</strong> TiDB Cloud (MySQL-compatible) + MySQL Workbench for schema design and data management</li>
+            <li><strong>Authentication:</strong> JWT, bcrypt, and email verification (SendGrid)</li>
+            <li><strong>Security:</strong> Input validation, XSS & SQL injection protection, and brute-force defense</li>
+            <li><strong>Deployment:</strong> Render (hosting for backend & environment variable configuration)</li>
+          </motion.ul>
 
 
           {/* Admin Capabilities */}
@@ -103,7 +104,7 @@ const ProjectInfo = () => {
             custom={8}
             className="list-disc space-y-2 px-4 mx-auto max-w-2xl text-left text-gray-200"
           >
-         <li>📦 <strong>Order Summary:</strong> Total number of orders, total loyalty points used, total revenue (€), top 10 best-selling products (by number of units sold), top 10 customers by total purchases in the shop</li>
+            <li>📦 <strong>Order Summary:</strong> Total number of orders, total loyalty points used, total revenue (€), top 10 best-selling products (by number of units sold), top 10 customers by total purchases in the shop</li>
             <li>👥 <strong>User Management:</strong> Full user list, role control, order history, delete user</li>
             <li>🛍️ <strong>Product Management:</strong> Add/Delete products by name, with image, price, description</li>
             <li>🚚 <strong>Delivery Settings:</strong> Modify delivery pricing</li>
@@ -180,7 +181,7 @@ const ProjectInfo = () => {
             animate="visible"
             custom={14}
           >
-            I see this project as my first complete fullstack application in JavaScript (React and Node.js), where I was able to go through the entire development process – from planning to implementation.
+           I see this project as an important full-stack JavaScript application (React and Node.js) where I went through the complete development process — from planning to implementation, including backend, frontend, database design, and deployment.
           </motion.p>
         </div>
       </div>
