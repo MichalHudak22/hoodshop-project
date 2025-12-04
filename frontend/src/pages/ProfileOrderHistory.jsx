@@ -104,12 +104,12 @@ function OrderHistory() {
 
                 <div className="flex flex-col items-center md:flex-row justify-around text-[14px] lg:text-lg">
                   <div className="mb-4 text-left w-[260px]">
-                    <p><strong>Date:</strong> {new Date(order.created_at).toLocaleString()}</p>
-                    <p><strong className='text-blue-200'>Name:</strong> {order.full_name}</p>
-                    <p><strong>Email:</strong> {order.profile_email}</p>
-                    <p><strong>Status:</strong> {order.status || 'not specified'}</p>
-                    <p><strong>Payment:</strong> {order.payment_method}</p>
-                    <p><strong>Total Items:</strong> {totalQuantity}</p>
+                    <p><strong className='text-blue-100'>Date:</strong> {new Date(order.created_at).toLocaleString()}</p>
+                    <p><strong className='text-blue-100'>Name:</strong> {order.full_name}</p>
+                    <p><strong className='text-blue-100'>Email:</strong> {order.profile_email}</p>
+                    <p><strong className='text-blue-100'>Status:</strong> {order.status || 'not specified'}</p>
+                    <p><strong className='text-blue-100'>Payment:</strong> {order.payment_method}</p>
+                    <p><strong className='text-blue-100'>Total Items:</strong> {totalQuantity}</p>
                   </div>
 
                   <div className="mb-4 text-left w-[260px]">
