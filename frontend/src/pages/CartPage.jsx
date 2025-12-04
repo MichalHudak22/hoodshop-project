@@ -129,7 +129,7 @@ const CartPage = () => {
     <div
       className={`relative bg-cover bg-center md:py-16 min-h-screen ${!isMobile ? 'bg-fixed' : ''}`}
       style={{
-        backgroundImage: "url('/img/bg-shop2.jpg')",
+        backgroundImage: "url('/img/bg-shop2.png')",
         backgroundAttachment: isMobile ? 'scroll' : 'fixed',
       }}
     >
