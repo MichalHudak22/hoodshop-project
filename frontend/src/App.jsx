@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { Suspense, lazy, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid'; 
+import { v4 as uuidv4 } from 'uuid';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import { CartProvider } from './context/CartContext'; // <- pridaj import
@@ -39,7 +39,7 @@ const Login = lazy(() => import('./pages/Login'));
 
 const Profile = lazy(() => import('./pages/Profile'));
 const ProfileOrderHistory = lazy(() => import('./pages/ProfileOrderHistory'));
-const ProfileLoyaltyPoints= lazy(() => import('./pages/ProfileLoyaltyPoints'));
+const ProfileLoyaltyPoints = lazy(() => import('./pages/ProfileLoyaltyPoints'));
 
 const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 const BrandDetail = lazy(() => import('./pages/BrandDetail'));
@@ -63,7 +63,13 @@ function App() {
       <CartProvider> {/* OBALÍME TÝMTO VŠETKO, ČO POTREBUJE PRÍSTUP KU KART CONTEXT */}
         <Header />
         <div className="pt-[80px]">
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense
+            fallback={
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                <p className="text-white text-lg font-semibold animate-pulse">Loading...</p>
+              </div>
+            }
+          >
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/admin" element={<AdminPage />} />
@@ -91,9 +97,9 @@ function App() {
               <Route path="/verify-email" element={<VerifyEmailPage />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/profileorderhistory" element={<ProfileOrderHistory />} />
-              <Route path="/profileloyaltypoints" element={<ProfileLoyaltyPoints/>} />
+              <Route path="/profileloyaltypoints" element={<ProfileLoyaltyPoints />} />
               <Route path="/product/:slug" element={<ProductDetail />} />
-              <Route path="/brands/:slug" element={<BrandDetail  />} />
+              <Route path="/brands/:slug" element={<BrandDetail />} />
               <Route path="/cart" element={<CartPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
               <Route path="/thank-you" element={<ThankYou />} />
