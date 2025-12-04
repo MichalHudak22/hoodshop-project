@@ -27,7 +27,7 @@ const DeleteProduct = () => {
         setAllProducts(products);
         setFiltered(products);
       } catch (err) {
-        setMessage('Chyba pri načítavaní produktov');
+        setMessage('Error loading products');
         console.error(err);
       } finally {
         setLoading(false);
@@ -60,7 +60,7 @@ const DeleteProduct = () => {
   // Tlačidlo pre prepnutie stavu produktu (active <-> inactive)
   const handleToggleClick = () => {
     if (!selectedSlug) {
-      setMessage('Najprv vyber produkt, ktorý chceš zmeniť.');
+      setMessage('Please select the product you want to modify first.');
       return;
     }
     setProductToToggle(selectedSlug);
@@ -85,7 +85,7 @@ const DeleteProduct = () => {
       );
       setAllProducts(updated);
       setSelectedSlug(null);
-      setMessage('Stav produktu bol aktualizovaný.');
+      setMessage('Product status has been updated.');
 
       // 2a. Aktualizácia filtered podľa showInactive, aby sa produkt presunul
       setFiltered(updated.filter(p =>
@@ -105,7 +105,7 @@ const DeleteProduct = () => {
         } catch (err) {
           // ignorujeme 404, všetko ostatné logujeme
           if (err.response?.status !== 404) {
-            console.error('Chyba pri odstraňovaní produktu z košíka', err);
+            console.error('Error removing product from cart', err);
           }
         }
       }
@@ -115,7 +115,7 @@ const DeleteProduct = () => {
 
     } catch (err) {
       console.error(err);
-      setMessage('Chyba pri aktualizácii produktu.');
+      setMessage('Error updating product.');
     } finally {
       setShowModal(false);
       setProductToToggle(null);
@@ -191,7 +191,7 @@ const DeleteProduct = () => {
       <div className="flex flex-col justify-center mt-6">
         <button
           onClick={handleToggleClick}
-          className={`w-[190px] py-2 px-4 text-sm md:text-lg rounded-lg transition mx-auto cursor-pointer ${showInactive ? 'bg-green-700 hover:bg-green-600 text-white' : 'bg-red-700 hover:bg-red-600 text-white'
+          className={`w-[210px] py-2 px-4 text-sm md:text-lg rounded-lg transition mx-auto cursor-pointer ${showInactive ? 'bg-green-700 hover:bg-green-600 text-white' : 'bg-red-700 hover:bg-red-600 text-white'
             }`}
           disabled={!selectedSlug}
         >
