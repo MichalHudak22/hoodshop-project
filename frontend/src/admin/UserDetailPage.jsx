@@ -172,7 +172,7 @@ function UserDetailPage() {
                       className="
                     w-full flex flex-col md:flex-row 
                     items-start md:items-start 
-                    md:space-x-12 
+                    md:space-x-4 lg:space-x-8 
                     space-y-4 md:space-y-0  
                   "
                     >
