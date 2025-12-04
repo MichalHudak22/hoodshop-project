@@ -273,7 +273,7 @@ const CheckoutPage = () => {
    <div
   className="relative bg-cover bg-center md:py-16"
   style={{
-    backgroundImage: "url('/img/bg-shop.jpg')",
+    backgroundImage: "url('/img/bg-shop2.jpg')",
     backgroundAttachment: isMobile ? 'scroll' : 'fixed', // 🟩 dynamický efekt
     backgroundSize: 'cover',
     backgroundPosition: 'center',
