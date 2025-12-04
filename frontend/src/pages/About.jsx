@@ -73,6 +73,8 @@ const ProjectInfo = () => {
             <li><strong>Authentication:</strong> JWT, bcrypt, and email verification (SendGrid)</li>
             <li><strong>Security:</strong> Input validation, XSS & SQL injection protection, and brute-force defense</li>
             <li><strong>Deployment:</strong> Render (hosting for both backend and frontend, including environment variable configuration)</li>
+            <li><strong>Media Storage:</strong> Cloudinary for product images and user avatars</li>
+
           </motion.ul>
 
 
@@ -170,7 +172,7 @@ const ProjectInfo = () => {
             animate="visible"
             custom={13}
           >
-            The backend architecture utilizes modular Express controllers and routes, ensuring clean, reusable, and maintainable code. I connected the frontend and backend on Render, integrating it with a TiDB database, configuring environment variables, and ensuring seamless communication across the full stack.
+            The backend architecture utilizes modular Express controllers and routes, ensuring clean, reusable, and maintainable code. I connected the frontend and backend on Render, integrating it with a TiDB database, configuring environment variables, and ensuring seamless communication across the full stack.I also integrated Cloudinary into the project for secure and optimized image storage. Product images and user avatars are uploaded directly to Cloudinary, and the backend ensures automatic URL handling and seamless delivery. This required configuring API keys on Render and establishing a stable connection between the backend and Cloudinary for image management.
           </motion.p>
 
 
