@@ -129,7 +129,7 @@ function UserDetailPage() {
         </div>
 
         {/* Orders */}
-        <div className="max-w-7xl mx-auto bg-black bg-opacity-80 p-6 sm:p-8 lg:px-24 md:rounded-xl shadow-lg border-2 border-gray-600 mt-10">
+        <div className="max-w-7xl mx-auto bg-black bg-opacity-80 p-3 md:p-6 lg:px-24 md:rounded-xl shadow-lg border-2 border-gray-600 mt-10">
           <h2 className="text-2xl font-bold text-blue-200  pb-3 text-center">
             Orders
           </h2>
@@ -149,7 +149,7 @@ function UserDetailPage() {
 
               <div
                 key={order.id}
-                className="border-2 border-gray-600 rounded-lg p-6 bg-gray-900 shadow-md hover:shadow-blue-600 transition-shadow duration-300 mb-12"
+                className="border-2 border-gray-600 rounded-lg p-3 md:p-6 bg-gray-900 shadow-md hover:shadow-blue-600 transition-shadow duration-300 mb-12"
               >
                 {/* rop section - order info */}
                 <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-8 gap-5">
