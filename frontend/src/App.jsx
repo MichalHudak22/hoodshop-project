@@ -105,9 +105,10 @@ function App() {
               <Route path="/thank-you" element={<ThankYou />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
+                    <Footer />
           </Suspense>
         </div>
-        <Footer />
+
       </CartProvider>
     </Router>
   );
