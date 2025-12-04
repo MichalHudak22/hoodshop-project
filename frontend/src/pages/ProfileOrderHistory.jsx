@@ -105,7 +105,7 @@ function OrderHistory() {
                 <div className="flex flex-col items-center md:flex-row justify-around text-[14px] lg:text-lg">
                   <div className="mb-4 text-left w-[260px]">
                     <p><strong>Date:</strong> {new Date(order.created_at).toLocaleString()}</p>
-                    <p><strong>Name:</strong> {order.full_name}</p>
+                    <p><strong className='text-blue-200'>Name:</strong> {order.full_name}</p>
                     <p><strong>Email:</strong> {order.profile_email}</p>
                     <p><strong>Status:</strong> {order.status || 'not specified'}</p>
                     <p><strong>Payment:</strong> {order.payment_method}</p>
