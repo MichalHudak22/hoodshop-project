@@ -125,88 +125,96 @@ const CartPage = () => {
   if (loading) return <p className="p-4 pt-8 text-white text-center text-xl">Loading cart...</p>;
   if (cartItems.length === 0) return <p className="p-4 pt-8 text-red-500 text-center text-xl">Your cart is empty.</p>;
 
-  return (
-    <div
-      className={`relative bg-cover bg-center md:py-16 min-h-screen ${!isMobile ? 'bg-fixed' : ''}`}
-      style={{
-        backgroundImage: "url('/img/bg-shop2.png')",
-        backgroundAttachment: isMobile ? 'scroll' : 'fixed',
-      }}
-    >
-      {/* Overlay pre stmavenie */}
-      <div className="absolute inset-0 bg-black bg-opacity-20 md:bg-opacity-50 z-0" />
+return (
+  <div
+    className={`relative bg-cover bg-center md:py-16 min-h-screen ${!isMobile ? 'bg-fixed' : ''}`}
+    style={{
+      backgroundImage: "url('/img/bg-shop2.png')",
+      backgroundAttachment: isMobile ? 'scroll' : 'fixed',
+    }}
+  >
+    {/* Overlay pre stmavenie */}
+    <div className="absolute inset-0 bg-black bg-opacity-20 md:bg-opacity-50 z-0" />
 
-      {/* Obsah s priehľadným pozadím */}
-      <div className="relative z-10 max-w-4xl mx-auto p-6 bg-black bg-opacity-30 md:bg-opacity-50 lg:rounded-xl lg:border-2 border-gray-500">
-        <h1 className="text-2xl lg:text-3xl font-bold mb-4 text-center py-3 text-blue-200">
-          Shopping Cart
-        </h1>
+    {/* Obsah s priehľadným pozadím */}
+    <div className="relative z-10 max-w-4xl mx-auto p-6 bg-black bg-opacity-30 md:bg-opacity-50 lg:rounded-xl lg:border-2 border-gray-500">
+      <h1 className="text-2xl lg:text-3xl font-bold mb-4 text-center py-3 text-blue-200">
+        Shopping Cart
+      </h1>
 
-        <ul className="space-y-4">
-          {cartItems.map(item => (
-            <li
-              key={item.id}
-              className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-100 p-4 shadow rounded-lg space-y-4 sm:space-y-0"
-            >
-              {/* LEFT - image + name */}
-              <div className="flex items-center space-x-4">
-                <img
-                  src={fixCloudinaryUrl(item.image)}
-                  alt={item.name}
-                  className="w-16 h-16 object-cover rounded"
-                />
-                <div>
-                  <h2 className="text-base sm:text-lg font-semibold">{item.name}</h2>
-                  <p className="text-sm">{item.price} €</p>
+      {loading ? (
+        <p className="text-white text-center text-xl py-8 animate-pulse">Loading cart...</p>
+      ) : cartItems.length === 0 ? (
+        <p className="text-red-500 text-center text-xl py-20">Your cart is empty.</p>
+      ) : (
+        <>
+          <ul className="space-y-4">
+            {cartItems.map(item => (
+              <li
+                key={item.id}
+                className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-100 p-4 shadow rounded-lg space-y-4 sm:space-y-0"
+              >
+                {/* LEFT - image + name */}
+                <div className="flex items-center space-x-4">
+                  <img
+                    src={fixCloudinaryUrl(item.image)}
+                    alt={item.name}
+                    className="w-16 h-16 object-cover rounded"
+                  />
+                  <div>
+                    <h2 className="text-base sm:text-lg font-semibold">{item.name}</h2>
+                    <p className="text-sm">{item.price} €</p>
+                  </div>
                 </div>
-              </div>
 
-              {/* RIGHT - quantity and remove */}
-              <div className="flex items-center justify-center sm:justify-end space-x-2 sm:space-x-3">
-                <button
-                  type="button"
-                  onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                  className="px-2 py-1 bg-blue-100 hover:bg-blue-200 rounded text-lg"
-                >
-                  −
-                </button>
-                <span className="min-w-[24px] text-center text-lg font-semibold">{item.quantity}</span>
-                <button
-                  type="button"
-                  onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                  className="px-2 py-1 bg-blue-100 hover:bg-blue-200 rounded text-lg"
-                >
-                  +
-                </button>
+                {/* RIGHT - quantity and remove */}
+                <div className="flex items-center justify-center sm:justify-end space-x-2 sm:space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                    className="px-2 py-1 bg-blue-100 hover:bg-blue-200 rounded text-lg"
+                  >
+                    −
+                  </button>
+                  <span className="min-w-[24px] text-center text-lg font-semibold">{item.quantity}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                    className="px-2 py-1 bg-blue-100 hover:bg-blue-200 rounded text-lg"
+                  >
+                    +
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => handleRemove(item.id)}
-                  className="ml-4 text-red-500 text-[16px] hover:text-red-500 hover:scale-105"
-                >
-                  Remove
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+                  <button
+                    type="button"
+                    onClick={() => handleRemove(item.id)}
+                    className="ml-4 text-red-500 text-[16px] hover:text-red-500 hover:scale-105"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
 
-        <div className="text-center flex flex-col space-y-3 py-5">
-          <h2 className="text-white text-lg lg:text-2xl font-semibold">
-            Total: <span className="text-green-500 text-2xl font-semibold">{total.toFixed(2)} €</span>
-          </h2>
-          <Link to="/checkout">
-            <button
-              type="button"
-              className="w-full md:w-[50%] lg:w-80 lg:text-xl bg-green-700 hover:bg-green-600 text-white font-semibold py-3 rounded-xl"
-            >
-              Proceed to Checkout
-            </button>
-          </Link>
-        </div>
-      </div>
+          <div className="text-center flex flex-col space-y-3 py-5">
+            <h2 className="text-white text-lg lg:text-2xl font-semibold">
+              Total: <span className="text-green-500 text-2xl font-semibold">{total.toFixed(2)} €</span>
+            </h2>
+            <Link to="/checkout">
+              <button
+                type="button"
+                className="w-full md:w-[50%] lg:w-80 lg:text-xl bg-green-700 hover:bg-green-600 text-white font-semibold py-3 rounded-xl"
+              >
+                Proceed to Checkout
+              </button>
+            </Link>
+          </div>
+        </>
+      )}
     </div>
-  );
+  </div>
+);
 };
 
 export default CartPage;
