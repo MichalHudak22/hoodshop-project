@@ -160,7 +160,7 @@ function UserDetailPage() {
                       minute: '2-digit',
                     })}
                   </div>
-                  <div className="flex flex-col items-center flex-grow px-4">
+                  <div className="flex flex-col items-center flex-grow lg:px-2">
                     <div className="text-xl md:text-2xl font-bold text-blue-500 text-center mb-6 tracking-wide">
                       Order No.{' '}
                       <span className="text-blue-200">
