@@ -170,34 +170,39 @@ function UserDetailPage() {
 
                     <div
                       className="
-                        w-full flex flex-col md:flex-row justify-center items-start md:items-center md:space-x-12 space-y-4 md:space-y-0"
+                    w-full flex flex-col md:flex-row 
+                    items-start md:items-start 
+                    md:space-x-12 
+                    space-y-4 md:space-y-0  
+                  "
                     >
                       {/* Prvá skupina: Full Name, Email, Mobile Number */}
-                      <div className="flex flex-col space-y-2 text-left w-full md:w-auto">
+                      <div className="flex flex-col space-y-2 text-left w-full md:w-1/2">
                         {[
                           ['Full Name', order.full_name],
                           ['Email', order.profile_email],
                           ['Mobile Number', order.mobile_number],
                         ].map(([lbl, val]) => (
-                          <div key={lbl} className="w-full md:min-w-[150px]">
+                          <div key={lbl} className="w-full">
                             <span className="font-semibold text-blue-300">{lbl}:</span> {val}
                           </div>
                         ))}
                       </div>
 
                       {/* Druhá skupina: Address, City, Postal Code */}
-                      <div className="flex flex-col space-y-2 text-left w-full md:w-auto">
+                      <div className="flex flex-col space-y-2 text-left w-full md:w-1/2">
                         {[
                           ['Address', order.address],
                           ['City', order.city],
                           ['Postal Code', order.postal_code],
                         ].map(([lbl, val]) => (
-                          <div key={lbl} className="w-full md:min-w-[150px]">
+                          <div key={lbl} className="w-full">
                             <span className="font-semibold text-blue-300">{lbl}:</span> {val}
                           </div>
                         ))}
                       </div>
                     </div>
+
 
 
                   </div>
