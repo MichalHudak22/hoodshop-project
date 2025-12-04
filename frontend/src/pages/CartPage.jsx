@@ -137,7 +137,7 @@ return (
     <div className="absolute inset-0 bg-black bg-opacity-20 md:bg-opacity-50 z-0" />
 
     {/* Obsah */}
-    <div className="relative z-10 max-w-4xl mx-auto p-6 bg-black bg-opacity-30 md:bg-opacity-50 lg:rounded-xl lg:border-2 border-gray-500 min-h-[60vh] flex flex-col justify-center">
+    <div className="relative z-10 max-w-4xl mx-auto p-6 bg-black bg-opacity-30 md:bg-opacity-50 lg:rounded-xl lg:border-2 border-gray-500 min-h-[40vh] flex flex-col justify-center">
       <h1 className="text-2xl lg:text-3xl font-bold mb-4 text-center py-3 text-blue-200">
         Shopping Cart
       </h1>
