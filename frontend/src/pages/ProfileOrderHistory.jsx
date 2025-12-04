@@ -103,7 +103,7 @@ function OrderHistory() {
                 </h2>
 
                 <div className="flex flex-col items-center md:flex-row justify-around text-[14px] lg:text-lg">
-                  <div className="mb-4 text-left w-[255px]">
+                  <div className="mb-4 text-left w-[260px]">
                     <p><strong>Date:</strong> {new Date(order.created_at).toLocaleString()}</p>
                     <p><strong>Name:</strong> {order.full_name}</p>
                     <p><strong>Email:</strong> {order.profile_email}</p>
@@ -112,7 +112,7 @@ function OrderHistory() {
                     <p><strong>Total Items:</strong> {totalQuantity}</p>
                   </div>
 
-                  <div className="mb-4 text-left w-[255px]">
+                  <div className="mb-4 text-left w-[260px]">
                     <strong>Items:</strong>
                     <ul className="list-none">
                       {order.items.map((item) => (
