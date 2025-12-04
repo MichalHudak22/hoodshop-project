@@ -122,7 +122,13 @@ const CartPage = () => {
     }
   };
 
-  if (loading) return <p className="p-4">Loading cart...</p>;
+  {loading && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <p className="text-white text-lg font-semibold animate-pulse">
+      Loading cart...
+    </p>
+  </div>
+)}
   if (cartItems.length === 0) return <p className="p-4 pt-8 text-red-500 text-center text-xl">Your cart is empty.</p>;
 
   return (
