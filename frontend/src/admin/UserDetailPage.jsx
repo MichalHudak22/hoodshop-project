@@ -80,7 +80,7 @@ function UserDetailPage() {
       <div className="relative z-10 w-full md:px-6 pb-12 space-y-10">
         {/* Nadpis */}
         <div className="pt-8 lg:pb-8 text-center bg-black w-full">
-          <h1 className="text-2xl lg:text-4xl font-bold text-white">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white">
             User Details for <span className="text-blue-200">{user.name}</span>
           </h1>
         </div>
