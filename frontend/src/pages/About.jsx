@@ -35,7 +35,7 @@ const ProjectInfo = () => {
 
       <div className="absolute inset-0 bg-black opacity-30 z-0" />
 
-      <div className="relative z-10 w-full py-7 px-4 lg:px-24 max-w-7xl mx-auto text-gray-200 bg-black/60 lg:rounded-xl shadow-md">
+      <div className="relative z-10 w-full py-7 px-4 lg:px-24 max-w-7xl mx-auto text-gray-200 bg-black/70 lg:rounded-xl shadow-md">
         <div className="space-y-6 text-sm md:text-lg xl:text-xl leading-relaxed">
           {paragraphs.map((text, i) => (
             <motion.p
