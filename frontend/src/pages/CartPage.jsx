@@ -125,31 +125,31 @@ const CartPage = () => {
   if (cartItems.length === 0) return <p className="p-4 pt-8 text-red-500 text-center text-xl">Your cart is empty.</p>;
 
   return (
-  <div className="relative min-h-screen">
-    {/* Loading overlay */}
-    {loading && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <p className="text-white text-lg font-semibold animate-pulse">
-          Loading cart...
-        </p>
-      </div>
-    )}
+ <div className="relative min-h-screen bg-cover bg-center" 
+     style={{ backgroundImage: "url('/img/bg-shop2.png')" }}>
+  
+  {/* Overlay stmavenie */}
+  <div className="absolute inset-0 bg-black bg-opacity-20 md:bg-opacity-50 z-0" />
 
-    {/* Hlavný obsah */}
-    <div
-      className={`relative bg-cover bg-center md:py-16 ${!isMobile ? 'bg-fixed' : ''} ${loading ? 'invisible' : 'visible'}`}
-      style={{
-        backgroundImage: "url('/img/bg-shop2.png')",
-        backgroundAttachment: isMobile ? 'scroll' : 'fixed',
-      }}
-    >
-      <div className="absolute inset-0 bg-black bg-opacity-20 md:bg-opacity-50 z-0" />
+  {/* Loading overlay */}
+  {loading && (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <p className="text-white text-lg font-semibold animate-pulse">
+        Loading cart...
+      </p>
+    </div>
+  )}
 
-      <div className="relative z-10 max-w-4xl mx-auto p-6 bg-black bg-opacity-30 md:bg-opacity-50 lg:rounded-xl lg:border-2 border-gray-500">
-        <h1 className="text-2xl lg:text-3xl font-bold mb-4 text-center py-3 text-blue-200">
-          Shopping Cart
-        </h1>
+  {/* Hlavný obsah */}
+  {!loading && (
+    <div className="relative z-10 max-w-4xl mx-auto p-6 bg-black bg-opacity-30 md:bg-opacity-50 lg:rounded-xl lg:border-2 border-gray-500">
+      <h1 className="text-2xl lg:text-3xl font-bold mb-4 text-center py-3 text-blue-200">
+        Shopping Cart
+      </h1>
 
+      {cartItems.length === 0 ? (
+        <p className="p-4 pt-8 text-red-500 text-center text-xl">Your cart is empty.</p>
+      ) : (
         <ul className="space-y-4">
           {cartItems.map(item => (
             <li key={item.id} className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-100 p-4 shadow rounded-lg space-y-4 sm:space-y-0">
@@ -170,7 +170,9 @@ const CartPage = () => {
             </li>
           ))}
         </ul>
+      )}
 
+      {cartItems.length > 0 && (
         <div className="text-center flex flex-col space-y-3 py-5">
           <h2 className="text-white text-lg lg:text-2xl font-semibold">
             Total: <span className="text-green-500 text-2xl font-semibold">{total.toFixed(2)} €</span>
@@ -181,9 +183,11 @@ const CartPage = () => {
             </button>
           </Link>
         </div>
-      </div>
+      )}
     </div>
-  </div>
+  )}
+</div>
+
 );
 };
 
