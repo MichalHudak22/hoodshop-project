@@ -62,7 +62,7 @@ function UserDetailPage() {
   if (error)
     return <p className="text-red-500 text-center">{error}</p>;
   if (!user)
-    return <p className="text-white text-center">Loading user data...</p>;
+    return <p className="p-4 pt-8 text-white text-center text-xl">Loading user data...</p>;
 
   const ordersCount = orders.length;
   const totalSpent = orders.reduce(
