@@ -123,21 +123,21 @@ const CartPage = () => {
   };
 
   if (loading) return <p className="p-4 pt-8 text-white text-center text-xl">Loading cart...</p>;
-  if (cartItems.length === 0) return <p className="p-4 pt-8 text-red-500 text-center text-xl">Your cart is empty.</p>;
+ 
 
 return (
   <div
-    className={`relative bg-cover bg-center md:py-16 min-h-screen ${!isMobile ? 'bg-fixed' : ''}`}
+    className={`relative bg-cover bg-center min-h-screen md:py-16 ${!isMobile ? 'bg-fixed' : ''}`}
     style={{
       backgroundImage: "url('/img/bg-shop2.png')",
       backgroundAttachment: isMobile ? 'scroll' : 'fixed',
     }}
   >
-    {/* Overlay pre stmavenie */}
+    {/* Overlay */}
     <div className="absolute inset-0 bg-black bg-opacity-20 md:bg-opacity-50 z-0" />
 
-    {/* Obsah s priehľadným pozadím */}
-    <div className="relative z-10 max-w-4xl mx-auto p-6 bg-black bg-opacity-30 md:bg-opacity-50 lg:rounded-xl lg:border-2 border-gray-500">
+    {/* Obsah */}
+    <div className="relative z-10 max-w-4xl mx-auto p-6 bg-black bg-opacity-30 md:bg-opacity-50 lg:rounded-xl lg:border-2 border-gray-500 min-h-[60vh] flex flex-col justify-center">
       <h1 className="text-2xl lg:text-3xl font-bold mb-4 text-center py-3 text-blue-200">
         Shopping Cart
       </h1>
@@ -154,7 +154,7 @@ return (
                 key={item.id}
                 className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-100 p-4 shadow rounded-lg space-y-4 sm:space-y-0"
               >
-                {/* LEFT - image + name */}
+                {/* LEFT */}
                 <div className="flex items-center space-x-4">
                   <img
                     src={fixCloudinaryUrl(item.image)}
@@ -167,7 +167,7 @@ return (
                   </div>
                 </div>
 
-                {/* RIGHT - quantity and remove */}
+                {/* RIGHT */}
                 <div className="flex items-center justify-center sm:justify-end space-x-2 sm:space-x-3">
                   <button
                     type="button"
