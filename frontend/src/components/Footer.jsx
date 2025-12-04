@@ -20,7 +20,7 @@ const Footer = () => {
         </div>
 
         {/* Right links → stacked */}
-        <div className="flex md:flex-col items-center md:items-start gap-2 text-lg">
+        <div className="flex md:flex-col items-center md:items-start gap-1 text-base">
           <Link to="/sports/football" className="hover:text-blue-200">
             Football
           </Link>
