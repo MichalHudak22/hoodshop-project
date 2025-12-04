@@ -267,7 +267,7 @@ const CheckoutPage = () => {
   const estimatedEarnedPoints = finalPrice * 0.05 * 10;
 
 
-  if (loading) return <p className='p-4 pt-8 text-white text-center text-xl'>Loading...</p>;
+  if (loading) return <p className='p-4 pt-8 text-white text-center text-xl'>Loading Checkout...</p>;
 
   return (
    <div
