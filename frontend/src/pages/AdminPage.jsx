@@ -46,7 +46,7 @@ function AdminPage() {
   return (
     <div
       className="relative min-h-screen text-white bg-fixed bg-cover bg-no-repeat bg-center pb-12 md:px-8"
-      style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}
+      style={{ backgroundImage: "url('/img/bg-profile-1.png')" }}
     >
       {/* Overlay */}
       <div className="absolute inset-0 bg-black opacity-50 z-0" />

@@ -223,7 +223,7 @@ function Profile() {
   return (
     <div
       className="relative text-white flex flex-col items-center bg-fixed bg-cover bg-no-repeat bg-center"
-      style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}
+      style={{ backgroundImage: "url('/img/bg-profile-1.png')" }}
     >
       {/* Overlay */}
       <div className="absolute inset-0 bg-black opacity-40 z-0" />

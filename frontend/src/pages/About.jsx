@@ -25,7 +25,7 @@ const ProjectInfo = () => {
   return (
     <div
       className="relative min-h-[100vh] text-white flex flex-col items-center bg-fixed bg-cover bg-no-repeat bg-center"
-      style={{ backgroundImage: "url('/img/bg-profile-1.jpg')" }}
+      style={{ backgroundImage: "url('/img/bg-profile-1.png')" }}
     >
       <div className="pt-8 pb-2 text-center bg-black/80 w-full z-10">
         <h1 className="text-2xl lg:text-4xl font-bold text-white">
