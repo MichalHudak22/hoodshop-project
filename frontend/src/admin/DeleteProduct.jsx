@@ -182,7 +182,7 @@ const DeleteProduct = () => {
             ))
           ) : (
             <li className="p-4 text-red-400 text-center">
-              {loading ? 'Loading products...' : 'Žiadne produkty na zobrazenie.'}
+              {loading ? 'Loading products...' : 'No products to display.'}
             </li>
           )}
         </ul>
