@@ -113,7 +113,7 @@ function OrderHistory() {
                   </div>
 
                   <div className="mb-4 text-left w-[260px]">
-                    <strong>Items:</strong>
+                    <strong className='text-blue-100'>Items:</strong>
                     <ul className="list-none">
                       {order.items.map((item) => (
                         <li className="text-sm" key={item.id}>

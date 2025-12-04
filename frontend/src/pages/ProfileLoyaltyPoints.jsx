@@ -82,7 +82,7 @@ function ProfileLoyaltyPoints() {
             </h1>
           </div>
 
-          <div className="lg:mt-6 bg-black bg-opacity-50 md:bg-opacity-70 p-6 lg:rounded-xl shadow-md text-center lg:border-2 border-gray-600">
+          <div className="lg:mt-6 bg-black bg-opacity-50 md:bg-opacity-70 px-6 py-3 lg:rounded-xl shadow-md text-center lg:border-2 border-gray-600">
             <p className="text-lg text-white">
               You currently have{' '}
               <span className="font-bold text-5xl p-3 text-yellow-400">
