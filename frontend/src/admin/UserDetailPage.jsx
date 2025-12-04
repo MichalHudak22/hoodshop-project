@@ -73,7 +73,7 @@ function UserDetailPage() {
   return (
     <div
       className="relative min-h-screen text-white flex flex-col items-center bg-fixed bg-cover bg-no-repeat bg-center"
-      style={{ backgroundImage: "url('/img/bg-profile-2.png')" }}
+      style={{ backgroundImage: "url('/img/bg-profile-1.png')" }}
     >
       <div className="absolute inset-0 bg-black opacity-30 z-0" />
 
