@@ -90,7 +90,7 @@ const BrandDetail = () => {
     }
   };
 
-  if (!brand) return <div className="text-white text-center py-10">Načítava sa...</div>;
+  if (!brand) return <div className="text-white text-center py-10">Loading...</div>;
 
   return (
     <section className="bg-black">
