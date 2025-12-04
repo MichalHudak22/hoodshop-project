@@ -170,7 +170,7 @@ function UserDetailPage() {
 
                     <div
                       className="
-                        w-full flex flex-col md:flex-row justify-center items-start md:items-center md:space-x-12 space-y-4 md:space-y-0 px-4"
+                        w-full flex flex-col md:flex-row justify-center items-start md:items-center md:space-x-12 space-y-4 md:space-y-0"
                     >
                       {/* Prvá skupina: Full Name, Email, Mobile Number */}
                       <div className="flex flex-col space-y-2 text-left w-full md:w-auto">
