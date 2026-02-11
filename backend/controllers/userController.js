@@ -1,128 +1,131 @@
-const Resend = await import("resend").then(mod => mod.Resend);
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
 const db = require('../database');
 
+(async () => {
+  // dynamický import Resend (ESM-only)
+  const { Resend } = await import('resend');
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
-// Funkcia pre získanie všetkých používateľov
-const getUsers = async (req, res) => {
-  try {
-    const [results] = await db.query('SELECT id, name, email, role FROM user');
-    res.json(results);
-  } catch (err) {
-    console.error('Chyba pri načítaní používateľov:', err);
-    res.status(500).json({ error: 'Interná chyba servera' });
-  }
-};
-
-// Funkcia pre vytvorenie nového používateľa (registrácia)
-const createUser = async (req, res) => {
-  const { name, email, password } = req.body;
-  const defaultAvatarUrl = 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1755594977/default-avatar_z3c30l.jpg';
-
-  try {
-    // 1️⃣ Overenie, či už email existuje
-    const [existingUsers] = await db.query('SELECT * FROM user WHERE email = ?', [email]);
-    if (existingUsers.length > 0) {
-      return res.status(400).json({ error: 'Email is already registered.' });
+  // Funkcia pre získanie všetkých používateľov
+  const getUsers = async (req, res) => {
+    try {
+      const [results] = await db.query('SELECT id, name, email, role FROM user');
+      res.json(results);
+    } catch (err) {
+      console.error('Chyba pri načítaní používateľov:', err);
+      res.status(500).json({ error: 'Interná chyba servera' });
     }
+  };
 
-    // 2️⃣ Hashovanie hesla
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // 3️⃣ Vloženie používateľa s default avatarom
-    const [insertResult] = await db.query(
-      'INSERT INTO user (name, email, password, is_verified, user_photo, user_photo_public_id) VALUES (?, ?, ?, false, ?, NULL)',
-      [name, email, hashedPassword, defaultAvatarUrl]
-    );
-
-    const userId = insertResult.insertId;
-
-    // 4️⃣ Vytvorenie tokenu na overenie emailu
-    const token = uuidv4();
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
-    const expiresAtFormatted = expiresAt.toISOString().slice(0, 19).replace('T', ' ');
-
-    await db.query(
-      'INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
-      [userId, token, expiresAtFormatted]
-    );
-
-    // 5️⃣ Odoslanie overovacieho emailu cez SendGrid
-    const frontendURL = process.env.FRONTEND_URL;
-    const verificationLink = `${frontendURL}/verify-email?token=${token}`;
+  // Funkcia pre vytvorenie nového používateľa (registrácia)
+  const createUser = async (req, res) => {
+    const { name, email, password } = req.body;
+    const defaultAvatarUrl = 'https://res.cloudinary.com/dd8gjvv80/image/upload/v1755594977/default-avatar_z3c30l.jpg';
 
     try {
-      console.log('🔹 Pokúšam sa odoslať e-mail na:', email);
+      // 1️⃣ Overenie, či už email existuje
+      const [existingUsers] = await db.query('SELECT * FROM user WHERE email = ?', [email]);
+      if (existingUsers.length > 0) {
+        return res.status(400).json({ error: 'Email is already registered.' });
+      }
 
-      await resend.emails.send({
-        from: "Hoodsport <noreply@tvoja-domena.shop>", // rovnaký email ako v CinemaSpace
-        to: email,
-        subject: "Overenie emailu - Hoodsport",
-        html: `
-    <p>Ahoj ${name},</p>
-    <p>Prosím over svoj účet kliknutím na odkaz nižšie:</p>
-    <a href="${verificationLink}">${verificationLink}</a>
-    <p>Ak si sa nezaregistroval, ignoruj tento email.</p>
-  `,
-      });
+      // 2️⃣ Hashovanie hesla
+      const hashedPassword = await bcrypt.hash(password, 10);
 
+      // 3️⃣ Vloženie používateľa s default avatarom
+      const [insertResult] = await db.query(
+        'INSERT INTO user (name, email, password, is_verified, user_photo, user_photo_public_id) VALUES (?, ?, ?, false, ?, NULL)',
+        [name, email, hashedPassword, defaultAvatarUrl]
+      );
 
-     console.log('✅ Overovací email úspešne odoslaný cez Resend');
-    } catch (mailErr) {
-     console.error('❌ Chyba pri odosielaní overovacieho emailu cez Resend:', mailErr);
+      const userId = insertResult.insertId;
+
+      // 4️⃣ Vytvorenie tokenu na overenie emailu
+      const token = uuidv4();
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      const expiresAtFormatted = expiresAt.toISOString().slice(0, 19).replace('T', ' ');
+
+      await db.query(
+        'INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES (?, ?, ?)',
+        [userId, token, expiresAtFormatted]
+      );
+
+      // 5️⃣ Odoslanie overovacieho emailu cez Resend
+      const frontendURL = process.env.FRONTEND_URL;
+      const verificationLink = `${frontendURL}/verify-email?token=${token}`;
+
+      try {
+        console.log('🔹 Pokúšam sa odoslať e-mail na:', email);
+
+        await resend.emails.send({
+          from: "Hoodsport <no-reply@hudo22portfolio.shop>",
+          to: email,
+          subject: "Overenie emailu - Hoodsport",
+          html: `
+            <p>Ahoj ${name},</p>
+            <p>Prosím over svoj účet kliknutím na odkaz nižšie:</p>
+            <a href="${verificationLink}">${verificationLink}</a>
+            <p>Ak si sa nezaregistroval, ignoruj tento email.</p>
+          `,
+        });
+
+        console.log('✅ Overovací email úspešne odoslaný cez Resend');
+      } catch (mailErr) {
+        console.error('❌ Chyba pri odosielaní overovacieho emailu cez Resend:', mailErr);
+      }
+
+      // 6️⃣ Úspešná odpoveď
+      res.status(201).json({ message: 'Registration successful. Check your email to verify your account.' });
+
+    } catch (err) {
+      console.error('Chyba pri registrácii používateľa:', err);
+      res.status(500).json({ error: 'Interná chyba servera' });
+    }
+  };
+
+  // Funkcia pre overenie registrácie pomocou emailu
+  const verifyEmail = async (req, res) => {
+    const token = req.query.token;
+    if (!token) {
+      return res.status(400).json({ error: 'Token chýba' });
     }
 
-    // 6️⃣ Úspešná odpoveď
-    res.status(201).json({ message: 'Registration successful. Check your email to verify your account.' });
+    try {
+      const [rows] = await db.query('SELECT * FROM email_verification_tokens WHERE token = ?', [token]);
+      if (rows.length === 0) {
+        return res.status(400).json({ error: 'Token neplatný alebo už použitý' });
+      }
 
-  } catch (err) {
-    console.error('Chyba pri registrácii používateľa:', err);
-    res.status(500).json({ error: 'Interná chyba servera' });
-  }
-};
+      const tokenData = rows[0];
+      const now = new Date();
+      const expiresAt = new Date(tokenData.expires_at);
 
-// Funkcia pre overenie registrácie pomocou emailu
-const verifyEmail = async (req, res) => {
-  const token = req.query.token;
-  if (!token) {
-    return res.status(400).json({ error: 'Token chýba' });
-  }
+      if (now > expiresAt) {
+        return res.status(400).json({ error: 'Token expiroval' });
+      }
 
-  try {
-    // 1️⃣ Skontrolujeme, či token existuje
-    const [rows] = await db.query('SELECT * FROM email_verification_tokens WHERE token = ?', [token]);
-    if (rows.length === 0) {
-      return res.status(400).json({ error: 'Token neplatný alebo už použitý' });
+      const userId = tokenData.user_id;
+
+      await db.query('UPDATE user SET is_verified = true WHERE id = ?', [userId]);
+      await db.query('DELETE FROM email_verification_tokens WHERE user_id = ?', [userId]);
+
+      res.status(200).json({ message: 'Email úspešne overený' });
+
+    } catch (err) {
+      console.error('Chyba pri overovaní emailu:', err);
+      res.status(500).json({ error: 'Interná chyba servera' });
     }
+  };
 
-    const tokenData = rows[0];
-    const now = new Date();
-    const expiresAt = new Date(tokenData.expires_at);
-
-    if (now > expiresAt) {
-      return res.status(400).json({ error: 'Token expiroval' });
-    }
-
-    const userId = tokenData.user_id;
-
-    // 2️⃣ Označíme používateľa ako overeného
-    await db.query('UPDATE user SET is_verified = true WHERE id = ?', [userId]);
-
-    // 3️⃣ Vymažeme token, aby sa už nedal použiť
-    await db.query('DELETE FROM email_verification_tokens WHERE user_id = ?', [userId]);
-
-    res.status(200).json({ message: 'Email úspešne overený' });
-
-  } catch (err) {
-    console.error('Chyba pri overovaní emailu:', err);
-    res.status(500).json({ error: 'Interná chyba servera' });
-  }
-};
+  // Export funkcií ako modul
+  module.exports = {
+    getUsers,
+    createUser,
+    verifyEmail,
+  };
+})();
 
 
 
