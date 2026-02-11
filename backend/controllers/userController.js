@@ -109,8 +109,6 @@ const verifyEmail = async (req, res) => {
 
 
 
-const { getAttempts, registerFailedAttempt, resetAttempts } = require('../middleware/failedLoginAttempts');
-
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
