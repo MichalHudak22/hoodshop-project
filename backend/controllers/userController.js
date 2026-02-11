@@ -1,14 +1,11 @@
+import { Resend } from "resend";
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
-const sgMail = require('@sendgrid/mail'); // <-- používa sa SendGrid
 const bcrypt = require('bcrypt');
 const db = require('../database');
 
-// Konfigurácia SendGrid
-require('dotenv').config();
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-console.log('SENDGRID_API_KEY loaded:', !!process.env.SENDGRID_API_KEY);
 
 // Funkcia pre získanie všetkých používateľov
 const getUsers = async (req, res) => {
@@ -61,22 +58,22 @@ const createUser = async (req, res) => {
     try {
       console.log('🔹 Pokúšam sa odoslať e-mail na:', email);
 
-      await sgMail.send({
+      await resend.emails.send({
+        from: "Hoodsport <noreply@tvoja-domena.shop>", // rovnaký email ako v CinemaSpace
         to: email,
-        from: process.env.EMAIL_USER, // overený sender na SendGrid
-        replyTo: process.env.EMAIL_USER,
-        subject: 'Overenie emailu - HoodShop',
+        subject: "Overenie emailu - Hoodsport",
         html: `
-        <p>Hello ${name},</p>
-        <p>Please verify your account by clicking the link below:</p>
-        <a href="${verificationLink}">${verificationLink}</a>
-        <p>If you did not register, please ignore this email.</p>
-        `,
+    <p>Ahoj ${name},</p>
+    <p>Prosím over svoj účet kliknutím na odkaz nižšie:</p>
+    <a href="${verificationLink}">${verificationLink}</a>
+    <p>Ak si sa nezaregistroval, ignoruj tento email.</p>
+  `,
       });
 
-      console.log('✅ E-mail úspešne odoslaný cez SendGrid');
+
+     console.log('✅ Overovací email úspešne odoslaný cez Resend');
     } catch (mailErr) {
-      console.error('❌ Chyba pri odosielaní e-mailu cez SendGrid:', mailErr);
+     console.error('❌ Chyba pri odosielaní overovacieho emailu cez Resend:', mailErr);
     }
 
     // 6️⃣ Úspešná odpoveď
