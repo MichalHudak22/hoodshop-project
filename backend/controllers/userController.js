@@ -1,5 +1,6 @@
-import { Resend } from "resend";
+const Resend = await import("resend").then(mod => mod.Resend);
 const resend = new Resend(process.env.RESEND_API_KEY);
+
 
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
