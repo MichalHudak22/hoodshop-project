@@ -4,7 +4,11 @@ const bcrypt = require('bcrypt');
 const db = require('../database');
 const { getAttempts, registerFailedAttempt, resetAttempts } = require('../middleware/failedLoginAttempts');
 
-// Funkcia pre získanie všetkých používateľov
+// ==========================
+// FUNKCIE PRE USEROV
+// ==========================
+
+// Získanie všetkých používateľov
 const getUsers = async (req, res) => {
   try {
     const [results] = await db.query('SELECT id, name, email, role FROM user');
@@ -15,9 +19,9 @@ const getUsers = async (req, res) => {
   }
 };
 
-// Funkcia pre vytvorenie nového používateľa (registrácia)
+// Vytvorenie nového používateľa
 const createUser = async (req, res) => {
-  // Dynamický import Resend (ESM-only) priamo tu
+  // Dynamický import Resend priamo tu
   const { Resend } = await import('resend');
   const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -26,24 +30,19 @@ const createUser = async (req, res) => {
     'https://res.cloudinary.com/dd8gjvv80/image/upload/v1755594977/default-avatar_z3c30l.jpg';
 
   try {
-    // Overenie, či už email existuje
     const [existingUsers] = await db.query('SELECT * FROM user WHERE email = ?', [email]);
     if (existingUsers.length > 0) {
       return res.status(400).json({ error: 'Email is already registered.' });
     }
 
-    // Hashovanie hesla
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Vloženie používateľa
     const [insertResult] = await db.query(
       'INSERT INTO user (name, email, password, is_verified, user_photo, user_photo_public_id) VALUES (?, ?, ?, false, ?, NULL)',
       [name, email, hashedPassword, defaultAvatarUrl]
     );
 
     const userId = insertResult.insertId;
-
-    // Vytvorenie tokenu na overenie emailu
     const token = uuidv4();
     const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
     const expiresAtFormatted = expiresAt.toISOString().slice(0, 19).replace('T', ' ');
@@ -53,13 +52,11 @@ const createUser = async (req, res) => {
       [userId, token, expiresAtFormatted]
     );
 
-    // Odoslanie overovacieho emailu cez Resend
     const frontendURL = process.env.FRONTEND_URL;
     const verificationLink = `${frontendURL}/verify-email?token=${token}`;
 
     try {
       console.log('🔹 Pokúšam sa odoslať e-mail na:', email);
-
       await resend.emails.send({
         from: 'Hoodsport <no-reply@hudo22portfolio.shop>',
         to: email,
@@ -71,15 +68,12 @@ const createUser = async (req, res) => {
           <p>Ak si sa nezaregistroval, ignoruj tento email.</p>
         `,
       });
-
       console.log('✅ Overovací email úspešne odoslaný cez Resend');
     } catch (mailErr) {
       console.error('❌ Chyba pri odosielaní overovacieho emailu cez Resend:', mailErr);
     }
 
-    res.status(201).json({
-      message: 'Registration successful. Check your email to verify your account.',
-    });
+    res.status(201).json({ message: 'Registration successful. Check your email to verify your account.' });
   } catch (err) {
     console.error('Chyba pri registrácii používateľa:', err);
     res.status(500).json({ error: 'Interná chyba servera' });
